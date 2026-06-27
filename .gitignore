@@ -43,3 +43,6 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 .firebase/
+
+# cloudinary
+scripts/cloudinary-manifest.json
