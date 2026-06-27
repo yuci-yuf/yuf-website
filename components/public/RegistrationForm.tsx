@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ShieldCheck, Lock, Clock, Phone, MapPin } from "lucide-react";
+import { ShieldCheck, Lock, Clock, Phone, MapPin, CheckCircle2 } from "lucide-react";
 import type { EventItem } from "@/types";
 import { Field, Input, Select, Textarea } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { siteConfig, registerContent } from "@/lib/content";
+import { submitRegistration } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
 
 const steps = ["Personal Info", "Event Selection", "Review", "Payment"];
@@ -34,11 +35,50 @@ export function RegistrationForm({
   const fee = selectedEvent?.registrationFee;
   const feeLabel = fee != null ? `₹ ${fee.toLocaleString("en-IN")}` : "—";
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Razorpay checkout + Firestore write land in Phase 3 (payments).
-    alert(
-      "Payment integration (Razorpay) is coming soon. Your details have been validated.",
+    if (!selectedEvent) return;
+    const data = new FormData(e.currentTarget);
+    setStatus("submitting");
+    try {
+      // Razorpay checkout (Phase 3) will run before this write; for now we
+      // persist the registration with a pending payment status.
+      await submitRegistration({
+        firstName: String(data.get("firstName") ?? ""),
+        lastName: String(data.get("lastName") ?? ""),
+        email: String(data.get("email") ?? ""),
+        phone: String(data.get("phone") ?? ""),
+        location: String(data.get("location") ?? ""),
+        institution: String(data.get("institution") ?? ""),
+        eventCategory: selectedEvent.category,
+        eventId: selectedEvent.id,
+        eventTitle: selectedEvent.title,
+        ageCategory: String(data.get("ageCategory") ?? ""),
+        message: String(data.get("message") ?? ""),
+        amountPaid: fee ?? 0,
+      });
+      setStatus("success");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error("Registration failed:", err);
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
+        <CheckCircle2 size={48} className="text-success" />
+        <h2 className="font-heading text-2xl font-bold text-text">Registration received!</h2>
+        <p className="text-text-muted">
+          Thanks for registering for <strong className="text-text">{selectedEvent?.title}</strong>.
+          Your spot is reserved with a pending payment status — our team will reach
+          out with payment and confirmation details.
+        </p>
+        <Button href="/events" variant="outline">Browse more events</Button>
+      </div>
     );
   }
 
@@ -192,8 +232,19 @@ export function RegistrationForm({
           </p>
         </div>
 
-        <Button type="submit" size="lg" icon={<Lock size={18} />}>
-          Pay &amp; Complete Registration
+        {status === "error" && (
+          <p className="text-sm text-error">
+            Something went wrong saving your registration. Please try again.
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          size="lg"
+          disabled={status === "submitting"}
+          icon={<Lock size={18} />}
+        >
+          {status === "submitting" ? "Submitting…" : "Pay & Complete Registration"}
         </Button>
 
         <p className="text-center text-xs text-text-muted">

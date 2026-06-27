@@ -128,3 +128,48 @@ export interface Partner {
   logoUrl?: string;
   link?: string;
 }
+
+// ── Submissions (stored in Firestore) ──
+
+export type PaymentStatus = "paid" | "pending" | "failed";
+export type RegistrationStatus = "confirmed" | "pending" | "cancelled";
+
+export interface Registration {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  location: string;
+  institution: string;
+  eventCategory: string;
+  eventId: string;
+  eventTitle: string;
+  ageCategory: string;
+  message?: string;
+  amountPaid: number;
+  paymentId?: string;
+  paymentStatus: PaymentStatus;
+  status: RegistrationStatus;
+  /** ISO string (converted from Firestore Timestamp on read) */
+  createdAt: string | null;
+}
+
+export interface ContactMessage {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string | null;
+}
+
+export interface AdminUser {
+  uid: string;
+  email: string;
+  name?: string;
+  role?: string;
+}

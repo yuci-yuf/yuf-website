@@ -25,3 +25,35 @@ export async function submitContact(data: ContactSubmission): Promise<void> {
     createdAt: serverTimestamp(),
   });
 }
+
+export interface RegistrationSubmission {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  location: string;
+  institution: string;
+  eventCategory: string;
+  eventId: string;
+  eventTitle: string;
+  ageCategory: string;
+  message?: string;
+  amountPaid: number;
+}
+
+/**
+ * Saves a registration with `pending` payment/status. The Razorpay payment
+ * flow (Phase 3) will instead create the doc after a verified payment and set
+ * paymentStatus/status to "paid"/"confirmed".
+ */
+export async function submitRegistration(
+  data: RegistrationSubmission,
+): Promise<string> {
+  const ref = await addDoc(collection(db, "registrations"), {
+    ...data,
+    paymentStatus: "pending",
+    status: "pending",
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+}
