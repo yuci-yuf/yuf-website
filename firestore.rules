@@ -2,17 +2,41 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 7, 27);
+
+    // Single-admin model: the admin account is the only one created in Firebase
+    // Auth (email/password only — no public sign-up), so any signed-in user is
+    // the admin. Matches the check in contexts/AuthContext.tsx.
+    function isAdmin() {
+      return request.auth != null;
     }
+
+    // ── Public CMS content ──
+    // Anyone may read events, categories, and gallery (they drive the public
+    // site). Only admins may create/update/delete them via the admin panel.
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /eventCategories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Public submissions ──
+    // Visitors may create a submission; only admins may read or modify them.
+    match /contactSubmissions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /registrations/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Everything else is denied by default.
   }
 }

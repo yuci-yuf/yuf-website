@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ClipboardList, IndianRupee, Mail, CalendarCheck, Loader2 } from "lucide-react";
+import { ClipboardList, IndianRupee, CalendarCheck, Loader2 } from "lucide-react";
 import {
   PageHeader,
   StatCard,
@@ -10,21 +10,26 @@ import {
   EmptyState,
   formatDate,
 } from "@/components/admin/AdminUI";
-import { getRegistrations, getContactMessages } from "@/lib/admin-data";
-import { events } from "@/lib/content";
-import type { ContactMessage, Registration } from "@/types";
+import {
+  getRegistrations,
+  getContactMessages,
+  getAdminEvents,
+} from "@/lib/admin-data";
+import type { ContactMessage, EventItem, Registration } from "@/types";
 
 export default function DashboardPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getRegistrations(), getContactMessages()])
-      .then(([regs, msgs]) => {
+    Promise.all([getRegistrations(), getContactMessages(), getAdminEvents()])
+      .then(([regs, msgs, evs]) => {
         setRegistrations(regs);
         setContacts(msgs);
+        setEvents(evs);
       })
       .catch((e) => {
         console.error(e);

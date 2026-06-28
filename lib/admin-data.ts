@@ -7,16 +7,26 @@
  * production rules with isAdmin() must be in place).
  */
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
+  setDoc,
   updateDoc,
   type Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { ContactMessage, Registration } from "@/types";
+import type {
+  ContactMessage,
+  EventCategoryDoc,
+  EventItem,
+  GalleryImage,
+  Registration,
+} from "@/types";
 
 function toISO(value: unknown): string | null {
   if (value && typeof (value as Timestamp).toDate === "function") {
@@ -78,9 +88,140 @@ export async function setContactRead(id: string, isRead: boolean): Promise<void>
   await updateDoc(doc(db, "contactSubmissions", id), { isRead });
 }
 
+export async function deleteContactMessage(id: string): Promise<void> {
+  await deleteDoc(doc(db, "contactSubmissions", id));
+}
+
 export async function setRegistrationStatus(
   id: string,
   status: Registration["status"],
 ): Promise<void> {
   await updateDoc(doc(db, "registrations", id), { status });
+}
+
+// ── Events CMS ──
+// Events live in the `events` collection. The doc id is the event slug/id used
+// in URLs (e.g. /events/<id>), so we write with setDoc on a chosen id rather
+// than addDoc. The public site reads these (with lib/content.ts as fallback).
+
+/** Editable fields for an event (everything except the id). */
+export type EventInput = Omit<EventItem, "id">;
+
+export async function getAdminEvents(): Promise<EventItem[]> {
+  const q = query(collection(db, "events"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => normalizeEvent(d.id, d.data()));
+}
+
+export async function createEvent(
+  id: string,
+  data: EventInput,
+): Promise<void> {
+  await setDoc(doc(db, "events", id), { ...stripUndefined(data) });
+}
+
+export async function updateEvent(
+  id: string,
+  data: Partial<EventInput>,
+): Promise<void> {
+  await updateDoc(doc(db, "events", id), { ...stripUndefined(data) });
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  await deleteDoc(doc(db, "events", id));
+}
+
+function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
+  return {
+    id,
+    title: (data.title as string) ?? "",
+    category: (data.category as string) ?? "",
+    tag: (data.tag as string) ?? "",
+    description: (data.description as string) ?? "",
+    image: (data.image as string) ?? undefined,
+    registrationFee:
+      typeof data.registrationFee === "number"
+        ? (data.registrationFee as number)
+        : undefined,
+    isActive: data.isActive !== false,
+    order: typeof data.order === "number" ? (data.order as number) : 0,
+    status: (data.status as EventItem["status"]) ?? "upcoming",
+    details: Array.isArray(data.details) ? (data.details as string[]) : undefined,
+    date: (data.date as string) ?? undefined,
+    venue: (data.venue as string) ?? undefined,
+    rules: Array.isArray(data.rules) ? (data.rules as string[]) : undefined,
+  };
+}
+
+// ── Event categories ──
+
+export async function getAdminCategories(): Promise<EventCategoryDoc[]> {
+  const q = query(collection(db, "eventCategories"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      name: (data.name as string) ?? "",
+      order: typeof data.order === "number" ? (data.order as number) : 0,
+    } satisfies EventCategoryDoc;
+  });
+}
+
+export async function createCategory(name: string, order: number): Promise<void> {
+  await addDoc(collection(db, "eventCategories"), { name, order });
+}
+
+export async function updateCategory(
+  id: string,
+  data: Partial<Omit<EventCategoryDoc, "id">>,
+): Promise<void> {
+  await updateDoc(doc(db, "eventCategories", id), { ...data });
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  await deleteDoc(doc(db, "eventCategories", id));
+}
+
+// ── Gallery ──
+
+export async function getAdminGallery(): Promise<GalleryImage[]> {
+  const q = query(collection(db, "gallery"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      src: (data.src as string) ?? "",
+      alt: (data.alt as string) ?? "",
+      order: typeof data.order === "number" ? (data.order as number) : 0,
+      createdAt: toISO(data.createdAt),
+    } satisfies GalleryImage;
+  });
+}
+
+export async function addGalleryImage(
+  src: string,
+  alt: string,
+  order: number,
+): Promise<void> {
+  await addDoc(collection(db, "gallery"), {
+    src,
+    alt,
+    order,
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function deleteGalleryImage(id: string): Promise<void> {
+  await deleteDoc(doc(db, "gallery", id));
+}
+
+/** Firestore rejects `undefined` field values; drop them before writing. */
+function stripUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) out[k] = v;
+  }
+  return out as Partial<T>;
 }

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ContactsProvider } from "@/contexts/ContactsContext";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
 export default function PanelLayout({
@@ -29,9 +30,11 @@ export default function PanelLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
-      <div className="flex-1 overflow-x-hidden">{children}</div>
-    </div>
+    <ContactsProvider>
+      <div className="flex min-h-screen">
+        <AdminSidebar />
+        <div className="flex-1 overflow-x-hidden">{children}</div>
+      </div>
+    </ContactsProvider>
   );
 }

@@ -9,24 +9,25 @@ import {
   type ReactNode,
 } from "react";
 import {
-  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut as fbSignOut,
   type User,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 
 interface AuthState {
   user: User | null;
-  /** True when the signed-in user has a doc in the `admins` collection. */
+  /**
+   * Single-admin model: any signed-in Firebase Auth user is the admin. The
+   * admin account is created manually in the Firebase console, and email/
+   * password is the only sign-in method exposed, so no extra allowlist or
+   * `admins` collection is needed.
+   */
   isAdmin: boolean;
-  /** True while the initial auth + admin check is resolving. */
+  /** True while the initial auth check is resolving. */
   loading: boolean;
   signInEmail: (email: string, password: string) => Promise<void>;
-  signInGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -38,18 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (current) => {
+    const unsub = onAuthStateChanged(auth, (current) => {
       setUser(current);
-      if (current) {
-        try {
-          const snap = await getDoc(doc(db, "admins", current.uid));
-          setIsAdmin(snap.exists());
-        } catch {
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
+      // Any signed-in user is the admin (single-admin model).
+      setIsAdmin(Boolean(current));
       setLoading(false);
     });
     return unsub;
@@ -62,9 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       signInEmail: async (email, password) => {
         await signInWithEmailAndPassword(auth, email, password);
-      },
-      signInGoogle: async () => {
-        await signInWithPopup(auth, new GoogleAuthProvider());
       },
       signOut: async () => {
         await fbSignOut(auth);

@@ -9,8 +9,11 @@ import {
   Mail,
   LogOut,
   ExternalLink,
+  Tags,
+  Images,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useContacts } from "@/contexts/ContactsContext";
 import { cn } from "@/lib/utils";
 
 const nav = [
@@ -18,11 +21,14 @@ const nav = [
   { label: "Registrations", href: "/admin/registrations", icon: ClipboardList },
   { label: "Contacts", href: "/admin/contacts", icon: Mail },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
+  { label: "Categories", href: "/admin/categories", icon: Tags },
+  { label: "Gallery", href: "/admin/gallery", icon: Images },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const { unreadCount } = useContacts();
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-surface">
@@ -46,7 +52,12 @@ export function AdminSidebar() {
               )}
             >
               <Icon size={18} />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === "/admin/contacts" && unreadCount > 0 && (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}

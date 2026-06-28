@@ -1,0 +1,93 @@
+/**
+ * Public-facing content loaders.
+ *
+ * These read CMS data from Firestore (events, categories, gallery). There is
+ * intentionally NO fallback to the hardcoded defaults: the public site shows
+ * exactly what the admin has published, and empty collections render empty
+ * states. Everything here uses the Firebase client SDK and runs in Server
+ * Components.
+ */
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { EventItem } from "@/types";
+
+function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
+  return {
+    id,
+    title: (data.title as string) ?? "",
+    category: (data.category as string) ?? "",
+    tag: (data.tag as string) ?? "",
+    description: (data.description as string) ?? "",
+    image: (data.image as string) ?? undefined,
+    registrationFee:
+      typeof data.registrationFee === "number"
+        ? (data.registrationFee as number)
+        : undefined,
+    isActive: data.isActive !== false,
+    order: typeof data.order === "number" ? (data.order as number) : 0,
+    status: (data.status as EventItem["status"]) ?? "upcoming",
+    details: Array.isArray(data.details) ? (data.details as string[]) : undefined,
+    date: (data.date as string) ?? undefined,
+    venue: (data.venue as string) ?? undefined,
+    rules: Array.isArray(data.rules) ? (data.rules as string[]) : undefined,
+  };
+}
+
+/** All events from Firestore, ordered. Empty array when none exist. */
+export async function getEvents(): Promise<EventItem[]> {
+  try {
+    const q = query(collection(db, "events"), orderBy("order", "asc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => normalizeEvent(d.id, d.data()));
+  } catch (e) {
+    console.error("getEvents failed", e);
+    return [];
+  }
+}
+
+/**
+ * A single event by id, read directly (so it works for events created after a
+ * build, and always returns the latest fee/details). Undefined if missing.
+ */
+export async function getEventById(id: string): Promise<EventItem | undefined> {
+  try {
+    const snap = await getDoc(doc(db, "events", id));
+    if (!snap.exists()) return undefined;
+    return normalizeEvent(snap.id, snap.data());
+  } catch (e) {
+    console.error("getEventById failed", e);
+    return undefined;
+  }
+}
+
+/**
+ * Ordered list of category names from the admin-managed `eventCategories`
+ * collection. Empty array when none exist.
+ */
+export async function getCategoryOrder(): Promise<string[]> {
+  try {
+    const q = query(collection(db, "eventCategories"), orderBy("order", "asc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => (d.data().name as string) ?? "").filter(Boolean);
+  } catch (e) {
+    console.error("getCategoryOrder failed", e);
+    return [];
+  }
+}
+
+/** Gallery photos from Firestore, ordered. Empty array when none exist. */
+export async function getGalleryPhotos(): Promise<
+  { src: string; alt: string }[]
+> {
+  try {
+    const q = query(collection(db, "gallery"), orderBy("order", "asc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => {
+      const data = d.data();
+      return { src: (data.src as string) ?? "", alt: (data.alt as string) ?? "" };
+    });
+  } catch (e) {
+    console.error("getGalleryPhotos failed", e);
+    return [];
+  }
+}

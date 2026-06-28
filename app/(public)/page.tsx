@@ -15,13 +15,17 @@ import {
   homeContent,
   siteConfig,
   tickerItems,
-  events,
   partners,
   registrationSteps,
 } from "@/lib/content";
+import { getEvents } from "@/lib/cms-data";
 
-export default function HomePage() {
-  const previewEvents = events.slice(0, 3);
+// Read fresh events so the home preview reflects admin edits after a reload.
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const events = await getEvents();
+  const previewEvents = events.filter((e) => e.isActive).slice(0, 3);
 
   return (
     <>
@@ -114,25 +118,27 @@ export default function HomePage() {
         title="A Word From Our Principal Advisor"
       />
 
-      {/* Events preview */}
-      <Section className="bg-surface-alt">
-        <SectionHeading
-          label={homeContent.eventsPreview.label}
-          title={homeContent.eventsPreview.title}
-          subtitle={homeContent.eventsPreview.subtitle}
-          className="mb-12"
-        />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {previewEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
-        <div className="mt-12 flex justify-center">
-          <Button href="/events" size="lg" variant="primary">
-            View All Events
-          </Button>
-        </div>
-      </Section>
+      {/* Events preview — only shown once events are published */}
+      {previewEvents.length > 0 && (
+        <Section className="bg-surface-alt">
+          <SectionHeading
+            label={homeContent.eventsPreview.label}
+            title={homeContent.eventsPreview.title}
+            subtitle={homeContent.eventsPreview.subtitle}
+            className="mb-12"
+          />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {previewEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+          <div className="mt-12 flex justify-center">
+            <Button href="/events" size="lg" variant="primary">
+              View All Events
+            </Button>
+          </div>
+        </Section>
+      )}
 
       {/* Steps to register */}
       <Section>

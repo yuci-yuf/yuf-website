@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Mail, MailOpen, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  Mail,
+  MailOpen,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { PageHeader, EmptyState, formatDate } from "@/components/admin/AdminUI";
-import { getContactMessages, setContactRead } from "@/lib/admin-data";
+import {
+  getContactMessages,
+  setContactRead,
+  deleteContactMessage,
+} from "@/lib/admin-data";
+import { useContacts } from "@/contexts/ContactsContext";
 import { cn } from "@/lib/utils";
 import type { ContactMessage } from "@/types";
 
@@ -12,6 +23,7 @@ export default function ContactsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const { refresh } = useContacts();
 
   useEffect(() => {
     getContactMessages()
@@ -28,12 +40,36 @@ export default function ContactsPage() {
     setOpenId(next);
     // Opening an unread message marks it read.
     if (next && !msg.isRead) {
-      setRows((prev) => prev.map((m) => (m.id === msg.id ? { ...m, isRead: true } : m)));
-      try {
-        await setContactRead(msg.id, true);
-      } catch (e) {
-        console.error(e);
-      }
+      await updateRead(msg.id, true);
+    }
+  }
+
+  async function updateRead(id: string, isRead: boolean) {
+    setRows((prev) => prev.map((m) => (m.id === id ? { ...m, isRead } : m)));
+    try {
+      await setContactRead(id, isRead);
+      refresh(); // keep the sidebar badge in sync
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function handleDelete(msg: ContactMessage) {
+    if (
+      !confirm(
+        `Delete the message from ${msg.firstName} ${msg.lastName}? This cannot be undone.`,
+      )
+    )
+      return;
+    const prev = rows;
+    setRows((r) => r.filter((m) => m.id !== msg.id)); // optimistic
+    try {
+      await deleteContactMessage(msg.id);
+      refresh();
+    } catch (e) {
+      console.error(e);
+      setRows(prev); // restore on failure
+      alert("Failed to delete the message.");
     }
   }
 
@@ -67,33 +103,53 @@ export default function ContactsPage() {
                     m.isRead ? "border-border" : "border-primary-300",
                   )}
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleOpen(m)}
-                    className="flex w-full items-center gap-4 px-6 py-4 text-left"
-                  >
-                    <span className={cn("shrink-0", m.isRead ? "text-text-muted" : "text-primary-600")}>
-                      {m.isRead ? <MailOpen size={20} /> : <Mail size={20} />}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className={cn("truncate text-sm", m.isRead ? "font-medium text-text" : "font-semibold text-text")}>
-                        {m.firstName} {m.lastName}
-                        <span className="ml-2 font-normal capitalize text-text-muted">· {m.subject}</span>
-                      </p>
-                      <p className="truncate text-xs text-text-muted">{m.email}</p>
+                  <div className="flex items-center gap-4 px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => toggleOpen(m)}
+                      className="flex min-w-0 flex-1 items-center gap-4 text-left"
+                    >
+                      <span className={cn("shrink-0", m.isRead ? "text-text-muted" : "text-primary-600")}>
+                        {m.isRead ? <MailOpen size={20} /> : <Mail size={20} />}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className={cn("truncate text-sm", m.isRead ? "font-medium text-text" : "font-semibold text-text")}>
+                          {m.firstName} {m.lastName}
+                          <span className="ml-2 font-normal capitalize text-text-muted">· {m.subject}</span>
+                        </p>
+                        <p className="truncate text-xs text-text-muted">{m.email}</p>
+                      </div>
+                      <span className="shrink-0 text-xs text-text-muted">{formatDate(m.createdAt)}</span>
+                      <ChevronDown
+                        size={18}
+                        className={cn("shrink-0 text-text-muted transition-transform", open && "rotate-180")}
+                      />
+                    </button>
+                    <div className="flex shrink-0 items-center gap-1 border-l border-border pl-3">
+                      <button
+                        type="button"
+                        onClick={() => updateRead(m.id, !m.isRead)}
+                        title={m.isRead ? "Mark as unread" : "Mark as read"}
+                        className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-alt hover:text-primary-700"
+                      >
+                        {m.isRead ? <Mail size={16} /> : <MailOpen size={16} />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(m)}
+                        title="Delete message"
+                        className="rounded-lg p-2 text-text-muted transition-colors hover:bg-error/10 hover:text-error"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <span className="shrink-0 text-xs text-text-muted">{formatDate(m.createdAt)}</span>
-                    <ChevronDown
-                      size={18}
-                      className={cn("shrink-0 text-text-muted transition-transform", open && "rotate-180")}
-                    />
-                  </button>
+                  </div>
 
                   {open && (
                     <div className="border-t border-border px-6 py-5">
                       <div className="grid gap-2 text-sm sm:grid-cols-2">
-                        <Detail label="Email" value={m.email} />
-                        <Detail label="Phone" value={m.phone || "—"} />
+                        <Detail label="Email" value={m.email} plain />
+                        <Detail label="Phone" value={m.phone || "—"} plain />
                         <Detail label="Subject" value={m.subject} />
                         <Detail label="Received" value={formatDate(m.createdAt)} />
                       </div>
@@ -119,11 +175,20 @@ export default function ContactsPage() {
   );
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({
+  label,
+  value,
+  plain,
+}: {
+  label: string;
+  value: string;
+  /** Skip capitalization for values like emails that are case-sensitive. */
+  plain?: boolean;
+}) {
   return (
     <div>
       <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">{label}: </span>
-      <span className="capitalize text-text">{value}</span>
+      <span className={cn("text-text", !plain && "capitalize")}>{value}</span>
     </div>
   );
 }

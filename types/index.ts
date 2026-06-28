@@ -103,6 +103,11 @@ export interface SiteConfig {
 
 // ── Events ──
 
+/**
+ * The default seed categories. Categories are now admin-managed (stored in the
+ * Firestore `eventCategories` collection), so `EventItem.category` is a plain
+ * string — this union only documents the original built-in set.
+ */
 export type EventCategory =
   | "Arts & Culturals"
   | "Sports & Games"
@@ -114,7 +119,8 @@ export type EventStatus = "upcoming" | "ongoing" | "past";
 export interface EventItem {
   id: string;
   title: string;
-  category: EventCategory;
+  /** Admin-defined category name (matches an `EventCategory` doc / seed value). */
+  category: string;
   tag: string;
   description: string;
   image?: string;
@@ -131,6 +137,23 @@ export interface EventItem {
   venue?: string;
   /** Bullet rules/guidelines shown on the detail page. */
   rules?: string[];
+}
+
+/** An admin-managed event category (Firestore `eventCategories` collection). */
+export interface EventCategoryDoc {
+  id: string;
+  name: string;
+  order: number;
+}
+
+/** A gallery image managed in the admin panel (Firestore `gallery` collection). */
+export interface GalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  order: number;
+  /** ISO string (converted from Firestore Timestamp on read) */
+  createdAt: string | null;
 }
 
 // ── Partners ──

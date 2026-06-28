@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
-import { events, getEventById } from "@/lib/content";
+import { getEvents, getEventById } from "@/lib/cms-data";
 
-export function generateStaticParams() {
-  return events.map((event) => ({ id: event.id }));
-}
+// Read fresh CMS data on every request so admin edits (including fee changes)
+// show after a reload, and events created post-build resolve without a rebuild.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const event = getEventById(id);
+  const event = await getEventById(id);
   if (!event) return { title: "Event Not Found" };
   return {
     title: event.title,
@@ -33,11 +33,12 @@ export default async function EventDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const event = getEventById(id);
+  const allEvents = await getEvents();
+  const event = allEvents.find((e) => e.id === id);
   if (!event) notFound();
 
   const body = event.details ?? [event.description];
-  const related = events
+  const related = allEvents
     .filter((e) => e.category === event.category && e.id !== event.id)
     .slice(0, 3);
 

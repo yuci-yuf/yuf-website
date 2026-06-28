@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogIn, ShieldAlert } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
@@ -11,7 +11,7 @@ import { siteConfig } from "@/lib/content";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { user, isAdmin, loading, signInEmail, signInGoogle, signOut } = useAuth();
+  const { user, isAdmin, loading, signInEmail } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -39,43 +39,6 @@ export default function AdminLoginPage() {
     }
   }
 
-  async function handleGoogle() {
-    setError(null);
-    setBusy(true);
-    try {
-      await signInGoogle();
-    } catch {
-      setError("Google sign-in failed or was cancelled.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // Signed in but not an admin → access denied (invite-only model).
-  if (!loading && user && !isAdmin) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <div className="flex w-full max-w-md flex-col items-center gap-5 rounded-2xl border border-border bg-surface p-8 text-center shadow-card">
-          <ShieldAlert size={48} className="text-error" />
-          <h1 className="font-heading text-2xl font-bold text-text">Access Denied</h1>
-          <p className="text-text-muted">
-            <span className="font-medium text-text">{user.email}</span> is not an
-            authorized admin. Admin access is invite-only.
-          </p>
-          <p className="w-full break-all rounded-lg bg-surface-alt p-3 text-xs text-text-muted">
-            To grant access, add a document with this UID to the{" "}
-            <span className="font-mono font-semibold">admins</span> collection:
-            <br />
-            <span className="font-mono font-semibold text-text">{user.uid}</span>
-          </p>
-          <Button variant="outline" onClick={() => signOut()}>
-            Sign out
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-border bg-surface p-8 shadow-card">
@@ -99,16 +62,6 @@ export default function AdminLoginPage() {
             {busy ? "Signing in…" : "Sign In"}
           </Button>
         </form>
-
-        <div className="flex items-center gap-3 text-xs text-text-muted">
-          <span className="h-px flex-1 bg-border" />
-          OR
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <Button variant="outline" size="lg" disabled={busy} onClick={handleGoogle}>
-          Continue with Google
-        </Button>
       </div>
     </div>
   );
