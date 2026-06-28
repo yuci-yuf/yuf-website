@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Hero } from "@/components/public/Hero";
 import { MarqueeTicker } from "@/components/public/MarqueeTicker";
 import { SplitSection } from "@/components/public/SplitSection";
@@ -35,6 +36,7 @@ export default function HomePage() {
         body={homeContent.about.body}
         features={homeContent.about.features}
         buttons={[homeContent.about.button]}
+        image={homeContent.about.image}
         imageSide="right"
       />
 
@@ -46,6 +48,7 @@ export default function HomePage() {
         title={homeContent.joinUs.title}
         body={homeContent.joinUs.body}
         buttons={homeContent.joinUs.buttons}
+        image={homeContent.joinUs.image}
         imageSide="left"
         className="bg-surface-alt"
       />
@@ -74,13 +77,21 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[0, 1, 2].map((i) => (
+            {homeContent.recognition.images.map((src, i) => (
               <div
-                key={i}
-                className={`aspect-[3/4] rounded-2xl bg-gradient-to-br from-primary-700 to-primary-900 ring-1 ring-white/10 ${
-                  i === 2 ? "col-span-2 aspect-[16/9]" : ""
+                key={src}
+                className={`relative overflow-hidden rounded-2xl ring-1 ring-white/10 ${
+                  i === 0 ? "col-span-2 aspect-[16/9]" : "aspect-[4/3]"
                 }`}
-              />
+              >
+                <Image
+                  src={src}
+                  alt={`YUCI award presentation ${i + 1}`}
+                  fill
+                  sizes="(min-width: 1024px) 30rem, 100vw"
+                  className="object-cover"
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -133,7 +144,7 @@ export default function HomePage() {
         />
         <StepsToRegister steps={registrationSteps} />
         <div className="mt-12 flex justify-center">
-          <Button href="/register" size="lg" variant="secondary" icon={<span aria-hidden>✏️</span>}>
+          <Button href="/register" size="lg" variant="secondary">
             Register Now
           </Button>
         </div>

@@ -68,15 +68,16 @@ export const siteConfig: SiteConfig = {
     title: "Ex. Mission Director, ISRO India",
     quote:
       "My aim towards the youth community is to contribute my part in moulding the future pillars of our country i.e our youth in all aspects of life. Let us not forget the fact that more empowered our youth are more empowered our country is.",
+    image: "/images/advisor/advisor.jpg",
     badge: "Principal Advisor YUCI",
   },
   registrationPerks: [
-    "🏅 Participation Certificate",
-    "🥇 Merit Awards & Trophies",
-    "👕 YUF 2026 Merchandise",
-    "🍽️ Refreshments & Meals",
-    "📷 Professional Photography",
-    "👥 Networking Opportunities",
+    "Participation Certificate",
+    "Merit Awards & Trophies",
+    "YUF 2026 Merchandise",
+    "Refreshments & Meals",
+    "Professional Photography",
+    "Networking Opportunities",
   ],
   ageCategories: [
     { label: "11 – 13 yrs", value: "11-13" },
@@ -98,7 +99,22 @@ export const tickerItems = [
 ];
 
 // ── Events ──
-export const events: EventItem[] = [
+// Event graphics live in /public/images/events; we cycle the available set
+// across the catalogue so every card has artwork until per-event images are
+// managed via the CMS.
+const eventImagePool = [
+  "/images/events/event-1.png",
+  "/images/events/event-2.png",
+  "/images/events/event-3.png",
+  "/images/events/event-4.png",
+  "/images/events/event-5.png",
+  "/images/events/event-6.png",
+  "/images/events/event-7.png",
+  "/images/events/event-8.png",
+  "/images/events/event-9.png",
+];
+
+const eventBase: EventItem[] = [
   // Arts & Culturals
   { id: "acapella", title: "Acapella Competition", category: "Arts & Culturals", tag: "Music", description: "Showcase your vocal harmony and group singing abilities in this exhilarating acapella competition.", isActive: true, order: 1 },
   { id: "performing-arts", title: "Performing Arts", category: "Arts & Culturals", tag: "Performance", description: "A stage for young dancers, actors, and musicians to express themselves and captivate audiences.", isActive: true, order: 2 },
@@ -131,6 +147,11 @@ export const events: EventItem[] = [
   { id: "collaborate-learn", title: "Collaborate & Learn", category: "Fun Events", tag: "Social", description: "Interactive group activities designed to foster friendships, creativity, and collaborative problem-solving.", isActive: true, order: 23 },
 ];
 
+export const events: EventItem[] = eventBase.map((e, i) => ({
+  ...e,
+  image: eventImagePool[i % eventImagePool.length],
+}));
+
 export const eventCategoryOrder: EventItem["category"][] = [
   "Arts & Culturals",
   "Sports & Games",
@@ -138,10 +159,20 @@ export const eventCategoryOrder: EventItem["category"][] = [
   "Fun Events",
 ];
 
-// ── Partners (logos to be supplied via CMS/Cloudinary later) ──
-export const partners: Partner[] = Array.from({ length: 9 }, (_, i) => ({
-  name: `Partner ${i + 1}`,
-}));
+// ── Partners & supporting institutions ──
+export const partners: Partner[] = [
+  { name: "De Montfort University, Leicester", logoUrl: "/images/partners/de-montfort.jpg" },
+  { name: "StudyIn", logoUrl: "/images/partners/study-in.jpg" },
+  { name: "Visa", logoUrl: "/images/partners/visa.jpg" },
+  { name: "Partner College 1", logoUrl: "/images/partners/college-1.png" },
+  { name: "Partner College 2", logoUrl: "/images/partners/college-2.png" },
+  { name: "Partner College 3", logoUrl: "/images/partners/college-3.png" },
+  { name: "Partner College 4", logoUrl: "/images/partners/college-4.png" },
+  { name: "Partner College 5", logoUrl: "/images/partners/college-5.png" },
+  { name: "Partner College 6", logoUrl: "/images/partners/college-6.png" },
+  { name: "Partner College 7", logoUrl: "/images/partners/college-7.png" },
+  { name: "Partner College 8", logoUrl: "/images/partners/college-8.png" },
+];
 
 // ── Shared registration steps ──
 export const registrationSteps: RegistrationStep[] = [
@@ -155,40 +186,43 @@ export const registrationSteps: RegistrationStep[] = [
 
 export const homeContent = {
   hero: {
-    badge: "⭐ YUF 2026 — Now Open",
+    badge: "YUF 2026 — Now Open",
     title: "Youth United Festival",
     highlight: "2026",
     subtitle:
       "Celebrating Youth Talent, Innovation, and Unity. Join thousands of young leaders, artists, athletes, and innovators from across India.",
     buttons: [
-      { label: "Join Now", href: "/events", icon: "🚀", variant: "primary" },
-      { label: "Learn More", href: "/about", icon: "ℹ️", variant: "outline" },
+      { label: "Join Now", href: "/events", variant: "primary" },
+      { label: "Learn More", href: "/about", variant: "outline" },
     ],
+    backgroundImage: "/images/hero/home.jpg",
   } satisfies Hero,
   about: {
     label: "About YUCI",
     title: "Who We Are",
     subhead: "United Youth Will Unite Nation",
+    image: "/images/sections/who-we-are.jpg",
     body: [
       "We are Youth United Council of India, a nonprofit organization dedicated to empowering youth worldwide. With a focus on inclusivity and collaboration, we create opportunities for young individuals to showcase their talents and drive change through transformative initiatives like the Youth United Festival (YUF).",
       "Through our efforts, we aim to inspire, innovate, and unite youth as changemakers, building a brighter and more inclusive future for all. Together, we amplify the voices of youth to shape the world.",
     ],
     features: [
-      { icon: "👥", title: "Inclusive Community", description: "Open to every young person regardless of background, region, or discipline." },
-      { icon: "💡", title: "Innovation-Driven", description: "Fostering creativity and problem-solving across arts, science, and technology." },
-      { icon: "🤝", title: "National Impact", description: "Recognized and supported by state governors and national institutions." },
+      { title: "Inclusive Community", description: "Open to every young person regardless of background, region, or discipline." },
+      { title: "Innovation-Driven", description: "Fostering creativity and problem-solving across arts, science, and technology." },
+      { title: "National Impact", description: "Recognized and supported by state governors and national institutions." },
     ] satisfies FeatureCard[],
     button: { label: "Learn More", href: "/about", variant: "primary" } satisfies CTAButton,
   },
   joinUs: {
     label: "Get Involved",
     title: "Join Us at YUF!",
+    image: "/images/sections/join-us.jpg",
     body: [
       "Showcase your skills, connect with peers, and drive change at the Youth United Festival (YUF). Whether you're a performer, innovator, athlete, or changemaker, there's a platform waiting for you to shine.",
       "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity.",
     ],
     buttons: [
-      { label: "Register now!", href: "/register", icon: "✏️", variant: "primary" },
+      { label: "Register now!", href: "/register", variant: "primary" },
       { label: "View Events", href: "/events", variant: "outline" },
     ] satisfies CTAButton[],
   },
@@ -201,6 +235,12 @@ export const homeContent = {
       "Sri Jishnu Dev Varma, Governor of Telangana, at Raj Bhavan, Hyderabad.",
       "Shri K. Kailashnathan, Lieutenant Governor of Puducherry, at Raj Bhavan, Puducherry.",
     ],
+    images: [
+      "/images/recognition/award-1.jpg",
+      "/images/recognition/award-2.jpg",
+      "/images/recognition/award-3.jpg",
+      "/images/recognition/award-4.jpg",
+    ],
   },
   govInitiatives: {
     label: "Aligned With",
@@ -208,9 +248,9 @@ export const homeContent = {
     subtitle:
       "YUF proudly supports and aligns with key national programs promoting youth development.",
     cards: [
-      { icon: "🇮🇳", title: "Proudly Made in India", description: "Support Local, Buy Indian products." },
-      { icon: "🏃", title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation." },
-      { icon: "🎓", title: "Skill India", description: "Empowering Youth, Building the Nation." },
+      { title: "Proudly Made in India", description: "Support Local, Buy Indian products.", image: "/images/gov/make-in-india.avif" },
+      { title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation.", image: "/images/gov/fit-india.jpg" },
+      { title: "Skill India", description: "Empowering Youth, Building the Nation.", image: "/images/gov/skill-india.png" },
     ] satisfies FeatureCard[],
   },
   eventsPreview: {
@@ -231,9 +271,9 @@ export const homeContent = {
     subtitle:
       "Joining Youth United Festival (YUF) means becoming part of a global movement that celebrates creativity, innovation, and unity.",
     cards: [
-      { icon: "🏆", title: "Partner with Us", description: "Perform, innovate, and lead in diverse categories. Gain recognition at state and national levels." },
-      { icon: "🎓", title: "Collaborate & Learn", description: "Gain valuable insights from workshops, expert talks, and networking with driven peers." },
-      { icon: "❤️", title: "Make an Impact", description: "Contribute to community service initiatives and create meaningful, lasting change in society." },
+      { title: "Partner with Us", description: "Perform, innovate, and lead in diverse categories. Gain recognition at state and national levels." },
+      { title: "Collaborate & Learn", description: "Gain valuable insights from workshops, expert talks, and networking with driven peers." },
+      { title: "Make an Impact", description: "Contribute to community service initiatives and create meaningful, lasting change in society." },
     ] satisfies FeatureCard[],
   },
   partners: {
@@ -245,7 +285,7 @@ export const homeContent = {
     title: "Get Involved Today",
     body: "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
     buttons: [
-      { label: "Let's Go!", href: "/register", icon: "🚀", variant: "primary" },
+      { label: "Let's Go!", href: "/register", variant: "primary" },
       { label: "Contact Us", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
@@ -253,11 +293,11 @@ export const homeContent = {
 
 export const aboutContent = {
   hero: {
-    badge: "ℹ️ About Us",
+    badge: "About Us",
     title: "Youth United Festival",
     subtitle: "Empowering the Next Generation of Leaders",
     buttons: [
-      { label: "Register Now", href: "/register", icon: "✏️", variant: "primary" },
+      { label: "Register Now", href: "/register", variant: "primary" },
       { label: "View Events", href: "/events", variant: "outline" },
     ],
   } satisfies Hero,
@@ -279,8 +319,8 @@ export const aboutContent = {
       "We aim to encourage youth participation, ignite creativity, and promote dialogue across diverse fields — from performing arts to technology and innovation. YUF fosters a sense of community, unity, and growth that reaches beyond the festival itself, encouraging long-lasting impact and collaboration.",
     ],
     cards: [
-      { icon: "🎯", title: "Our Vision", description: "A world where every young person has the platform to lead, innovate, and inspire." },
-      { icon: "❤️", title: "Our Values", description: "Inclusivity, creativity, collaboration, integrity, and youth empowerment." },
+      { title: "Our Vision", description: "A world where every young person has the platform to lead, innovate, and inspire." },
+      { title: "Our Values", description: "Inclusivity, creativity, collaboration, integrity, and youth empowerment." },
     ] satisfies FeatureCard[],
   },
   activities: {
@@ -289,10 +329,10 @@ export const aboutContent = {
     subtitle:
       "At YUF, we curate a variety of events designed to engage and inspire the youth. Some of our most anticipated activities include:",
     cards: [
-      { icon: "🎭", title: "Cultural Performances", description: "A platform for young artists to display their skills in music, dance, and drama. From classical to contemporary, every form of expression is celebrated." },
-      { icon: "💡", title: "Technology & Innovation Exhibitions", description: "Showcasing groundbreaking innovations from young minds in the fields of tech and science. A space for tomorrow's inventors and thinkers." },
-      { icon: "🏆", title: "Sports Challenges", description: "A chance for youth to compete, collaborate, and build team spirit through various sports events ranging from athletics to martial arts." },
-      { icon: "🎓", title: "Workshops & Leadership Talks", description: "Offering expert guidance on career development, leadership, and personal growth. Connect with mentors and industry leaders who inspire." },
+      { title: "Cultural Performances", description: "A platform for young artists to display their skills in music, dance, and drama. From classical to contemporary, every form of expression is celebrated." },
+      { title: "Technology & Innovation Exhibitions", description: "Showcasing groundbreaking innovations from young minds in the fields of tech and science. A space for tomorrow's inventors and thinkers." },
+      { title: "Sports Challenges", description: "A chance for youth to compete, collaborate, and build team spirit through various sports events ranging from athletics to martial arts." },
+      { title: "Workshops & Leadership Talks", description: "Offering expert guidance on career development, leadership, and personal growth. Connect with mentors and industry leaders who inspire." },
     ] satisfies FeatureCard[],
   },
   whyJoinUs: {
@@ -301,9 +341,9 @@ export const aboutContent = {
     subtitle:
       "By participating in YUF, you are joining a global community of passionate, creative, and driven individuals. YUF is not just an event; it's a movement.",
     cards: [
-      { icon: "⭐", title: "Showcase Your Talents", description: "Whether you're an artist, innovator, athlete, or leader, YUF gives you the platform to shine in front of thousands." },
-      { icon: "📖", title: "Learn & Grow", description: "Gain valuable insights through workshops, talks, and networking opportunities with experts, peers, and national icons." },
-      { icon: "🌐", title: "Make a Difference", description: "Contribute to meaningful change by participating in community service and social impact initiatives." },
+      { title: "Showcase Your Talents", description: "Whether you're an artist, innovator, athlete, or leader, YUF gives you the platform to shine in front of thousands." },
+      { title: "Learn & Grow", description: "Gain valuable insights through workshops, talks, and networking opportunities with experts, peers, and national icons." },
+      { title: "Make a Difference", description: "Contribute to meaningful change by participating in community service and social impact initiatives." },
     ] satisfies FeatureCard[],
   },
   impact: {
@@ -325,7 +365,7 @@ export const aboutContent = {
     title: "Be Part of the Movement",
     body: "Join thousands of young leaders, artists, athletes, and innovators at Youth United Festival 2026. Your talent deserves a stage.",
     buttons: [
-      { label: "Register Now", href: "/register", icon: "✏️", variant: "primary" },
+      { label: "Register Now", href: "/register", variant: "primary" },
       { label: "Explore Events", href: "/events", variant: "outline" },
     ],
   } satisfies CTABanner,
@@ -333,14 +373,14 @@ export const aboutContent = {
 
 export const eventsContent = {
   hero: {
-    badge: "📅 YUF 2026 Events",
+    badge: "YUF 2026 Events",
     title: "Youth United Festival",
     highlight: "2026",
     subtitle:
       "Celebrating Youth Talent, Innovation, and Unity — explore our full lineup of events designed to engage, inspire, and transform.",
     buttons: [
-      { label: "Register Now", href: "/register", icon: "✏️", variant: "primary" },
-      { label: "Browse Events", href: "#events-list", icon: "📋", variant: "outline" },
+      { label: "Register Now", href: "/register", variant: "primary" },
+      { label: "Browse Events", href: "#events-list", variant: "outline" },
     ],
   } satisfies Hero,
   intro: {
@@ -354,7 +394,7 @@ export const eventsContent = {
     title: "Transforming Lives Through Youth Power",
     body: "Discover how YUF initiatives are transforming lives and empowering individuals to achieve their full potential. Join the movement today.",
     buttons: [
-      { label: "Register for YUF 2026", href: "/register", icon: "🚀", variant: "primary" },
+      { label: "Register for YUF 2026", href: "/register", variant: "primary" },
       { label: "Get in Touch", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
@@ -362,7 +402,7 @@ export const eventsContent = {
 
 export const registerContent = {
   hero: {
-    badge: "✏️ Registration Open",
+    badge: "Registration Open",
     title: "Register for",
     highlight: "YUF 2026",
     subtitle:
@@ -377,12 +417,12 @@ export const registerContent = {
 
 export const contactContent = {
   hero: {
-    badge: "✉️ Get In Touch",
+    badge: "Get In Touch",
     title: "Contact Us",
     subtitle:
       "We'd love to hear from you! Whether you have questions, need more details about YUF, or want to get involved — feel free to reach out.",
     buttons: [
-      { label: "Send a Message", href: "#contact-form", icon: "📨", variant: "primary" },
+      { label: "Send a Message", href: "#contact-form", variant: "primary" },
       { label: "Register Now", href: "/register", variant: "outline" },
     ],
   } satisfies Hero,
@@ -400,9 +440,9 @@ export const contactContent = {
     title: "We're Here for You",
     subtitle: "Reach out for any of the following and we'll respond within 24 hours.",
     cards: [
-      { icon: "❓", title: "General Questions", description: "Ask anything about YUF 2026 — schedule, venues, eligibility, categories, or participation rules." },
-      { icon: "🤝", title: "Partnerships", description: "Interested in sponsoring or partnering with YUF? We'd love to explore opportunities together." },
-      { icon: "👥", title: "Volunteering", description: "Want to be part of the organizing team? Get in touch to learn about volunteer opportunities at YUF 2026." },
+      { title: "General Questions", description: "Ask anything about YUF 2026 — schedule, venues, eligibility, categories, or participation rules." },
+      { title: "Partnerships", description: "Interested in sponsoring or partnering with YUF? We'd love to explore opportunities together." },
+      { title: "Volunteering", description: "Want to be part of the organizing team? Get in touch to learn about volunteer opportunities at YUF 2026." },
     ] satisfies FeatureCard[],
   },
   ctaBanner: {
@@ -410,7 +450,7 @@ export const contactContent = {
     title: "Get Involved Today",
     body: "Don't wait — register now for Youth United Festival 2026 and be part of India's biggest youth celebration.",
     buttons: [
-      { label: "Register Now", href: "/register", icon: "✏️", variant: "primary" },
+      { label: "Register Now", href: "/register", variant: "primary" },
       { label: "Browse Events", href: "/events", variant: "outline" },
     ],
   } satisfies CTABanner,

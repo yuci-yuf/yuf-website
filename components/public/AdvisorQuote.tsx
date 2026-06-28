@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Quote } from "lucide-react";
 import type { Advisor } from "@/types";
 import { Container } from "@/components/ui/Container";
@@ -21,8 +22,17 @@ export function AdvisorQuote({
           <blockquote className="text-center text-lg font-medium leading-relaxed text-text sm:text-xl">
             &ldquo;{advisor.quote}&rdquo;
           </blockquote>
-          <figcaption className="flex flex-col items-center gap-1 text-center">
-            <span className="font-heading text-lg font-bold text-primary-800">
+          <figcaption className="flex flex-col items-center gap-2 text-center">
+            {advisor.image && (
+              <Image
+                src={advisor.image}
+                alt={advisor.name}
+                width={88}
+                height={88}
+                className="h-22 w-22 rounded-full object-cover ring-4 ring-primary-50"
+              />
+            )}
+            <span className="mt-1 font-heading text-lg font-bold text-primary-800">
               {advisor.name}
             </span>
             <span className="text-sm text-text-muted">{advisor.title}</span>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Hero as HeroData } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -6,9 +7,24 @@ import { Container } from "@/components/ui/Container";
 export function Hero({ data }: { data: HeroData }) {
   return (
     <section className="relative overflow-hidden bg-primary-950">
+      {/* Background photo */}
+      {data.backgroundImage && (
+        <Image
+          src={data.backgroundImage}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-40"
+        />
+      )}
+      {/* Readability scrim */}
+      {data.backgroundImage && (
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/80 to-primary-900/60" aria-hidden />
+      )}
       {/* Decorative gradient field */}
       <div
-        className="absolute inset-0 opacity-90"
+        className="absolute inset-0 opacity-90 mix-blend-screen"
         style={{
           backgroundImage:
             "radial-gradient(60rem 40rem at 15% 10%, rgba(37,99,235,0.55), transparent), radial-gradient(40rem 30rem at 95% 90%, rgba(245,158,11,0.35), transparent)",

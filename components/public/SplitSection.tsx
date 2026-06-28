@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { Check } from "lucide-react";
 import type { CTAButton, FeatureCard } from "@/types";
@@ -14,7 +15,9 @@ interface SplitSectionProps {
   buttons?: CTAButton[];
   /** Image side: "left" or "right" (default right) */
   imageSide?: "left" | "right";
-  /** Visual panel content; defaults to a branded gradient panel */
+  /** Photo for the visual panel; falls back to a branded gradient */
+  image?: string;
+  /** Custom visual panel content; overrides image + gradient fallback */
   visual?: ReactNode;
   className?: string;
 }
@@ -27,6 +30,7 @@ export function SplitSection({
   features,
   buttons,
   imageSide = "right",
+  image,
   visual,
   className,
 }: SplitSectionProps) {
@@ -94,11 +98,25 @@ export function SplitSection({
           </div>
 
           <div className={cn(imageSide === "left" && "lg:order-1")}>
-            {visual ?? <DefaultVisual />}
+            {visual ?? (image ? <ImageVisual src={image} alt={title} /> : <DefaultVisual />)}
           </div>
         </div>
       </Container>
     </section>
+  );
+}
+
+function ImageVisual({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-hover ring-1 ring-border">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(min-width: 1024px) 40rem, 100vw"
+        className="object-cover"
+      />
+    </div>
   );
 }
 

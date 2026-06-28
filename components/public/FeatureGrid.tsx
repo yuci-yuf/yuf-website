@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { FeatureCard } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -22,10 +23,22 @@ export function FeatureGrid({
           key={card.title}
           className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-hover"
         >
-          {card.icon && (
-            <span className="flex h-13 w-13 items-center justify-center rounded-xl bg-primary-50 text-2xl">
-              {card.icon}
+          {card.image ? (
+            <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-surface-alt p-2 ring-1 ring-border">
+              <Image
+                src={card.image}
+                alt={card.title}
+                width={56}
+                height={56}
+                className="h-full w-full object-contain"
+              />
             </span>
+          ) : (
+            card.icon && (
+              <span className="flex h-13 w-13 items-center justify-center rounded-xl bg-primary-50 text-2xl">
+                {card.icon}
+              </span>
+            )
           )}
           <h3 className="font-heading text-lg font-bold text-text">{card.title}</h3>
           <p className="text-sm leading-relaxed text-text-muted">

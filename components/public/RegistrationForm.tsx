@@ -109,7 +109,7 @@ export function RegistrationForm({
         {/* Personal details */}
         <fieldset className="flex flex-col gap-5">
           <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
-            <span aria-hidden>👤</span> Personal Details
+            Personal Details
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="First Name" htmlFor="firstName" required>
@@ -130,7 +130,7 @@ export function RegistrationForm({
         {/* Institution */}
         <fieldset className="flex flex-col gap-5">
           <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
-            <span aria-hidden>🏫</span> Institution Details
+            Institution Details
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Location" htmlFor="location" required>
@@ -150,7 +150,7 @@ export function RegistrationForm({
         {/* Event selection */}
         <fieldset className="flex flex-col gap-5">
           <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
-            <span aria-hidden>📅</span> Event Selection
+            Event Selection
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Event Category" htmlFor="category" required>
@@ -220,7 +220,7 @@ export function RegistrationForm({
         <div className="flex flex-col gap-4 rounded-xl bg-surface-alt p-5">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-2 font-medium text-text">
-              <span aria-hidden>💰</span> Amount to Pay
+              Amount to Pay
             </span>
             <span className="font-heading text-xl font-bold text-primary-700">
               {feeLabel}

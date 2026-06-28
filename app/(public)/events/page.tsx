@@ -49,7 +49,7 @@ export default function EventsPage() {
         />
         <StepsToRegister steps={registrationSteps} />
         <div className="mt-12 flex justify-center">
-          <Button href="/register" size="lg" variant="secondary" icon={<span aria-hidden>✏️</span>}>
+          <Button href="/register" size="lg" variant="secondary">
             Register Now
           </Button>
         </div>
