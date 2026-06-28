@@ -16,7 +16,7 @@ export interface NavLink {
 }
 
 export interface SocialLink {
-  platform: "facebook" | "twitter" | "instagram" | "youtube";
+  platform: "facebook" | "twitter" | "instagram" | "youtube" | "linkedin";
   url: string;
 }
 
@@ -109,6 +109,8 @@ export type EventCategory =
   | "Innovation"
   | "Fun Events";
 
+export type EventStatus = "upcoming" | "ongoing" | "past";
+
 export interface EventItem {
   id: string;
   title: string;
@@ -119,6 +121,16 @@ export interface EventItem {
   registrationFee?: number;
   isActive: boolean;
   order: number;
+  /** Scheduling state used to group events on the Events page. Defaults to "upcoming". */
+  status?: EventStatus;
+  /** Longer write-up shown on the event detail page (falls back to `description`). */
+  details?: string[];
+  /** Human-readable schedule label, e.g. "15 Feb 2026". */
+  date?: string;
+  /** Venue / city for this event. */
+  venue?: string;
+  /** Bullet rules/guidelines shown on the detail page. */
+  rules?: string[];
 }
 
 // ── Partners ──

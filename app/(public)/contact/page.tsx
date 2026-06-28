@@ -56,6 +56,8 @@ export default function ContactPage() {
                     <a
                       key={s.platform}
                       href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={s.platform}
                       className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-primary-700 transition-colors hover:bg-primary-600 hover:text-white"
                     >

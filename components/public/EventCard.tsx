@@ -26,15 +26,19 @@ export function EventCard({ event }: { event: EventItem }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <h3 className="font-heading text-lg font-bold text-text">{event.title}</h3>
+        <h3 className="font-heading text-lg font-bold text-text">
+          <Link href={`/events/${event.id}`} className="hover:text-primary-700">
+            {event.title}
+          </Link>
+        </h3>
         <p className="flex-1 text-sm leading-relaxed text-text-muted">
           {event.description}
         </p>
         <Link
-          href={`/register?event=${event.id}`}
+          href={`/events/${event.id}`}
           className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-600"
         >
-          Register
+          View Details
           <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
         </Link>
       </div>

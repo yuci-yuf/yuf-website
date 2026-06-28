@@ -32,6 +32,8 @@ export function Footer() {
                 <a
                   key={s.platform}
                   href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.platform}
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-accent-500"
                 >
@@ -75,9 +77,10 @@ export function Footer() {
       <div className="border-t border-white/10">
         <Container className="flex flex-col items-center justify-between gap-3 py-6 text-sm text-primary-300 sm:flex-row">
           <p>{siteConfig.copyrightText}</p>
-          <div className="flex gap-6">
-            <Link href="#" className="hover:text-white">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white">Terms of Use</Link>
+          <div className="flex flex-wrap gap-6">
+            <Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-white">Terms &amp; Conditions</Link>
+            <Link href="/refund-policy" className="hover:text-white">Refund Policy</Link>
             <Link href="/contact" className="hover:text-white">Contact</Link>
           </div>
         </Container>

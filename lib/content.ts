@@ -10,6 +10,7 @@ import type {
   CTABanner,
   CTAButton,
   EventItem,
+  EventStatus,
   FeatureCard,
   Hero,
   Partner,
@@ -26,32 +27,32 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
+    { label: "Gallery", path: "/gallery" },
     { label: "Contact", path: "/contact" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
     "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
   socialLinks: [
-    { platform: "facebook", url: "#" },
-    { platform: "twitter", url: "#" },
-    { platform: "instagram", url: "#" },
-    { platform: "youtube", url: "#" },
+    { platform: "instagram", url: "https://www.instagram.com/youthunitedfestival" },
+    { platform: "linkedin", url: "https://www.linkedin.com/company/youth-united-festival/" },
+    { platform: "twitter", url: "https://x.com/YUCIfestival" },
   ],
   quickLinks: [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
+    { label: "Gallery", path: "/gallery" },
     { label: "Contact Us", path: "/contact" },
-    { label: "FAQs", path: "#" },
   ],
   usefulLinks: [
     { label: "Register Now", path: "/register" },
-    { label: "Privacy Policy", path: "#" },
-    { label: "Terms & Conditions", path: "#" },
-    { label: "FAQs", path: "#" },
+    { label: "Privacy Policy", path: "/privacy-policy" },
+    { label: "Terms & Conditions", path: "/terms-and-conditions" },
+    { label: "Refund Policy", path: "/refund-policy" },
   ],
   contact: {
-    phone: "+91 12334 12345",
+    phone: "+91 93855 38114",
     email: "info@youthunitedcouncilofindia.org",
     address:
       "NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India",
@@ -150,6 +151,11 @@ const eventBase: EventItem[] = [
 export const events: EventItem[] = eventBase.map((e, i) => ({
   ...e,
   image: eventImagePool[i % eventImagePool.length],
+  // All catalogue events are part of the upcoming YUF 2026 edition until the
+  // CMS sets per-event scheduling. Detail/venue come from the festival defaults.
+  status: e.status ?? "upcoming",
+  date: e.date ?? "Youth United Festival 2026",
+  venue: e.venue ?? "Chennai · Coimbatore · Pondicherry",
 }));
 
 export const eventCategoryOrder: EventItem["category"][] = [
@@ -159,19 +165,25 @@ export const eventCategoryOrder: EventItem["category"][] = [
   "Fun Events",
 ];
 
+/** Look up a single event by its id (used by the event detail route). */
+export function getEventById(id: string): EventItem | undefined {
+  return events.find((e) => e.id === id);
+}
+
+export const eventStatusOrder: { status: EventStatus; label: string }[] = [
+  { status: "ongoing", label: "Ongoing Events" },
+  { status: "upcoming", label: "Upcoming Events" },
+  { status: "past", label: "Past Events" },
+];
+
 // ── Partners & supporting institutions ──
 export const partners: Partner[] = [
-  { name: "De Montfort University, Leicester", logoUrl: "/images/partners/de-montfort.jpg" },
-  { name: "StudyIn", logoUrl: "/images/partners/study-in.jpg" },
-  { name: "Visa", logoUrl: "/images/partners/visa.jpg" },
-  { name: "Partner College 1", logoUrl: "/images/partners/college-1.png" },
-  { name: "Partner College 2", logoUrl: "/images/partners/college-2.png" },
-  { name: "Partner College 3", logoUrl: "/images/partners/college-3.png" },
-  { name: "Partner College 4", logoUrl: "/images/partners/college-4.png" },
-  { name: "Partner College 5", logoUrl: "/images/partners/college-5.png" },
-  { name: "Partner College 6", logoUrl: "/images/partners/college-6.png" },
-  { name: "Partner College 7", logoUrl: "/images/partners/college-7.png" },
-  { name: "Partner College 8", logoUrl: "/images/partners/college-8.png" },
+  { name: "De Montfort University, Leicester", logoUrl: "/images/partners/de_montfort.png" },
+  { name: "Falmouth University", logoUrl: "/images/partners/falmouth_university.png" },
+  { name: "StudyIn", logoUrl: "/images/partners/studyin.png" },
+  { name: "University of Salford", logoUrl: "/images/partners/university-of-salford.png" },
+  { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
+  { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
 ];
 
 // ── Shared registration steps ──
@@ -458,6 +470,267 @@ export const contactContent = {
       { label: "Browse Events", href: "/events", variant: "outline" },
     ],
   } satisfies CTABanner,
+};
+
+// ── Gallery ──
+// Photos are seeded from the existing event/recognition imagery already in
+// /public/images. The CMS can later replace these with a managed media set.
+
+export interface GalleryPhoto {
+  src: string;
+  alt: string;
+}
+export interface GalleryVideo {
+  /** YouTube embed URL, e.g. https://www.youtube.com/embed/<id> */
+  embedUrl: string;
+  title: string;
+}
+
+export const galleryContent = {
+  hero: {
+    badge: "Gallery",
+    title: "Moments From YUF",
+    subtitle:
+      "A glimpse into the energy, talent, and unity of the Youth United Festival — through photos, videos, and event highlights.",
+    backgroundImage: "/images/hero/events.jpg",
+  } satisfies Hero,
+  photos: [
+    { src: "/images/recognition/award-1.jpg", alt: "YUCI award presentation at Raj Bhavan" },
+    { src: "/images/recognition/award-2.jpg", alt: "YUCI recognition ceremony" },
+    { src: "/images/recognition/award-3.jpg", alt: "YUCI dignitaries felicitation" },
+    { src: "/images/recognition/award-4.jpg", alt: "YUCI appreciation award" },
+    { src: "/images/events/event-1.png", alt: "YUF event highlight" },
+    { src: "/images/events/event-4.png", alt: "YUF event highlight" },
+    { src: "/images/events/event-5.png", alt: "YUF event highlight" },
+    { src: "/images/events/event-6.png", alt: "YUF event highlight" },
+    { src: "/images/events/event-7.png", alt: "YUF event highlight" },
+  ] satisfies GalleryPhoto[],
+  videos: [] satisfies GalleryVideo[],
+  highlights: {
+    label: "Event Highlights",
+    title: "Highlights From Across India",
+    subtitle:
+      "From Chennai to Pondicherry, the Youth United Festival brought together thousands of young talents across arts, sports, science, and innovation.",
+  },
+};
+
+// ── Legal pages ──
+// Each section renders as a heading followed by its blocks. A string block is a
+// paragraph; a { list } block renders as a bulleted list (with an optional lead
+// paragraph). `intro` shows above the first section.
+
+export interface LegalListBlock {
+  lead?: string;
+  list: string[];
+}
+export type LegalBlock = string | LegalListBlock;
+export interface LegalSection {
+  heading: string;
+  blocks: LegalBlock[];
+}
+export interface LegalPage {
+  title: string;
+  updated: string;
+  intro?: string;
+  sections: LegalSection[];
+}
+
+export const privacyPolicy: LegalPage = {
+  title: "Privacy Policy",
+  updated: "Last updated: January 2026",
+  intro:
+    "At youthunitedfestival.com, we value your privacy and are committed to protecting your personal information. This policy outlines how we collect, use, and protect your data.",
+  sections: [
+    {
+      heading: "Information We Collect",
+      blocks: [
+        { lead: "We may collect the following types of information:", list: [
+          "Personal Information: Name, email, phone number, language preference, and social media contacts, either directly or via third-party sign-ins.",
+          "Browsing Data: Pages viewed, traffic data (e.g., IP address, browser type), and other analytics.",
+          "Survey Responses: Feedback on tournaments, events, or website features.",
+        ] },
+      ],
+    },
+    {
+      heading: "Use of Cookies",
+      blocks: [
+        "Cookies enhance your experience by storing preferences and enabling certain website features. Third-party partners may also use cookies to display ads and gather non-personal demographic data. You can disable cookies in your browser settings, but some features may become inaccessible.",
+      ],
+    },
+    {
+      heading: "How We Use Your Information",
+      blocks: [
+        { lead: "We use your data to:", list: [
+          "Improve user experience by tailoring content.",
+          "Conduct surveys and analytics to enhance services.",
+          "Protect against fraud and ensure security.",
+          "Fulfill legal obligations or cooperate with law enforcement.",
+          "Collaborate with affiliates and partners for promotions or improved services.",
+        ] },
+      ],
+    },
+    {
+      heading: "Sharing of Information",
+      blocks: [
+        { lead: "We may share your data with:", list: [
+          "Reliable third-party services like payment gateways (e.g., Razorpay) for transactions.",
+          "Affiliates and trusted partners for marketing or service enhancements.",
+          "Legal authorities or others when required by law.",
+        ] },
+      ],
+    },
+    {
+      heading: "Changes to Policy",
+      blocks: [
+        "We reserve the right to update this policy. Continued use of our website signifies acceptance of changes. For updates, revisit this page periodically.",
+      ],
+    },
+    {
+      heading: "Security and Disclaimer",
+      blocks: [
+        "While we strive to secure your information, we cannot guarantee absolute confidentiality due to evolving internet risks. By using our site, you agree to assume responsibility for your data and interactions online.",
+      ],
+    },
+    {
+      heading: "Contact",
+      blocks: [
+        "For questions or concerns, email us at info@youthunitedcouncilofindia.org",
+      ],
+    },
+  ],
+};
+
+export const termsAndConditions: LegalPage = {
+  title: "Terms and Conditions",
+  updated: "Last updated: January 2026",
+  sections: [
+    {
+      heading: "Eligibility",
+      blocks: [
+        "Participation in the Youth United Festival is open to individuals aged 17 to 25 years. All participants must register through the official YUF website or authorized platforms. For team-based events, it is essential that all team members meet the eligibility requirements.",
+      ],
+    },
+    {
+      heading: "Registration",
+      blocks: [
+        "All participants must complete the registration process to take part in the festival and its events. Accurate personal and contact information must be provided during registration. Registration fees and platform fee, if applicable, are non-refundable except in cases where the event is cancelled by the organizers. In such cases, refunds will be Credited within 15 working days. For certain additional events, on-the-spot registration will be available.",
+      ],
+    },
+    {
+      heading: "Code of Conduct",
+      blocks: [
+        "The festival promotes values of respect, inclusivity, and professionalism, which all participants are expected to uphold throughout the event. Harassment, discrimination, or any form of inappropriate behavior is strictly prohibited. Attendees must comply with the laws of the Republic of India and adhere to the venue's rules.",
+        "All attendees are required to carry a valid government-issued ID for entry into the venue. Participants may bring one additional person if permitted by the authorities.",
+        "Participants must bring their own tools and accessories, as the management will not provide these essentials. Additionally, a printed copy of the email confirmation from the organization is mandatory for entry.",
+      ],
+    },
+    {
+      heading: "Event Participation",
+      blocks: [
+        "Participants must arrive at their designated event locations at the specified time. Late arrivals may forfeit the right to participate. For competitions, decisions made by the jury or organizing committee are final and binding, and no appeals will be entertained. Participants should show their conformation Email before entering into the respective venue.",
+      ],
+    },
+    {
+      heading: "Intellectual Property",
+      blocks: [
+        "Participants retain ownership of their original works created for the festival but grant the Youth United Festival permission to use photographs, videos, or content captured during the event for promotional purposes. Any form of plagiarism or misrepresentation will result in immediate disqualification.",
+      ],
+    },
+    {
+      heading: "Safety and Security",
+      blocks: [
+        "Participants are responsible for the safety of their personal belongings during the festival. The organizers will not be held liable for any loss, theft, or damage. Emergency protocols and instructions provided by security personnel must be strictly followed at all times to ensure safety.",
+      ],
+    },
+    {
+      heading: "Photography and Media",
+      blocks: [
+        "The festival will be documented through photography, videography, and live streaming. By participating, attendees consent to being recorded. Media captured during the event may be used for promotional or archival purposes without additional permissions or compensation.",
+      ],
+    },
+    {
+      heading: "Workshops and Competitions",
+      blocks: [
+        "Participation in workshops will be based on a first-come, first-served basis unless otherwise specified. Each competition will have specific rules and guidelines that must be strictly followed by participants.",
+      ],
+    },
+    {
+      heading: "Liability",
+      blocks: [
+        "Participants attend the festival at their own risk. The organizers are not responsible for any injuries, illnesses, or damages sustained during the event. Willful damage to property or misconduct will lead to immediate disqualification and may result in legal action.",
+      ],
+    },
+    {
+      heading: "Cancellations and Modifications",
+      blocks: [
+        "The organizers reserve the right to cancel, reschedule, or modify any event without prior notice. In the case of unforeseen circumstances, updates or changes will be communicated through official channels to all participants.",
+      ],
+    },
+    {
+      heading: "Partnerships and Sponsorships",
+      blocks: [
+        "All partnerships and sponsorships must align with the core values and objectives of the Youth United Festival. The display of partner logos or branding during the festival requires prior approval from the organizing committee. VVISION proudly serves as our official accounting partner.",
+      ],
+    },
+    {
+      heading: "Dispute Resolution",
+      blocks: [
+        "Any disputes or grievances related to the festival must be submitted in writing to the organizing committee. The committee's decision in resolving disputes will be considered final.",
+      ],
+    },
+    {
+      heading: "Acknowledgments",
+      blocks: [
+        "By registering for or attending the festival, participants confirm that they have read, understood, and agreed to these terms and conditions. These terms and conditions are subject to change. Updates will be posted on the official Youth United Festival website, and participants are encouraged to review the latest version before the event.",
+        "Note: The organizing committee reserves the right to finalize and announce the scoring format on the spot based on time and event conditions.",
+      ],
+    },
+  ],
+};
+
+export const refundPolicy: LegalPage = {
+  title: "Refund & Cancellation Policy",
+  updated: "Last updated: January 2026",
+  intro:
+    "This policy explains the conditions under which registration fees for the Youth United Festival may be refunded or cancelled.",
+  sections: [
+    {
+      heading: "Registration Fees",
+      blocks: [
+        "Registration fees and platform fees (if applicable) are non-refundable, except in cases where the event is cancelled by the organizers.",
+      ],
+    },
+    {
+      heading: "Organizer Cancellation",
+      blocks: [
+        "If an event is cancelled by the organizers, eligible registration fees will be credited back to the original payment method within 15 working days of the cancellation announcement.",
+      ],
+    },
+    {
+      heading: "Participant Cancellation",
+      blocks: [
+        "Cancellations or withdrawals initiated by a participant after a successful registration are not eligible for a refund. Registrations are non-transferable unless expressly permitted by the organizing committee.",
+      ],
+    },
+    {
+      heading: "Rescheduled Events",
+      blocks: [
+        "If an event is rescheduled rather than cancelled, existing registrations remain valid for the new date and no refund will be issued. Affected participants will be notified through official channels.",
+      ],
+    },
+    {
+      heading: "Processing of Refunds",
+      blocks: [
+        "Approved refunds are processed through the original payment gateway (e.g., Razorpay). The time taken for the amount to reflect in your account may vary depending on your bank or card issuer.",
+      ],
+    },
+    {
+      heading: "Contact",
+      blocks: [
+        "For any refund or cancellation queries, email us at info@youthunitedcouncilofindia.org",
+      ],
+    },
+  ],
 };
 
 // Re-export advisor for shared use on home + about
