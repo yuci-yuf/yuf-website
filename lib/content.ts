@@ -300,6 +300,7 @@ export const aboutContent = {
       { label: "Register Now", href: "/register", variant: "primary" },
       { label: "View Events", href: "/events", variant: "outline" },
     ],
+    backgroundImage: "/images/hero/about.jpg",
   } satisfies Hero,
   about: {
     label: "Our Story",
@@ -382,6 +383,7 @@ export const eventsContent = {
       { label: "Register Now", href: "/register", variant: "primary" },
       { label: "Browse Events", href: "#events-list", variant: "outline" },
     ],
+    backgroundImage: "/images/hero/events.jpg",
   } satisfies Hero,
   intro: {
     label: "Empowering Youth",
@@ -407,6 +409,7 @@ export const registerContent = {
     highlight: "YUF 2026",
     subtitle:
       "Secure your spot at the Youth United Festival 2026. Choose your event, fill your details, and complete payment in minutes.",
+    backgroundImage: "/images/hero/register.jpg",
   } satisfies Hero,
   locations: [
     { city: "Chennai", region: "Tamil Nadu" },
@@ -425,6 +428,7 @@ export const contactContent = {
       { label: "Send a Message", href: "#contact-form", variant: "primary" },
       { label: "Register Now", href: "/register", variant: "outline" },
     ],
+    backgroundImage: "/images/hero/contact.jpg",
   } satisfies Hero,
   subjects: [
     { label: "General Enquiry", value: "general" },
