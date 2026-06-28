@@ -248,10 +248,10 @@ export const homeContent = {
       "Shri K. Kailashnathan, Lieutenant Governor of Puducherry, at Raj Bhavan, Puducherry.",
     ],
     images: [
-      "/images/recognition/award-1.jpg",
-      "/images/recognition/award-2.jpg",
-      "/images/recognition/award-3.jpg",
-      "/images/recognition/award-4.jpg",
+      "/images/recognition/award_1.jpg",
+      "/images/recognition/award_2.jpg",
+      "/images/recognition/award_3.jpg",
+      "/images/recognition/award_4.jpg",
     ],
   },
   govInitiatives: {
@@ -260,8 +260,8 @@ export const homeContent = {
     subtitle:
       "YUF proudly supports and aligns with key national programs promoting youth development.",
     cards: [
-      { title: "Proudly Made in India", description: "Support Local, Buy Indian products.", image: "/images/gov/make-in-india.avif" },
-      { title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation.", image: "/images/gov/fit-india.jpg" },
+      { title: "Proudly Made in India", description: "Support Local, Buy Indian products.", image: "/images/gov/made_in_india_logo.png" },
+      { title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation.", image: "/images/gov/fit-india.png" },
       { title: "Skill India", description: "Empowering Youth, Building the Nation.", image: "/images/gov/skill-india.png" },
     ] satisfies FeatureCard[],
   },
@@ -495,10 +495,10 @@ export const galleryContent = {
     backgroundImage: "/images/hero/events.jpg",
   } satisfies Hero,
   photos: [
-    { src: "/images/recognition/award-1.jpg", alt: "YUCI award presentation at Raj Bhavan" },
-    { src: "/images/recognition/award-2.jpg", alt: "YUCI recognition ceremony" },
-    { src: "/images/recognition/award-3.jpg", alt: "YUCI dignitaries felicitation" },
-    { src: "/images/recognition/award-4.jpg", alt: "YUCI appreciation award" },
+    { src: "/images/recognition/award_1.jpg", alt: "YUCI award presentation at Raj Bhavan" },
+    { src: "/images/recognition/award_2.jpg", alt: "YUCI recognition ceremony" },
+    { src: "/images/recognition/award_3.jpg", alt: "YUCI dignitaries felicitation" },
+    { src: "/images/recognition/award_4.jpg", alt: "YUCI appreciation award" },
     { src: "/images/events/event-1.png", alt: "YUF event highlight" },
     { src: "/images/events/event-4.png", alt: "YUF event highlight" },
     { src: "/images/events/event-5.png", alt: "YUF event highlight" },

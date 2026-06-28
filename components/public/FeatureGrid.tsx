@@ -24,12 +24,12 @@ export function FeatureGrid({
           className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-hover"
         >
           {card.image ? (
-            <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-surface-alt p-2 ring-1 ring-border">
+            <span className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl bg-white p-3 ring-1 ring-border">
               <Image
                 src={card.image}
                 alt={card.title}
-                width={56}
-                height={56}
+                width={104}
+                height={104}
                 className="h-full w-full object-contain"
               />
             </span>
