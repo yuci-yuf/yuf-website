@@ -14,6 +14,7 @@ const galleryImages = [
   { src: "/images/sections/join-us.jpg", alt: "Join YUF", span: "" },
   { src: "/images/recognition/award_2.jpg", alt: "Governor Award", span: "" },
   { src: "/images/events/event-5.png", alt: "Makeup & Saree Draping", span: "col-span-2" },
+  { src: "/images/gallery/pondicherry-juniors.jpg", alt: "Youth United Festival for Juniors — Pondicherry 2025", span: "col-span-2" },
 ];
 
 export function GalleryMosaic() {

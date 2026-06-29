@@ -47,8 +47,6 @@ export default async function HomePage() {
         title={homeContent.about.title}
         body={homeContent.about.body}
         primaryImage={homeContent.about.image!}
-        secondaryImage={homeContent.joinUs.image!}
-        advisor={siteConfig.advisor}
       />
 
       <RecognitionBanner

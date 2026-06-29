@@ -188,10 +188,9 @@ export const partners: Partner[] = [
 
 // ── Shared registration steps ──
 export const registrationSteps: RegistrationStep[] = [
-  { step: 1, title: "Create an Account", description: "Register by providing your basic details such as name, email, and password. This will create your unique account for the event." },
-  { step: 2, title: "Select the Competition", description: "Browse the list of available competitions and select the one you're interested in. Ensure it aligns with your interests and skills." },
-  { step: 3, title: "Fill the Form", description: "Complete the registration form with the necessary details, such as participant information, category, and additional required specifics." },
-  { step: 4, title: "Payment", description: "Proceed to payment to confirm your registration. Choose your preferred payment method and ensure the transaction is completed." },
+  { step: 1, title: "Select the Competition", description: "Browse the list of available competitions and select the one you're interested in. Ensure it aligns with your interests and skills." },
+  { step: 2, title: "Fill the Form", description: "Complete the registration form with the necessary details, such as participant information, category, and additional required specifics." },
+  { step: 3, title: "Payment", description: "Proceed to payment to confirm your registration. Choose your preferred payment method and ensure the transaction is completed." },
 ];
 
 // ── Page content ──

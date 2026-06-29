@@ -27,7 +27,7 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
             aria-hidden
           />
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-3">
             {steps.map((step) => (
               <StaggerItem key={step.step}>
                 <div className="relative flex flex-col items-center gap-5 text-center">
