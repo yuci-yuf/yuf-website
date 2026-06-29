@@ -21,10 +21,10 @@ export function FeatureGrid({
       {cards.map((card) => (
         <div
           key={card.title}
-          className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-hover"
+          className="group flex flex-col gap-4 rounded-2xl border border-border bg-surface p-8 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-hover"
         >
           {card.image ? (
-            <span className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl bg-white p-3 ring-1 ring-border">
+            <span className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-sm">
               <Image
                 src={card.image}
                 alt={card.title}
@@ -35,12 +35,14 @@ export function FeatureGrid({
             </span>
           ) : (
             card.icon && (
-              <span className="flex h-13 w-13 items-center justify-center rounded-xl bg-primary-50 text-2xl">
+              <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary-50/70 text-2xl transition-colors group-hover:bg-primary-100">
                 {card.icon}
               </span>
             )
           )}
-          <h3 className="font-heading text-lg font-bold text-text">{card.title}</h3>
+          <h3 className="font-heading text-xl font-bold text-text">
+            {card.title}
+          </h3>
           <p className="text-sm leading-relaxed text-text-muted">
             {card.description}
           </p>

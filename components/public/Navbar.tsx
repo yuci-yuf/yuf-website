@@ -1,61 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/content";
-import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   const links = siteConfig.navLinks.filter((l) => !l.isCTA);
   const cta = siteConfig.navLinks.find((l) => l.isCTA);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-surface/85 backdrop-blur-md">
-      <nav className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-8">
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
-          <Link
-            href="/"
-            className="flex items-center gap-3 sm:gap-4"
-            aria-label={siteConfig.siteName}
-          >
+    <>
+      <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-4 lg:px-6">
+        <nav
+          className={cn(
+            "mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3 transition-all duration-300 lg:px-6",
+            scrolled
+              ? "bg-white/85 shadow-lg shadow-black/[0.04] ring-1 ring-black/[0.06] backdrop-blur-xl"
+              : "bg-white/60 ring-1 ring-black/[0.04] backdrop-blur-md",
+          )}
+        >
+          {/* Logo cluster */}
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={siteConfig.siteName}>
             <Image
               src="/images/logo.png"
               alt={siteConfig.siteName}
-              width={150}
-              height={75}
-              className="h-16 w-auto object-contain"
+              width={120}
+              height={60}
+              className="h-10 w-auto object-contain"
               priority
             />
+            <span className="hidden h-7 w-px bg-gray-200 sm:block" aria-hidden />
             <Image
               src="/images/yuci-logo.png"
-              alt="Youth United Council of India"
-              width={88}
-              height={88}
-              className="h-16 w-auto object-contain"
+              alt="YUCI"
+              width={48}
+              height={48}
+              className="hidden h-9 w-auto object-contain sm:block"
               priority
             />
           </Link>
 
-          {/* Ministry of Skill Development & Entrepreneurship credit */}
-          <Image
-            src="/images/gov-logo.png"
-            alt="Ministry of Skill Development and Entrepreneurship, Government of India"
-            width={275}
-            height={100}
-            className="hidden h-16 w-auto object-contain lg:block"
-            priority
-          />
-        </div>
-
-        <div className="flex items-center gap-3 lg:gap-5">
-          {/* Desktop nav */}
+          {/* Desktop links — centered */}
           <div className="hidden items-center gap-1 lg:flex">
             {links.map((link) => {
               const active = pathname === link.path;
@@ -64,10 +71,10 @@ export function Navbar() {
                   key={link.path}
                   href={link.path}
                   className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                    "rounded-full px-4 py-2 text-[13.5px] font-medium transition-colors",
                     active
-                      ? "bg-primary-50 text-primary-700"
-                      : "text-text hover:text-primary-700",
+                      ? "bg-gray-100 text-gray-900"
+                      : "text-gray-500 hover:text-gray-900",
                   )}
                 >
                   {link.label}
@@ -76,59 +83,78 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="hidden lg:block">
+          {/* Right: CTA + hamburger */}
+          <div className="flex items-center gap-3">
             {cta && (
-              <Button href={cta.path} size="sm" variant="secondary">
-                {cta.label}
-              </Button>
-            )}
-          </div>
-
-          {/* Mobile toggle */}
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="inline-flex items-center justify-center rounded-md p-2 text-text lg:hidden"
-            aria-expanded={open}
-            aria-label="Toggle navigation menu"
-          >
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile menu */}
-      {open && (
-        <div className="border-t border-border bg-surface lg:hidden">
-          <div className="flex flex-col gap-1 px-6 py-4">
-            {links.map((link) => (
               <Link
-                key={link.path}
-                href={link.path}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "rounded-lg px-4 py-2.5 text-sm font-medium",
-                  pathname === link.path
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-text hover:bg-surface-alt",
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {cta && (
-              <Button
                 href={cta.path}
-                variant="secondary"
-                className="mt-2 w-full"
-                onClick={() => setOpen(false)}
+                className="group hidden items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow-md lg:inline-flex"
               >
                 {cta.label}
-              </Button>
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
             )}
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 transition-colors hover:bg-gray-100 lg:hidden"
+              aria-label="Toggle menu"
+              aria-expanded={open}
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
-        </div>
-      )}
-    </header>
+        </nav>
+      </header>
+
+      {/* Mobile drawer overlay */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+              className="fixed left-4 right-4 top-20 z-50 rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl lg:hidden"
+            >
+              <div className="flex flex-col gap-1">
+                {links.map((link) => (
+                  <Link
+                    key={link.path}
+                    href={link.path}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
+                      pathname === link.path
+                        ? "bg-gray-50 text-gray-900"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                {cta && (
+                  <Link
+                    href={cta.path}
+                    onClick={() => setOpen(false)}
+                    className="mt-3 flex h-12 items-center justify-center rounded-xl bg-primary-600 text-[15px] font-semibold text-white transition-colors hover:bg-primary-700"
+                  >
+                    {cta.label}
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

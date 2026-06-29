@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Roboto_Slab } from "next/font/google";
+import { Poppins, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -9,10 +9,10 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const robotoSlab = Roboto_Slab({
-  variable: "--font-roboto-slab",
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -50,7 +50,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${robotoSlab.variable} h-full`}
+      data-scroll-behavior="smooth"
+      className={`${poppins.variable} ${jakartaSans.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-surface text-text">
         {children}

@@ -35,27 +35,32 @@ export function SplitSection({
   className,
 }: SplitSectionProps) {
   return (
-    <section className={cn("py-20 lg:py-24", className)}>
+    <section className={cn("py-24 lg:py-32", className)}>
       <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
           <div
             className={cn(
-              "flex flex-col gap-5",
+              "flex flex-col gap-6",
               imageSide === "left" && "lg:order-2",
             )}
           >
-            <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-accent-600">
-              <span className="h-px w-6 bg-accent-500" aria-hidden />
+            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-primary-50 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-primary-700">
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-primary-500"
+                aria-hidden
+              />
               {label}
             </span>
-            <h2 className="font-heading text-3xl font-bold leading-tight text-text sm:text-4xl">
+            <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">
               {title}
             </h2>
             {subhead && (
-              <p className="text-lg font-semibold text-primary-700">{subhead}</p>
+              <p className="text-lg font-semibold text-primary-700">
+                {subhead}
+              </p>
             )}
             {body.map((p, i) => (
-              <p key={i} className="leading-relaxed text-text-muted">
+              <p key={i} className="text-[17px] leading-relaxed text-text-muted">
                 {p}
               </p>
             ))}
@@ -64,15 +69,19 @@ export function SplitSection({
               <ul className="flex flex-col gap-4 pt-2">
                 {features.map((f) => (
                   <li key={f.title} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
                       {f.icon ? (
-                        <span className="text-sm" aria-hidden>{f.icon}</span>
+                        <span className="text-sm" aria-hidden>
+                          {f.icon}
+                        </span>
                       ) : (
                         <Check size={16} />
                       )}
                     </span>
                     <span>
-                      <span className="font-semibold text-text">{f.title}</span>
+                      <span className="font-semibold text-text">
+                        {f.title}
+                      </span>
                       {" — "}
                       <span className="text-text-muted">{f.description}</span>
                     </span>
@@ -88,7 +97,9 @@ export function SplitSection({
                     key={b.label}
                     href={b.href}
                     variant={b.variant ?? "primary"}
-                    icon={b.icon ? <span aria-hidden>{b.icon}</span> : undefined}
+                    icon={
+                      b.icon ? <span aria-hidden>{b.icon}</span> : undefined
+                    }
                   >
                     {b.label}
                   </Button>
@@ -98,7 +109,13 @@ export function SplitSection({
           </div>
 
           <div className={cn(imageSide === "left" && "lg:order-1")}>
-            {visual ?? (image ? <ImageVisual src={image} alt={title} /> : <DefaultVisual />)}
+            {visual ?? (
+              image ? (
+                <ImageVisual src={image} alt={title} />
+              ) : (
+                <DefaultVisual />
+              )
+            )}
           </div>
         </div>
       </Container>
@@ -108,13 +125,18 @@ export function SplitSection({
 
 function ImageVisual({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-hover ring-1 ring-border">
+    <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-hover ring-1 ring-border">
+      {/* Subtle colored shadow behind image */}
+      <div
+        className="absolute -inset-1 -z-10 rounded-3xl bg-gradient-to-br from-primary-200/30 to-accent-200/30 blur-xl"
+        aria-hidden
+      />
       <Image
         src={src}
         alt={alt}
         fill
         sizes="(min-width: 1024px) 40rem, 100vw"
-        className="object-cover"
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
       />
     </div>
   );
@@ -122,7 +144,7 @@ function ImageVisual({ src, alt }: { src: string; alt: string }) {
 
 function DefaultVisual() {
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-950 shadow-hover">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-950 shadow-hover">
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -132,7 +154,7 @@ function DefaultVisual() {
         aria-hidden
       />
       <div
-        className="absolute inset-0 opacity-[0.08]"
+        className="absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage:
             "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",

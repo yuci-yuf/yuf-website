@@ -14,7 +14,7 @@ export function Section({
   containerClassName?: string;
 }) {
   return (
-    <section id={id} className={cn("py-20 lg:py-24", className)}>
+    <section id={id} className={cn("py-24 lg:py-32", className)}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );
@@ -36,24 +36,27 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4",
+        "flex flex-col gap-5",
         align === "center" ? "items-center text-center" : "items-start",
         className,
       )}
     >
       {label && (
-        <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-accent-600">
-          <span className="h-px w-6 bg-accent-500" aria-hidden />
+        <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-primary-700">
+          <span
+            className="h-1.5 w-1.5 rounded-full bg-primary-500"
+            aria-hidden
+          />
           {label}
         </span>
       )}
-      <h2 className="max-w-3xl text-3xl font-bold leading-tight text-text sm:text-4xl lg:text-[2.75rem]">
+      <h2 className="max-w-3xl font-heading text-3xl font-bold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">
         {title}
       </h2>
       {subtitle && (
         <p
           className={cn(
-            "max-w-2xl text-base leading-relaxed text-text-muted",
+            "max-w-2xl text-[17px] leading-relaxed text-text-muted",
             align === "center" && "mx-auto",
           )}
         >

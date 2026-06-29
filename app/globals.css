@@ -32,9 +32,9 @@
   /* ── Surface / neutral ── */
   --color-surface: #ffffff;
   --color-surface-alt: #f8fafc;
-  --color-border: #e2e8f0;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
+  --color-border: #e5e7eb;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
 
   /* ── Semantic ── */
   --color-success: #22c55e;
@@ -43,8 +43,8 @@
   --color-info: #3b82f6;
 
   /* ── Typography ── */
-  --font-heading: var(--font-roboto-slab), serif;
-  --font-body: var(--font-poppins), sans-serif;
+  --font-heading: var(--font-jakarta), system-ui, sans-serif;
+  --font-body: var(--font-poppins), system-ui, sans-serif;
 
   /* ── Layout ── */
   --spacing-section: 5rem;
@@ -58,32 +58,16 @@
   --radius-2xl: 1.5rem;
 
   /* ── Shadow ── */
-  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06);
-  --shadow-hover: 0 18px 40px -12px rgb(30 58 138 / 0.25);
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.04), 0 1px 2px rgb(0 0 0 / 0.03);
+  --shadow-hover: 0 20px 44px -12px rgb(0 0 0 / 0.1);
 
   /* ── Motion ── */
   --animate-marquee: marquee 30s linear infinite;
-  --animate-fade-up: fade-up 0.6s ease-out both;
 }
 
 @keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(1.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 /* ── Base ── */
@@ -100,21 +84,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
 }
 
-/* Respect reduced-motion for all token-driven animations */
+/* Respect reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

@@ -328,7 +328,6 @@ export const aboutContent = {
     label: "Our Purpose",
     title: "Our Mission",
     body: [
-      "Our mission is to inspire and empower the next generation of leaders, innovators, and changemakers by providing them with the resources, mentorship, and opportunities they need to realize their potential.",
       "We aim to encourage youth participation, ignite creativity, and promote dialogue across diverse fields — from performing arts to technology and innovation. YUF fosters a sense of community, unity, and growth that reaches beyond the festival itself, encouraging long-lasting impact and collaboration.",
     ],
     cards: [

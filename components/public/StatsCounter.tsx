@@ -26,18 +26,35 @@ function useCountUp(target: number, run: boolean, duration = 1600) {
   return value;
 }
 
-function StatItem({ stat, run }: { stat: Stat; run: boolean }) {
+function StatItem({
+  stat,
+  run,
+  isLast,
+}: {
+  stat: Stat;
+  run: boolean;
+  isLast: boolean;
+}) {
   const value = useCountUp(stat.number, run);
   return (
-    <div className="flex flex-col items-center gap-1 text-center">
-      <span className="font-heading text-4xl font-bold text-white sm:text-5xl">
-        {value.toLocaleString("en-IN")}
-        <span className="text-accent-400">{stat.suffix}</span>
-      </span>
-      <span className="text-sm font-medium uppercase tracking-wide text-primary-200">
-        {stat.label}
-      </span>
-    </div>
+    <>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <span className="font-heading text-5xl font-extrabold text-white sm:text-6xl">
+          {value.toLocaleString("en-IN")}
+          <span className="text-accent-400">{stat.suffix}</span>
+        </span>
+        <span className="text-sm font-medium uppercase tracking-wider text-primary-300">
+          {stat.label}
+        </span>
+      </div>
+      {/* Vertical divider between stats — hidden on mobile grid */}
+      {!isLast && (
+        <div
+          className="hidden h-16 w-px self-center bg-white/10 lg:block"
+          aria-hidden
+        />
+      )}
+    </>
   );
 }
 
@@ -62,14 +79,28 @@ export function StatsCounter({ stats }: { stats: Stat[] }) {
   }, []);
 
   return (
-    <section className="bg-primary-900 py-16">
-      <Container>
+    <section className="relative overflow-hidden bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 py-20">
+      {/* Subtle radial glow */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage:
+            "radial-gradient(40rem 20rem at 50% 50%, rgba(37,99,235,0.3), transparent)",
+        }}
+        aria-hidden
+      />
+      <Container className="relative">
         <div
           ref={ref}
-          className="grid grid-cols-2 gap-10 lg:grid-cols-4"
+          className="grid grid-cols-2 items-center gap-10 lg:flex lg:justify-between"
         >
-          {stats.map((stat) => (
-            <StatItem key={stat.label} stat={stat} run={run} />
+          {stats.map((stat, i) => (
+            <StatItem
+              key={stat.label}
+              stat={stat}
+              run={run}
+              isLast={i === stats.length - 1}
+            />
           ))}
         </div>
       </Container>

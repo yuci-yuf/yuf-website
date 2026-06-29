@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
@@ -15,16 +15,21 @@ export function BackToTop() {
   }, []);
 
   return (
-    <button
-      type="button"
-      aria-label="Back to top"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={cn(
-        "fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white shadow-hover transition-all duration-300 hover:bg-primary-700",
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          type="button"
+          aria-label="Back to top"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-600 shadow-lg ring-1 ring-black/5 transition-colors hover:bg-gray-50 hover:text-gray-900"
+        >
+          <ArrowUp size={18} />
+        </motion.button>
       )}
-    >
-      <ArrowUp size={20} />
-    </button>
+    </AnimatePresence>
   );
 }
