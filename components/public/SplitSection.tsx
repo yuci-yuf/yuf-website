@@ -44,11 +44,7 @@ export function SplitSection({
               imageSide === "left" && "lg:order-2",
             )}
           >
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-primary-50 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-primary-700">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-primary-500"
-                aria-hidden
-              />
+            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               {label}
             </span>
             <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">

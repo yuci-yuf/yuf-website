@@ -3,222 +3,190 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
 interface HeroSectionProps {
-  badge: string;
   title: string;
   highlight: string;
   subtitle: string;
-  heroImage: string;
-  floatingImage: string;
   stats: { number: string; label: string }[];
+  marqueeItems: string[];
 }
 
+// Dense photo wall behind the dark blanket — drawn from the site's image library.
+const COLLAGE = [
+  "/images/events/event-1.png",
+  "/images/recognition/award_1.jpg",
+  "/images/hero/home.jpg",
+  "/images/events/event-2.png",
+  "/images/sections/who-we-are.jpg",
+  "/images/recognition/award_2.jpg",
+  "/images/events/event-3.png",
+  "/images/hero/events.jpg",
+  "/images/recognition/backup/award_1.jpg",
+  "/images/events/event-4.png",
+  "/images/advisor/advisor.jpg",
+  "/images/recognition/award_3.jpg",
+  "/images/events/event-5.png",
+  "/images/hero/about.jpg",
+  "/images/recognition/backup/award_2.jpg",
+  "/images/events/event-6.png",
+  "/images/sections/join-us.jpg",
+  "/images/recognition/award_4.jpg",
+  "/images/events/event-7.png",
+  "/images/hero/register.jpg",
+  "/images/recognition/backup/award_3.png",
+  "/images/events/event-8.png",
+  "/images/gallery/pondicherry-juniors.jpg",
+  "/images/recognition/backup/award_4.jpg",
+  "/images/events/event-9.png",
+  "/images/hero/contact.jpg",
+  "/images/recognition/award_1.jpg",
+  "/images/events/event-1.png",
+  "/images/sections/who-we-are.jpg",
+  "/images/events/event-4.png",
+];
+
 export function HeroSection({
-  badge,
   title,
   highlight,
   subtitle,
-  heroImage,
-  floatingImage,
   stats,
+  marqueeItems,
 }: HeroSectionProps) {
+  const loop = [...marqueeItems, ...marqueeItems];
+
   return (
-    <section className="relative min-h-[90vh] overflow-hidden pt-8 lg:pt-0"
-      style={{
-        background: "linear-gradient(135deg, #eff6ff 0%, #f8fafc 40%, #fffbeb 100%)",
-      }}
-    >
-      {/* Blue glow — top right */}
-      <div
-        className="pointer-events-none absolute -right-40 -top-20 h-[650px] w-[650px] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.22) 0%, transparent 70%)" }}
+    <section className="relative min-h-[100svh] overflow-hidden bg-primary-950">
+      {/* ── 1 · Photo collage ── */}
+      <motion.div
         aria-hidden
-      />
-
-      {/* Amber glow — bottom left */}
-      <div
-        className="pointer-events-none absolute -bottom-20 -left-20 h-[400px] w-[400px] rounded-full blur-[100px]"
-        style={{ background: "radial-gradient(circle, rgba(251,191,36,0.18) 0%, transparent 70%)" }}
-        aria-hidden
-      />
-
-      <Container className="relative flex min-h-[90vh] items-center pt-24 pb-16 lg:pt-28 lg:pb-20">
-        <div className="grid w-full items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
-          {/* Left column — content */}
-          <div className="flex flex-col gap-7">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-            >
-              <span className="inline-flex items-center gap-2.5 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-600" />
-                </span>
-                {badge}
-              </span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="font-heading text-[3.25rem] font-extrabold leading-[1.08] tracking-tight text-gray-900 sm:text-6xl lg:text-[4.25rem]"
-            >
-              {title}
-              <br />
-              <span className="bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-                {highlight}
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.5 }}
-              className="max-w-lg text-lg leading-relaxed text-gray-500"
-            >
-              {subtitle}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.5 }}
-              className="flex flex-wrap items-center gap-4 pt-1"
-            >
-              <Link
-                href="/events"
-                className="group inline-flex h-13 items-center gap-2 rounded-full bg-primary-600 px-7 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg"
-              >
-                Browse Events
-                <ArrowRight
-                  size={16}
-                  className="transition-transform group-hover:translate-x-0.5"
-                />
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex h-13 items-center gap-2 rounded-full border border-gray-200 bg-white px-7 text-[15px] font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50"
-              >
-                Learn More
-              </Link>
-            </motion.div>
-
-            {/* Trust indicators */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-wrap items-center gap-6 border-t border-gray-100 pt-7"
-            >
-              {stats.map((stat, i) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  <span className="font-heading text-2xl font-bold text-gray-900">
-                    {stat.number}
-                  </span>
-                  <span className="text-sm text-gray-400">{stat.label}</span>
-                  {i < stats.length - 1 && (
-                    <span
-                      className="ml-3 h-8 w-px bg-gray-100"
-                      aria-hidden
-                    />
-                  )}
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right column — creative image arrangement */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="relative hidden lg:block"
-          >
-            {/* Decorative bg shape */}
-            <div
-              className="absolute -inset-8 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-50 via-blue-50/50 to-amber-50/30"
-              aria-hidden
-            />
-
-            {/* Main image */}
-<div className="relative w-full h-[550px] overflow-hidden rounded-3xl shadow-2xl ring-1 ring-black/5">
-  <Image
-    src={heroImage}
-    alt="Youth United Festival"
-    fill
-    priority
-    sizes="(min-width: 1024px) 40vw, 100vw"
-    className="object-cover"
-  />
-</div>
-
-            {/* Floating event card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-              className="absolute -bottom-6 -left-12 z-10 rounded-2xl border border-gray-100 bg-white p-4 shadow-xl"
-            >
-              <div className="flex items-center gap-3">
-                <div className="relative h-12 w-12 overflow-hidden rounded-xl">
-                  <Image
-                    src={floatingImage}
-                    alt="Event preview"
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    Youth United Festival
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    2026 · Multiple Cities
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Floating registration badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.85, duration: 0.4 }}
-              className="absolute -right-6 top-12 z-10 rounded-2xl border border-gray-100 bg-white px-5 py-3.5 shadow-xl"
-            >
-              <p className="text-xs font-medium text-gray-400">
-                Registration
-              </p>
-              <p className="mt-0.5 text-lg font-bold text-primary-600">
-                Open Now
-              </p>
-            </motion.div>
-
-            {/* Floating secondary image thumbnail */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.95, duration: 0.5 }}
-              className="absolute -left-8 top-1/3 z-10 h-24 w-24 overflow-hidden rounded-2xl border-2 border-white shadow-lg"
-            >
+        className="absolute inset-0 z-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: "easeOut" }}
+      >
+        <div className="grid h-full w-full auto-rows-fr grid-cols-3 sm:grid-cols-5 lg:grid-cols-6">
+          {COLLAGE.map((src, i) => (
+            <div key={i} className="relative">
               <Image
-                src="/images/events/event-4.png"
-                alt="Event highlight"
+                src={src}
+                alt=""
                 fill
-                sizes="96px"
+                sizes="(min-width:1024px) 17vw, (min-width:640px) 20vw, 34vw"
                 className="object-cover"
               />
-            </motion.div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ── 2 · Dark blue blanket ── */}
+      <div
+        aria-hidden
+        className="absolute inset-0 z-10"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(8,43,61,0.88) 0%, rgba(15,71,95,0.74) 46%, rgba(8,43,61,0.94) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 z-10"
+        style={{
+          background:
+            "radial-gradient(120% 78% at 50% 34%, rgba(31,168,215,0.22) 0%, transparent 62%)",
+        }}
+      />
+
+      {/* ── 3 · Centred wordings ── */}
+      <Container className="relative z-30 h-full">
+        <div className="flex h-full flex-col items-center justify-center gap-5 px-2 pb-24 pt-24 text-center sm:gap-6 sm:pb-28 sm:pt-28">
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="font-heading text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[5.25rem]"
+          >
+            {title}
+            <br />
+            <span className="bg-gradient-to-r from-accent-400 via-primary-300 to-accent-400 bg-clip-text text-transparent">
+              {highlight}
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="max-w-3xl text-balance text-lg font-medium leading-relaxed text-primary-50 sm:text-xl"
+            style={{ textShadow: "0 2px 16px rgba(8,43,61,0.65)" }}
+          >
+            {subtitle}
+          </motion.p>
+
+          {/* Stats — glassmorphic horizontal card */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 rounded-2xl border border-white/15 bg-white/10 px-5 py-4 shadow-xl shadow-primary-950/30 ring-1 ring-inset ring-white/5 backdrop-blur-md sm:gap-x-8 sm:px-7"
+          >
+            {stats.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-2.5">
+                <span className="font-heading text-2xl font-bold text-white">
+                  {stat.number}
+                </span>
+                <span className="text-sm text-primary-100">{stat.label}</span>
+                {i < stats.length - 1 && (
+                  <span className="ml-3 hidden h-8 w-px bg-white/20 sm:block" aria-hidden />
+                )}
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.62, duration: 0.6 }}
+            className="flex w-full max-w-sm flex-col items-stretch justify-center gap-3 pt-1 sm:max-w-none sm:flex-row sm:items-center sm:gap-4"
+          >
+            <Link
+              href="/events"
+              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-accent-500 px-7 text-[15px] font-semibold text-primary-950 shadow-lg shadow-accent-500/20 transition-all hover:bg-accent-400"
+            >
+              Browse Events
+              <ArrowRight
+                size={16}
+                className="transition-transform group-hover:translate-x-0.5"
+              />
+            </Link>
+            <Link
+              href="/about"
+              className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/5 px-7 text-[15px] font-semibold text-white backdrop-blur-sm transition-all hover:border-white/50 hover:bg-white/10"
+            >
+              Learn More
+            </Link>
           </motion.div>
         </div>
       </Container>
+
+      {/* ── 5 · Event-name marquee ── */}
+      <div className="absolute inset-x-0 bottom-0 z-30 overflow-hidden border-t border-white/10 bg-primary-950/45 py-3.5 backdrop-blur-sm">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-primary-950 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-primary-950 to-transparent" />
+        <div className="flex w-max animate-[marquee_30s_linear_infinite] items-center gap-10 pr-10">
+          {loop.map((item, i) => (
+            <div key={i} className="flex items-center gap-10 whitespace-nowrap">
+              <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-primary-100">
+                {item}
+              </span>
+              <Star size={13} className="shrink-0 text-accent-400" fill="currentColor" />
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

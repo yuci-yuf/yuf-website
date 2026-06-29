@@ -27,11 +27,7 @@ export function CTABanner({ data }: { data: CTABannerData }) {
 
       <Container className="relative">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-7 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-accent-400 backdrop-blur-sm ring-1 ring-white/10">
-            <span
-              className="h-1.5 w-1.5 rounded-full bg-accent-400"
-              aria-hidden
-            />
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-accent-400">
             {data.label}
           </span>
           <h2 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl">

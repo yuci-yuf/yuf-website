@@ -73,7 +73,7 @@ export default function ContactPage() {
               <iframe
                 title="YUF location map"
                 src={`https://www.google.com/maps?q=${mapsQuery}&output=embed`}
-                className="h-64 w-full"
+                className="h-56 w-full sm:h-64"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />

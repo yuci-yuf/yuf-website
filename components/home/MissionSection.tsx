@@ -16,7 +16,7 @@ export function MissionSection({
   primaryImage,
 }: MissionSectionProps) {
   return (
-    <section className="bg-white py-24 lg:py-32">
+    <section className="bg-white py-16 sm:py-24 lg:py-32">
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_1fr]">
           {/* Left — Image */}
@@ -32,25 +32,13 @@ export function MissionSection({
                   className="object-cover"
                 />
               </div>
-
-              {/* Floating badge */}
-              <div className="absolute -bottom-6 right-6 z-10 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-lg">
-                <p className="font-heading text-3xl font-bold text-primary-600">
-                  10+
-                </p>
-                <p className="text-xs font-medium text-gray-400">
-                  Years of
-                  <br />
-                  Excellence
-                </p>
-              </div>
             </div>
           </FadeUp>
 
           {/* Right — Content */}
           <StaggerContainer stagger={0.08} className="flex flex-col gap-6">
             <StaggerItem>
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-700">
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {label}
               </span>
             </StaggerItem>

@@ -14,7 +14,7 @@ export function Section({
   containerClassName?: string;
 }) {
   return (
-    <section id={id} className={cn("py-24 lg:py-32", className)}>
+    <section id={id} className={cn("py-16 sm:py-24 lg:py-32", className)}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );
@@ -42,11 +42,7 @@ export function SectionHeading({
       )}
     >
       {label && (
-        <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-primary-700">
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-primary-500"
-            aria-hidden
-          />
+        <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
           {label}
         </span>
       )}

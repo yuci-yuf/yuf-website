@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
+import { FadeUp } from "./MotionWrapper";
+import { RecognitionCarousel } from "./RecognitionCarousel";
 
 interface RecognitionBannerProps {
   label: string;
@@ -17,54 +17,48 @@ export function RecognitionBanner({
   details,
   images,
 }: RecognitionBannerProps) {
+  // Drop the last two words ("Raj Bhavan") onto their own line.
+  const words = title.split(" ");
+  const titleHead = words.length > 2 ? words.slice(0, -2).join(" ") : title;
+  const titleTail = words.length > 2 ? words.slice(-2).join(" ") : "";
+
   return (
-    <section className="bg-gradient-to-b from-amber-50/40 to-white py-24 lg:py-32">
+    <section className="bg-gradient-to-br from-primary-200/70 via-primary-100/60 to-primary-50 py-16 sm:py-24 lg:py-32">
       <Container>
-        <div className="grid items-start gap-14 lg:grid-cols-2">
+        <div className="grid items-center gap-14 lg:grid-cols-2">
           {/* Left — content */}
-          <FadeUp className="flex flex-col gap-6">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700">
+          <FadeUp className="flex flex-col gap-7">
+            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-700">
               {label}
             </span>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              {title}
+            <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-gray-900 sm:text-[2.5rem] lg:text-[2.75rem] lg:whitespace-nowrap">
+              {titleHead}
+              {titleTail && (
+                <>
+                  <br />
+                  <span className="bg-gradient-to-r from-primary-700 via-primary-500 to-accent-500 bg-clip-text text-transparent">
+                    {titleTail}
+                  </span>
+                </>
+              )}
             </h2>
-            <p className="text-[16px] leading-relaxed text-gray-500">
+            <p className="text-lg leading-relaxed text-gray-600">
               {subtitle}
             </p>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-4">
               {details.map((d) => (
-                <li key={d} className="flex items-start gap-3 text-gray-600">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden />
-                  <span className="text-[15px] leading-relaxed">{d}</span>
+                <li key={d} className="flex items-start gap-3 text-gray-700">
+                  <span className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-accent-500" aria-hidden />
+                  <span className="text-base leading-relaxed sm:text-[17px]">{d}</span>
                 </li>
               ))}
             </ul>
           </FadeUp>
 
-          {/* Right — staggered image grid */}
-          <StaggerContainer stagger={0.1} className="grid grid-cols-2 gap-4">
-            {images.map((src, i) => (
-              <StaggerItem
-                key={src}
-                className={i === 0 ? "col-span-2" : ""}
-              >
-                <div
-                  className={`group relative overflow-hidden rounded-2xl ${
-                    i === 0 ? "aspect-[16/9]" : "aspect-[4/3]"
-                  }`}
-                >
-                  <Image
-                    src={src}
-                    alt={`Recognition award ${i + 1}`}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+          {/* Right — auto-sliding carousel */}
+          <FadeUp delay={0.15}>
+            <RecognitionCarousel images={images} />
+          </FadeUp>
         </div>
       </Container>
     </section>

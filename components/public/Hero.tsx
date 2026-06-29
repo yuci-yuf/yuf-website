@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { Hero as HeroData } from "@/types";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
@@ -70,18 +69,14 @@ export function Hero({ data }: { data: HeroData }) {
               className="animate-[fade-up_0.6s_ease-out_both]"
               style={{ animationDelay: "0.1s" }}
             >
-              <Badge tone="solid" className="gap-2">
-                <span
-                  className="h-2 w-2 animate-[pulse-dot_2s_ease-in-out_infinite] rounded-full bg-accent-400"
-                  aria-hidden
-                />
+              <span className="text-sm font-bold uppercase tracking-[0.25em] text-accent-400">
                 {data.badge}
-              </Badge>
+              </span>
             </div>
           )}
 
           <h1
-            className="animate-[fade-up_0.6s_ease-out_both] font-heading text-5xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl"
+            className="animate-[fade-up_0.6s_ease-out_both] font-heading text-4xl font-extrabold leading-[1.07] tracking-tight text-white sm:text-6xl lg:text-7xl"
             style={{ animationDelay: "0.2s" }}
           >
             {data.title}{" "}
@@ -89,7 +84,7 @@ export function Hero({ data }: { data: HeroData }) {
               <span
                 className="text-accent-400"
                 style={{
-                  textShadow: "0 0 40px rgba(251,191,36,0.3)",
+                  textShadow: "0 0 40px rgba(100,209,236,0.45)",
                 }}
               >
                 {data.highlight}

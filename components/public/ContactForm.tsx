@@ -37,7 +37,7 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-6 text-center shadow-card sm:p-10">
         <CheckCircle2 size={48} className="text-success" />
         <h3 className="font-heading text-xl font-bold text-text">Message sent!</h3>
         <p className="max-w-sm text-text-muted">

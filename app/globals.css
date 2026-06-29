@@ -8,43 +8,47 @@
    ────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* ── Primary brand (civic blue) ── */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
+  /* ── Primary brand (YUCI ocean blue) ──
+     Anchored on the logo: Light Cyan #9DE0EF (200), Sky Blue #64D1EC (300),
+     Primary Blue #1FA8D7 (500), Deep Ocean #146B94 (700). */
+  --color-primary-50: #edfbff;
+  --color-primary-100: #d2f3fc;
+  --color-primary-200: #9de0ef;
+  --color-primary-300: #64d1ec;
+  --color-primary-400: #3cbce2;
+  --color-primary-500: #1fa8d7;
+  --color-primary-600: #1787b3;
+  --color-primary-700: #146b94;
+  --color-primary-800: #115774;
+  --color-primary-900: #0f475f;
+  --color-primary-950: #082b3d;
 
-  /* ── Accent (saffron / amber) ── */
-  --color-accent-50: #fffbeb;
-  --color-accent-100: #fef3c7;
-  --color-accent-400: #fbbf24;
-  --color-accent-500: #f59e0b;
-  --color-accent-600: #d97706;
-  --color-accent-700: #b45309;
+  /* ── Accent (luminous sky cyan) ──
+     The logo's bright Sky Blue #64D1EC, used for glows & highlights. */
+  --color-accent-50: #effcfe;
+  --color-accent-100: #d4f5fb;
+  --color-accent-400: #64d1ec;
+  --color-accent-500: #2fb6da;
+  --color-accent-600: #1c9bc2;
+  --color-accent-700: #15809f;
 
-  /* ── Surface / neutral ── */
+  /* ── Surface / neutral (cool, faint cyan tint) ── */
   --color-surface: #ffffff;
-  --color-surface-alt: #f8fafc;
-  --color-border: #e5e7eb;
-  --color-text: #111827;
-  --color-text-muted: #6b7280;
+  --color-surface-alt: #f1f8fb;
+  --color-border: #d9e7ee;
+  --color-text: #102330;
+  --color-text-muted: #4c729a;
 
   /* ── Semantic ── */
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #1fa8d7;
 
   /* ── Typography ── */
   --font-heading: var(--font-jakarta), system-ui, sans-serif;
   --font-body: var(--font-poppins), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-jakarta), system-ui, sans-serif;
 
   /* ── Layout ── */
   --spacing-section: 5rem;

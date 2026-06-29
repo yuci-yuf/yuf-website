@@ -108,7 +108,7 @@ export default function AboutPage() {
         <Container>
           <div className="grid gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-700">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {aboutContent.about.label}
               </span>
               <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-[2.75rem]">
@@ -124,7 +124,7 @@ export default function AboutPage() {
               ))}
             </FadeUp>
 
-            {/* Right — image + floating badge */}
+            {/* Right — image */}
             <FadeUp delay={0.15} className="relative">
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-md">
                 <Image
@@ -134,10 +134,6 @@ export default function AboutPage() {
                   sizes="(min-width: 1024px) 40vw, 90vw"
                   className="object-cover"
                 />
-              </div>
-              <div className="absolute -bottom-6 -left-4 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-lg lg:-left-8">
-                <p className="font-heading text-3xl font-bold text-primary-600">10+</p>
-                <p className="text-xs font-medium text-gray-400">Years of Excellence</p>
               </div>
             </FadeUp>
           </div>
@@ -151,7 +147,7 @@ export default function AboutPage() {
         <Container>
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {aboutContent.mission.label}
               </span>
               <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -194,7 +190,7 @@ export default function AboutPage() {
       <section className="bg-slate-50/60 py-24 lg:py-32">
         <Container>
           <FadeUp className="mb-14 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               Leadership
             </span>
             <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -223,7 +219,7 @@ export default function AboutPage() {
                 <p className="mt-1 text-sm text-gray-400">
                   {siteConfig.advisor.title}
                 </p>
-                <span className="mt-2 inline-flex rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
+                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-primary-600">
                   {siteConfig.advisor.badge}
                 </span>
               </div>
@@ -245,7 +241,7 @@ export default function AboutPage() {
       <section className="bg-white py-24 lg:py-32">
         <Container>
           <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               {aboutContent.activities.label}
             </span>
             <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -285,7 +281,7 @@ export default function AboutPage() {
       <section className="bg-slate-50/60 py-24 lg:py-32">
         <Container>
           <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               {aboutContent.whyJoinUs.label}
             </span>
             <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -327,7 +323,7 @@ export default function AboutPage() {
           <div className="grid items-center gap-16 lg:grid-cols-2">
             {/* Left — impact text + image */}
             <FadeUp className="flex flex-col gap-6">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {aboutContent.impact.label}
               </span>
               <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

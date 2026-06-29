@@ -7,7 +7,7 @@ import type {
 import { cn } from "@/lib/utils";
 
 const fieldBase =
-  "w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text placeholder:text-text-muted/70 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100";
+  "w-full rounded-lg border border-border bg-surface px-4 py-3 text-base text-text placeholder:text-text-muted/70 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 sm:py-2.5 sm:text-sm";
 
 export function FieldLabel({
   htmlFor,
@@ -38,7 +38,7 @@ export function Textarea({
   ...props
 }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
-    <textarea className={cn(fieldBase, "min-h-32 resize-y", className)} {...props} />
+    <textarea className={cn(fieldBase, "min-h-28 resize-y sm:min-h-32", className)} {...props} />
   );
 }
 

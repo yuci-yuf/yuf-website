@@ -1,18 +1,16 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { LogoStrip } from "@/components/home/LogoStrip";
-import { StatsBar } from "@/components/home/StatsBar";
 import { MissionSection } from "@/components/home/MissionSection";
 import { RecognitionBanner } from "@/components/home/RecognitionBanner";
 import { InitiativesRow } from "@/components/home/InitiativesRow";
 import { EventShowcase } from "@/components/home/EventShowcase";
 import { StepsTimeline } from "@/components/home/StepsTimeline";
 import { GalleryMosaic } from "@/components/home/GalleryMosaic";
-import { RegisterCTA } from "@/components/home/RegisterCTA";
 import {
   homeContent,
-  siteConfig,
   partners,
   registrationSteps,
+  tickerItems,
 } from "@/lib/content";
 import { getEvents } from "@/lib/cms-data";
 
@@ -25,22 +23,16 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection
-        badge={homeContent.hero.badge}
         title={homeContent.hero.title}
         highlight={homeContent.hero.highlight}
         subtitle={homeContent.hero.subtitle}
-        heroImage={homeContent.hero.backgroundImage!}
-        floatingImage="/images/events/event-1.png"
+        marqueeItems={tickerItems}
         stats={[
           { number: "5K+", label: "Participants" },
           { number: "28+", label: "States" },
           { number: "100+", label: "Districts" },
         ]}
       />
-
-      <LogoStrip partners={partners} />
-
-      <StatsBar stats={siteConfig.stats} />
 
       <MissionSection
         label={homeContent.about.label}
@@ -72,7 +64,7 @@ export default async function HomePage() {
 
 <GalleryMosaic />
 
-      <RegisterCTA data={homeContent.ctaBanner} />
+      <LogoStrip partners={partners} />
     </>
   );
 }

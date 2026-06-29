@@ -19,11 +19,11 @@ const galleryImages = [
 
 export function GalleryMosaic() {
   return (
-    <section className="bg-slate-50/60 py-24 lg:py-32">
+    <section className="bg-slate-50/60 py-16 sm:py-24 lg:py-32">
       <Container>
         <FadeUp className="mb-14 flex items-end justify-between">
           <div className="flex flex-col gap-4">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               Gallery
             </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

@@ -72,7 +72,7 @@ export default async function EventDetailPage({
                 <Tag size={15} /> {event.tag}
               </span>
             </div>
-            <h1 className="font-heading text-4xl font-bold leading-tight sm:text-5xl">
+            <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
             </h1>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-primary-100">

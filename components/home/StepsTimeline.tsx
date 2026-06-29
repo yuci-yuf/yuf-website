@@ -6,10 +6,10 @@ import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
 
 export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
   return (
-    <section className="bg-slate-50/60 py-24 lg:py-32">
+    <section className="bg-slate-50/60 py-16 sm:py-24 lg:py-32">
       <Container>
         <FadeUp className="mb-16 flex flex-col items-center gap-4 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
             How It Works
           </span>
           <h2 className="max-w-md font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

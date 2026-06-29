@@ -17,10 +17,10 @@ export function InitiativesRow({
   cards,
 }: InitiativesRowProps) {
   return (
-    <section className="bg-slate-50/60 py-24 lg:py-32">
+    <section className="bg-gradient-to-b from-primary-50/50 to-white py-16 sm:py-24 lg:py-32">
       <Container>
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
             {label}
           </span>
           <h2 className="max-w-xl font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -34,9 +34,9 @@ export function InitiativesRow({
         <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-3">
           {cards.map((card) => (
             <StaggerItem key={card.title}>
-              <div className="group flex flex-col items-center gap-5 rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="group flex flex-col items-center gap-5 rounded-3xl border border-primary-200 bg-gradient-to-br from-primary-100 to-primary-200/80 p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:from-primary-100 hover:to-primary-300/70 hover:shadow-lg hover:shadow-primary-200/60">
                 {card.image && (
-                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-gray-50 p-2">
+                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-white p-2 shadow-sm ring-1 ring-primary-200">
                     <Image
                       src={card.image}
                       alt={card.title}
@@ -46,10 +46,10 @@ export function InitiativesRow({
                     />
                   </div>
                 )}
-                <h3 className="font-heading text-lg font-bold text-gray-900">
+                <h3 className="font-heading text-lg font-bold text-primary-900">
                   {card.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-gray-500">
+                <p className="text-sm leading-relaxed text-gray-600">
                   {card.description}
                 </p>
               </div>

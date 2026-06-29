@@ -36,7 +36,7 @@ export default async function RegisterPage() {
       <Hero data={registerContent.hero} />
       <Section>
         {activeEvents.length > 0 ? (
-          <Suspense fallback={<div className="h-96" />}>
+          <Suspense fallback={<div className="h-64 sm:h-96" />}>
             <RegistrationForm events={activeEvents} categories={categories} />
           </Suspense>
         ) : (

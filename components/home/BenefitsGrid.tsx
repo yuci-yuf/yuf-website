@@ -17,10 +17,10 @@ export function BenefitsGrid({
   cards: FeatureCard[];
 }) {
   return (
-    <section className="bg-white py-24 lg:py-32">
+    <section className="bg-white py-16 sm:py-24 lg:py-32">
       <Container>
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
             {label}
           </span>
           <h2 className="max-w-md font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
