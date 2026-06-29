@@ -6,7 +6,6 @@ import { RecognitionBanner } from "@/components/home/RecognitionBanner";
 import { InitiativesRow } from "@/components/home/InitiativesRow";
 import { EventShowcase } from "@/components/home/EventShowcase";
 import { StepsTimeline } from "@/components/home/StepsTimeline";
-import { BenefitsGrid } from "@/components/home/BenefitsGrid";
 import { GalleryMosaic } from "@/components/home/GalleryMosaic";
 import { RegisterCTA } from "@/components/home/RegisterCTA";
 import {
@@ -73,14 +72,7 @@ export default async function HomePage() {
 
       <StepsTimeline steps={registrationSteps} />
 
-      <BenefitsGrid
-        label={homeContent.whyJoinUs.label}
-        title={homeContent.whyJoinUs.title}
-        subtitle={homeContent.whyJoinUs.subtitle}
-        cards={homeContent.whyJoinUs.cards}
-      />
-
-      <GalleryMosaic />
+<GalleryMosaic />
 
       <RegisterCTA data={homeContent.ctaBanner} />
     </>

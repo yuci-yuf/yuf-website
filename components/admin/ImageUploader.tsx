@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import {
   isCloudinaryConfigured,
@@ -9,12 +9,6 @@ import {
 import { Input } from "@/components/ui/Field";
 import { cn } from "@/lib/utils";
 
-/**
- * Image input for the admin CMS. When Cloudinary is configured (via the
- * NEXT_PUBLIC_CLOUDINARY_* env vars) it lets the admin pick a file and uploads
- * it directly from the browser; otherwise it falls back to pasting a URL. Both
- * paths produce a single string URL surfaced via `onChange`.
- */
 export function ImageUploader({
   value,
   onChange,
@@ -28,11 +22,16 @@ export function ImageUploader({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const configured = isCloudinaryConfigured();
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Only image files are supported.");
+      return;
+    }
     setError(null);
     setUploading(true);
     try {
@@ -47,18 +46,29 @@ export function ImageUploader({
     }
   }
 
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(true);
+  }, []);
+
+  const onDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+  }, []);
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    handleFile(e.dataTransfer.files?.[0]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [folder]);
+
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       {value ? (
         <div className="relative h-40 w-full overflow-hidden rounded-xl border border-border bg-surface-alt">
-          {/* Next/Image needs known hosts; use a plain img to tolerate any URL
-              the admin pastes during editing. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={value}
-            alt="Preview"
-            className="h-full w-full object-cover"
-          />
+          <img src={value} alt="Preview" className="h-full w-full object-cover" />
           <button
             type="button"
             onClick={() => onChange("")}
@@ -68,28 +78,39 @@ export function ImageUploader({
             <X size={16} />
           </button>
         </div>
-      ) : (
-        configured && (
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="flex h-40 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-surface-alt text-text-muted transition-colors hover:border-primary-300 hover:text-primary-700 disabled:opacity-60"
-          >
-            {uploading ? (
-              <>
-                <Loader2 className="animate-spin" size={24} />
-                <span className="text-sm">Uploading…</span>
-              </>
-            ) : (
-              <>
-                <ImagePlus size={24} />
-                <span className="text-sm font-medium">Click to upload an image</span>
-              </>
-            )}
-          </button>
-        )
-      )}
+      ) : configured ? (
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          disabled={uploading}
+          className={cn(
+            "flex h-40 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-surface-alt text-text-muted transition-colors disabled:opacity-60",
+            dragging
+              ? "border-primary-500 bg-primary-50 text-primary-700"
+              : "border-border hover:border-primary-300 hover:text-primary-700",
+          )}
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="animate-spin" size={24} />
+              <span className="text-sm">Uploading…</span>
+            </>
+          ) : dragging ? (
+            <>
+              <ImagePlus size={24} />
+              <span className="text-sm font-medium">Drop to upload</span>
+            </>
+          ) : (
+            <>
+              <ImagePlus size={24} />
+              <span className="text-sm font-medium">Click or drag & drop an image</span>
+            </>
+          )}
+        </button>
+      ) : null}
 
       <input
         ref={fileRef}
@@ -99,21 +120,16 @@ export function ImageUploader({
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
 
-      {/* URL field — primary input when Cloudinary isn't configured, and a
-          handy override otherwise. */}
       <Input
         type="url"
-        placeholder={
-          configured ? "…or paste an image URL" : "Paste an image URL"
-        }
+        placeholder={configured ? "…or paste an image URL" : "Paste an image URL"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
 
       {!configured && (
         <p className="text-xs text-text-muted">
-          Tip: set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and
-          NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET to enable direct file uploads.
+          Tip: set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET to enable direct file uploads.
         </p>
       )}
       {error && <p className="text-xs text-error">{error}</p>}

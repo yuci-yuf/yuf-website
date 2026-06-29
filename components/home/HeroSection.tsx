@@ -31,18 +31,6 @@ export function HeroSection({
         background: "linear-gradient(135deg, #eff6ff 0%, #f8fafc 40%, #fffbeb 100%)",
       }}
     >
-      {/* Dot grid */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: "radial-gradient(circle, rgba(59,130,246,0.18) 1.5px, transparent 1.5px)",
-          backgroundSize: "26px 26px",
-          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)",
-        }}
-        aria-hidden
-      />
-
       {/* Blue glow — top right */}
       <div
         className="pointer-events-none absolute -right-40 -top-20 h-[650px] w-[650px] rounded-full blur-[130px]"

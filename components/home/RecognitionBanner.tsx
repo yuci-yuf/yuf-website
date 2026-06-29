@@ -20,7 +20,7 @@ export function RecognitionBanner({
   return (
     <section className="bg-gradient-to-b from-amber-50/40 to-white py-24 lg:py-32">
       <Container>
-        <div className="grid items-center gap-14 lg:grid-cols-2">
+        <div className="grid items-start gap-14 lg:grid-cols-2">
           {/* Left — content */}
           <FadeUp className="flex flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700">
