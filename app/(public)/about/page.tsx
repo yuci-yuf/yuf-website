@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowRight, Eye, Heart, Sparkles, Music, Cpu, Dumbbell, Mic, Users, Globe, MapPin, Trophy, Quote } from "lucide-react";
 import { aboutContent, siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
+import { HeroBackdrop } from "@/components/public/HeroBackdrop";
+import { IndiaMapImage } from "@/components/public/IndiaMapImage";
 import { FadeUp, FadeIn, StaggerContainer, StaggerItem, ScaleIn } from "@/components/home/MotionWrapper";
 
 export const metadata: Metadata = {
@@ -22,62 +24,76 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           1. HERO — Editorial 3-column layout (reference match)
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-white pb-16 pt-28 lg:pb-24 lg:pt-36">
-        <Container>
-          {/* ── Top row: ABOUT ── */}
-          <div className="mb-12 lg:mb-10 lg:pl-1">
-  <FadeUp>
-    <h1 className="font-heading text-[5rem] font-black uppercase leading-[0.85] tracking-tighter text-gray-900 sm:text-[7.5rem] lg:text-[10rem]">
-      About
-    </h1>
-  </FadeUp>
-</div>
+      <section className="relative overflow-hidden bg-primary-950 pb-12 pt-20 lg:pb-20 lg:pt-24">
+        <HeroBackdrop />
+        <Container className="relative z-30">
+          {/* ── Top row: ABOUT + tagline ── */}
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-x-10 gap-y-4 lg:mb-10 lg:pl-1">
+            <FadeUp>
+              <h1 className="font-heading text-[3.5rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
+                About
+              </h1>
+            </FadeUp>
+
+            <FadeUp delay={0.12} className="hidden max-w-sm flex-col items-start gap-4 pb-3 lg:flex">
+              {/* <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-400 backdrop-blur-sm">
+                {aboutContent.hero.badge}
+              </span> */}
+              <p className="font-heading text-2xl font-bold leading-snug text-white">
+                {aboutContent.about.subhead}
+              </p>
+              <p className="text-sm leading-relaxed text-primary-100/80">
+                A nationwide movement by the Youth United Council of India,
+                empowering young changemakers to lead, innovate, and inspire.
+              </p>
+            </FadeUp>
+          </div>
 
           {/* ── Bottom row: US | Large Image | Small Image + Text ── */}
-          <div className="grid grid-cols-1 items-stretch gap-x-10 gap-y-12 lg:grid-cols-[max-content_1fr_minmax(300px,0.4fr)]">
-            
+          <div className="grid grid-cols-1 items-stretch gap-x-10 gap-y-6 sm:gap-y-8 lg:grid-cols-[max-content_1fr_minmax(300px,0.4fr)]">
+
             {/* Left Column */}
             <div className="flex flex-col">
               <FadeUp delay={0.05}>
-                <h1 className="font-heading text-[5rem] font-black uppercase leading-[0.85] tracking-tighter text-gray-900 sm:text-[7.5rem] lg:text-[10rem]">
+                <h1 className="font-heading text-[3.5rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
                   Us
                 </h1>
               </FadeUp>
-              
-              <div className="mt-8 flex flex-col gap-10 lg:mt-12 lg:pb-4 lg:pl-2">
+
+              <div className="mt-6 flex flex-col gap-6 lg:pb-4 lg:pl-2">
                 <FadeUp delay={0.15}>
-                  <p className="max-w-[200px] text-[13px] font-semibold leading-relaxed text-gray-600">
+                  <p className="max-w-full text-[13px] font-semibold leading-relaxed text-primary-100 sm:max-w-[200px]">
                     {aboutContent.hero.subtitle}
                   </p>
                 </FadeUp>
                 <FadeUp delay={0.2}>
-                  <p className="max-w-[250px] text-[13px] leading-relaxed text-gray-500">
-                    {aboutContent.about.body[0]}
+                  <p className="max-w-full text-[13px] leading-relaxed text-primary-200/80 sm:max-w-[280px]">
+                    At Youth United Council of India (YUCI), we believe in the limitless potential of young people. As a nonprofit organization, we empower youth worldwide by fostering inclusivity, nurturing talent, and creating impactful platforms like the Youth United Festival (YUF) that inspire leadership, creativity, and positive change.
                   </p>
                 </FadeUp>
               </div>
             </div>
 
             {/* Center Column */}
-            <FadeUp delay={0.1} className="h-full">
-              <div className="relative h-full min-h-[350px] w-full overflow-hidden rounded-[2.5rem] lg:min-h-[480px]">
-                <Image
-                  src="/images/hero/about.jpg"
-                  alt="Youth United Festival"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 90vw"
-                  className="object-cover"
-                />
-              </div>
-            </FadeUp>
+<FadeUp delay={0.1} className="h-full">
+  <div className="relative h-[190px] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:h-[280px] sm:rounded-[2.5rem] lg:h-[390px]">
+    <Image
+      src="/images/hero/pondicherry-event.jpg"
+      alt="Youth United Festival"
+      fill
+      priority
+      sizes="(min-width: 1024px) 50vw, 90vw"
+      className="object-cover"
+    />
+  </div>
+</FadeUp>
 
             {/* Right Column */}
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col gap-6">
               <FadeUp delay={0.2}>
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] lg:aspect-[2/1] xl:aspect-[4/3]">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:rounded-[2.5rem] lg:aspect-[2/1] xl:aspect-[4/3]">
                   <Image
-                    src="/images/sections/who-we-are.jpg"
+                    src="/images/hero/pondicherry-community.jpg"
                     alt="YUCI Community"
                     fill
                     sizes="(min-width: 1024px) 25vw, 50vw"
@@ -85,14 +101,14 @@ export default function AboutPage() {
                   />
                 </div>
               </FadeUp>
-              
-              <div className="mt-10 flex flex-col gap-3 lg:mt-0 lg:pb-4">
+
+              <div className="flex flex-col gap-3 lg:pb-4">
                 <FadeUp delay={0.25} className="flex flex-col gap-3">
-                  <h2 className="font-heading text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     Our Philosophy
                   </h2>
-                  <p className="text-[14px] leading-relaxed text-gray-500">
-                    "We strive to inspire active youth participation, spark creativity, and encourage meaningful conversations across a wide range of fields—from performing arts to technology and innovation. YUF cultivates a strong sense of community, unity, and personal growth that extends far beyond the meaningful connections, and continued collaboration."
+                  <p className="text-[14px] leading-relaxed text-primary-100/90">
+                    "We strive to inspire active youth participation and encourage meaningful conversations across a wide range of fields—from performing arts to innovation."
                   </p>
                 </FadeUp>
               </div>
@@ -104,9 +120,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           2. WHO WE ARE — Split text + quote
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-24 lg:py-32">
+      <section className="bg-slate-50/60 py-16 lg:py-24">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-2">
+          <div className="grid gap-10 lg:gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {aboutContent.about.label}
@@ -141,11 +157,63 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
+          2.5 BELIEF — Pill collage + statement
+          ═══════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-white py-16 lg:py-24">
+        {/* Decorative organic blobs */}
+        <div className="pointer-events-none absolute -left-16 top-10 h-48 w-48 rounded-full bg-accent-100/60 blur-2xl" aria-hidden />
+        <div className="pointer-events-none absolute bottom-10 right-1/3 h-40 w-40 rounded-full bg-primary-100/70 blur-2xl" aria-hidden />
+
+        <Container>
+          <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
+            {/* Left — statement */}
+            <FadeUp className="flex flex-col gap-6">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+                Our Belief
+              </span>
+              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-[2.75rem]">
+                Change begins where
+                <br className="hidden sm:block" /> youth find their voice
+              </h2>
+              <p className="max-w-md text-[16px] leading-relaxed text-gray-500">
+                Every young person carries a spark to transform their community.
+                At YUF, we provide the stage, the mentorship, and the
+                opportunities that turn that spark into lasting impact — across
+                arts, sport, science, and service.
+              </p>
+              <Link
+                href="/register"
+                className="group mt-2 inline-flex h-13 w-fit items-center gap-2 rounded-full bg-primary-600 px-7 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg"
+              >
+                Join the Movement
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </FadeUp>
+
+            {/* Right — India map filled with event imagery */}
+            <FadeUp delay={0.15} className="relative">
+              {/* scattered accent dots */}
+              <span className="absolute left-4 top-4 h-3 w-3 rounded-full bg-accent-400" aria-hidden />
+              <span className="absolute right-12 top-10 h-2.5 w-2.5 rounded-full bg-primary-400" aria-hidden />
+              <span className="absolute bottom-10 left-8 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
+              <span className="absolute bottom-16 right-6 h-3 w-3 rounded-full bg-primary-300" aria-hidden />
+
+              <IndiaMapImage
+                src="/images/about/youth-event.jpg"
+                label="YUF youth across India"
+                className="mx-auto h-[300px] w-full max-w-sm text-primary-700 drop-shadow-xl sm:h-[400px] sm:max-w-md lg:h-[500px] lg:max-w-lg"
+              />
+            </FadeUp>
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
           3. MISSION — Vision & Values cards
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-white py-24 lg:py-32">
+      <section className="bg-white py-16 lg:py-24">
         <Container>
-          <div className="grid items-center gap-16 lg:grid-cols-2">
+          <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
                 {aboutContent.mission.label}
@@ -187,9 +255,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           4. MEET THE PRINCIPAL — Advisor spotlight
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-24 lg:py-32">
+      <section className="bg-slate-50/60 py-16 lg:py-24">
         <Container>
-          <FadeUp className="mb-14 text-center">
+          <FadeUp className="mb-10 text-center lg:mb-14">
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               Leadership
             </span>
@@ -198,7 +266,7 @@ export default function AboutPage() {
             </h2>
           </FadeUp>
 
-          <div className="mx-auto grid max-w-4xl items-center gap-12 lg:grid-cols-[auto_1fr]">
+          <div className="mx-auto grid max-w-4xl items-center gap-8 lg:gap-12 lg:grid-cols-[auto_1fr]">
             <ScaleIn>
               <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-3xl shadow-md lg:h-64 lg:w-64">
                 <Image
@@ -238,9 +306,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           5. WHAT WE DO — Activity cards (4-col)
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-white py-24 lg:py-32">
+      <section className="bg-white py-16 lg:py-24">
         <Container>
-          <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
+          <FadeUp className="mb-10 flex flex-col items-center gap-4 text-center lg:mb-14">
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               {aboutContent.activities.label}
             </span>
@@ -278,9 +346,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           6. WHY JOIN US — 3-col benefit cards
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-24 lg:py-32">
+      <section className="bg-slate-50/60 py-16 lg:py-24">
         <Container>
-          <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
+          <FadeUp className="mb-10 flex flex-col items-center gap-4 text-center lg:mb-14">
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
               {aboutContent.whyJoinUs.label}
             </span>
@@ -292,7 +360,7 @@ export default function AboutPage() {
             </p>
           </FadeUp>
 
-          <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-3">
+          <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {aboutContent.whyJoinUs.cards.map((card, i) => {
               const Icon = whyJoinIcons[i % whyJoinIcons.length];
               return (
@@ -318,9 +386,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           7. IMPACT — Stats + text
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-white py-24 lg:py-32">
+      <section className="bg-white py-16 lg:py-24">
         <Container>
-          <div className="grid items-center gap-16 lg:grid-cols-2">
+          <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             {/* Left — impact text + image */}
             <FadeUp className="flex flex-col gap-6">
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
@@ -389,7 +457,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           8. CTA — Premium register banner
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-white pb-24 pt-8 lg:pb-32">
+      <section className="bg-white pb-16 pt-4 lg:pb-24">
         <Container>
           <FadeUp>
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 px-8 py-16 sm:px-14 lg:px-20">

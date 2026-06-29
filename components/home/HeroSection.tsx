@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { HERO_COLLAGE } from "@/components/public/HeroBackdrop";
 
 interface HeroSectionProps {
   title: string;
@@ -13,40 +14,6 @@ interface HeroSectionProps {
   stats: { number: string; label: string }[];
   marqueeItems: string[];
 }
-
-// Dense photo wall behind the dark blanket — drawn from the site's image library.
-const COLLAGE = [
-  "/images/events/event-1.png",
-  "/images/recognition/award_1.jpg",
-  "/images/hero/home.jpg",
-  "/images/events/event-2.png",
-  "/images/sections/who-we-are.jpg",
-  "/images/recognition/award_2.jpg",
-  "/images/events/event-3.png",
-  "/images/hero/events.jpg",
-  "/images/recognition/backup/award_1.jpg",
-  "/images/events/event-4.png",
-  "/images/advisor/advisor.jpg",
-  "/images/recognition/award_3.jpg",
-  "/images/events/event-5.png",
-  "/images/hero/about.jpg",
-  "/images/recognition/backup/award_2.jpg",
-  "/images/events/event-6.png",
-  "/images/sections/join-us.jpg",
-  "/images/recognition/award_4.jpg",
-  "/images/events/event-7.png",
-  "/images/hero/register.jpg",
-  "/images/recognition/backup/award_3.png",
-  "/images/events/event-8.png",
-  "/images/gallery/pondicherry-juniors.jpg",
-  "/images/recognition/backup/award_4.jpg",
-  "/images/events/event-9.png",
-  "/images/hero/contact.jpg",
-  "/images/recognition/award_1.jpg",
-  "/images/events/event-1.png",
-  "/images/sections/who-we-are.jpg",
-  "/images/events/event-4.png",
-];
 
 export function HeroSection({
   title,
@@ -68,7 +35,7 @@ export function HeroSection({
         transition={{ duration: 1.4, ease: "easeOut" }}
       >
         <div className="grid h-full w-full auto-rows-fr grid-cols-3 sm:grid-cols-5 lg:grid-cols-6">
-          {COLLAGE.map((src, i) => (
+          {HERO_COLLAGE.map((src, i) => (
             <div key={i} className="relative">
               <Image
                 src={src}
