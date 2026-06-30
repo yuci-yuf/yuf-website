@@ -66,7 +66,7 @@ export function EventsExplorer({
           {/* Only label groups when more than one status is present, to avoid a
               redundant single heading. */}
           {groups.length > 1 && (
-            <h3 className="font-heading text-xl font-bold text-text">
+            <h3 className="font-heading text-xl font-bold text-heading">
               {group.label}
             </h3>
           )}

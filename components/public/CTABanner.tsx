@@ -6,7 +6,7 @@ import { ctaButtonVariant } from "@/lib/utils";
 
 export function CTABanner({ data }: { data: CTABannerData }) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 py-24 lg:py-28">
+    <section className="bg-festival-gradient relative overflow-hidden py-24 lg:py-28">
       {/* Radial accent glows */}
       <div
         className="absolute inset-0 opacity-80"
@@ -29,13 +29,13 @@ export function CTABanner({ data }: { data: CTABannerData }) {
 
       <Container className="relative">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-7 text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.2em] text-accent-400">
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
             {data.label}
           </span>
           <h2 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl">
             {data.title}
           </h2>
-          <p className="text-lg leading-relaxed text-primary-100">
+          <p className="text-lg leading-relaxed text-white/90">
             {data.body}
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-2">

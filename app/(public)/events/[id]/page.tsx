@@ -45,7 +45,7 @@ export default async function EventDetailPage({
   return (
     <>
       {/* Header */}
-      <section className="relative overflow-hidden bg-primary-950 py-20 text-white lg:py-28">
+      <section className="bg-festival-gradient relative overflow-hidden py-20 text-white lg:py-28">
         {event.image && (
           <Image
             src={event.image}
@@ -56,11 +56,18 @@ export default async function EventDetailPage({
             className="object-cover opacity-25"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/85 to-primary-900/60" aria-hidden />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 100% at 12% 8%, rgba(123,52,226,0.5) 0%, transparent 46%), linear-gradient(120deg, rgba(28,79,198,0.92) 0%, rgba(30,127,212,0.9) 38%, rgba(26,166,206,0.88) 62%, rgba(30,198,192,0.92) 100%)",
+          }}
+          aria-hidden
+        />
         <div className="relative mx-auto w-full max-w-4xl px-6 lg:px-8">
           <Link
             href="/events"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-200 transition-colors hover:text-white"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 transition-colors hover:text-white"
           >
             <ArrowLeft size={16} />
             All Events
@@ -70,22 +77,22 @@ export default async function EventDetailPage({
               <Badge className="bg-white/15 px-4 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
                 {event.category}
               </Badge>
-              <span className="inline-flex items-center gap-1.5 text-sm text-primary-200">
+              <span className="inline-flex items-center gap-1.5 text-sm text-white/80">
                 <Tag size={15} /> {event.tag}
               </span>
             </div>
             <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
             </h1>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-primary-100">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/90">
               {event.date && (
                 <span className="inline-flex items-center gap-2">
-                  <CalendarDays size={16} className="text-accent-400" /> {event.date}
+                  <CalendarDays size={16} className="text-highlight-400" /> {event.date}
                 </span>
               )}
               {event.venue && (
                 <span className="inline-flex items-center gap-2">
-                  <MapPin size={16} className="text-accent-400" /> {event.venue}
+                  <MapPin size={16} className="text-highlight-400" /> {event.venue}
                 </span>
               )}
             </div>
@@ -97,7 +104,7 @@ export default async function EventDetailPage({
       <Section containerClassName="max-w-4xl">
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div className="flex flex-col gap-5">
-            <h2 className="font-heading text-2xl font-bold text-text">
+            <h2 className="font-heading text-2xl font-bold text-heading">
               About this event
             </h2>
             {body.map((p, i) => (
@@ -108,7 +115,7 @@ export default async function EventDetailPage({
 
             {event.rules && event.rules.length > 0 && (
               <div className="mt-4 flex flex-col gap-4">
-                <h3 className="font-heading text-xl font-bold text-text">
+                <h3 className="font-heading text-xl font-bold text-heading">
                   Rules &amp; Guidelines
                 </h3>
                 <ul className="flex list-disc flex-col gap-2 pl-5 text-text-muted">
@@ -126,7 +133,7 @@ export default async function EventDetailPage({
           <aside className="h-fit rounded-2xl border border-border bg-surface p-6 shadow-card lg:sticky lg:top-28">
             {event.registrationOpen !== false ? (
               <>
-                <h3 className="font-heading text-lg font-bold text-text">
+                <h3 className="font-heading text-lg font-bold text-heading">
                   Ready to participate?
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted">
@@ -144,7 +151,7 @@ export default async function EventDetailPage({
               </>
             ) : (
               <>
-                <h3 className="font-heading text-lg font-bold text-text">
+                <h3 className="font-heading text-lg font-bold text-heading">
                   Registration closed
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted">
@@ -162,7 +169,7 @@ export default async function EventDetailPage({
       {/* Related events */}
       {related.length > 0 && (
         <Section className="bg-surface-alt">
-          <h2 className="mb-10 font-heading text-2xl font-bold text-text">
+          <h2 className="mb-10 font-heading text-2xl font-bold text-heading">
             More in {event.category}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -32,15 +32,13 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-4 lg:px-6">
-        <nav
-          className={cn(
-            "mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3 transition-all duration-300 lg:px-6",
-            scrolled
-              ? "bg-white/85 shadow-lg shadow-black/[0.04] ring-1 ring-black/[0.06] backdrop-blur-xl"
-              : "bg-white/60 ring-1 ring-black/[0.04] backdrop-blur-md",
-          )}
-        >
+      <header
+        className={cn(
+          "fixed left-0 right-0 top-0 z-50 border-b border-border bg-white transition-shadow duration-300",
+          scrolled ? "shadow-sm" : "",
+        )}
+      >
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8">
           {/* Logo cluster */}
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={siteConfig.siteName}>
             <Image
@@ -123,7 +121,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
-              className="fixed left-4 right-4 top-20 z-50 rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl lg:hidden"
+              className="fixed left-0 right-0 top-16 z-50 border-b border-border bg-white p-6 shadow-lg lg:hidden"
             >
               <div className="flex flex-col gap-1">
                 {links.map((link) => (

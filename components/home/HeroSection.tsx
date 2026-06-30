@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Star, Users, Map, MapPin } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
 interface HeroSectionProps {
@@ -26,11 +26,11 @@ const DIAMONDS_RIGHT = [
   { src: "/images/recognition/award_1.jpg", className: "right-[1%] bottom-[8%] h-24 w-24 lg:h-32 lg:w-32", delay: 1.7 },
 ];
 
-/* Icon + supporting line for each stat card (matched to the reference). */
+/* Supporting line for each stat card (matched to the reference). */
 const STAT_META = [
-  { Icon: Users, desc: "Young talents from every corner of India" },
-  { Icon: Map, desc: "States represented across the festival" },
-  { Icon: MapPin, desc: "Districts joining the celebration" },
+  { desc: "Young talents from every corner of India" },
+  { desc: "States represented across the festival" },
+  { desc: "Districts joining the celebration" },
 ];
 
 function DiamondTile({
@@ -205,17 +205,6 @@ export function HeroSection({
       {/* ── Centred content ── */}
       <Container className="relative z-30 h-full">
         <div className="flex min-h-[100svh] flex-col items-center justify-center gap-6 px-2 pb-28 pt-28 text-center">
-          {/* Festival badge */}
-          <motion.span
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md"
-          >
-            {/* <Sparkles size={14} className="text-highlight-400" />
-            India&apos;s Biggest Youth Festival */}
-          </motion.span>
-
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -245,14 +234,14 @@ export function HeroSection({
           >
             <Link
               href="/register"
-              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-festival-blue to-festival-cyan px-8 text-[15px] font-semibold text-white shadow-xl shadow-festival-blue/30 transition-all hover:brightness-110"
+              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-white px-8 text-[15px] font-bold text-festival-blue shadow-xl shadow-primary-950/25 transition-all hover:bg-primary-50"
             >
               Register Now
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/events"
-              className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 text-[15px] font-semibold text-white backdrop-blur-sm transition-all hover:border-white/50 hover:bg-white/20"
+              className="inline-flex h-13 items-center justify-center gap-2 rounded-full border-2 border-white bg-white/10 px-8 text-[15px] font-bold text-white backdrop-blur-sm transition-all hover:bg-white/25"
             >
               Browse Events
             </Link>
@@ -266,20 +255,15 @@ export function HeroSection({
             className="mt-6 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3"
           >
             {stats.map((stat, i) => {
-              const { Icon, desc } = STAT_META[i] ?? STAT_META[0];
+              const { desc } = STAT_META[i] ?? STAT_META[0];
               return (
                 <div
                   key={stat.label}
                   className="rounded-2xl border border-white/20 bg-white/12 p-5 text-left shadow-xl shadow-primary-950/20 backdrop-blur-md"
                 >
-                  <div className="flex items-start justify-between">
-                    <span className="font-display text-3xl font-extrabold text-white">
-                      {stat.number}
-                    </span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white">
-                      <Icon size={16} />
-                    </span>
-                  </div>
+                  <span className="font-display text-3xl font-extrabold text-white">
+                    {stat.number}
+                  </span>
                   <p className="mt-1 font-semibold text-white">{stat.label}</p>
                   <p className="mt-1 text-xs leading-relaxed text-white/70">{desc}</p>
                 </div>

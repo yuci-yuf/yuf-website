@@ -7,17 +7,17 @@ import { ctaButtonVariant } from "@/lib/utils";
 
 export function Hero({ data }: { data: HeroData }) {
   return (
-    <section className="relative overflow-hidden bg-primary-950">
+    <section className="relative flex min-h-[34rem] items-center overflow-hidden bg-primary-950 lg:min-h-[40rem]">
       <HeroBackdrop />
 
-      <Container className="relative z-30 py-32 lg:py-44">
+      <Container className="relative z-30 py-24 lg:py-28">
         <div className="flex max-w-3xl flex-col gap-8">
           {data.badge && (
             <div
               className="animate-[fade-up_0.6s_ease-out_both]"
               style={{ animationDelay: "0.1s" }}
             >
-              <span className="text-sm font-bold uppercase tracking-[0.25em] text-accent-400">
+              <span className="text-sm font-bold uppercase tracking-[0.25em] text-highlight-400">
                 {data.badge}
               </span>
             </div>
@@ -29,14 +29,14 @@ export function Hero({ data }: { data: HeroData }) {
           >
             {data.title}{" "}
             {data.highlight && (
-              <span className="bg-gradient-to-r from-accent-400 via-primary-300 to-accent-400 bg-clip-text text-transparent">
+              <span className="text-highlight-400">
                 {data.highlight}
               </span>
             )}
           </h1>
 
           <p
-            className="max-w-2xl animate-[fade-up_0.6s_ease-out_both] text-lg leading-relaxed text-primary-100/90 lg:text-xl"
+            className="max-w-2xl animate-[fade-up_0.6s_ease-out_both] text-lg leading-relaxed text-white/90 lg:text-xl"
             style={{ animationDelay: "0.35s" }}
           >
             {data.subtitle}
@@ -55,8 +55,8 @@ export function Hero({ data }: { data: HeroData }) {
                   variant={ctaButtonVariant(b.variant)}
                   className={
                     b.variant === "outline"
-                      ? "border-white/25 bg-white/5 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
-                      : "shadow-lg hover:shadow-glow"
+                      ? "border-2 border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/25 hover:text-white"
+                      : "bg-white text-festival-blue shadow-xl shadow-primary-950/25 hover:bg-primary-50"
                   }
                 >
                   <Link href={b.href}>

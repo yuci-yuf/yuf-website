@@ -42,17 +42,17 @@ export function SectionHeading({
       )}
     >
       {label && (
-        <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+        <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
           {label}
         </span>
       )}
-      <h2 className="max-w-3xl font-heading text-3xl font-bold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">
+      <h2 className="max-w-3xl font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
         {title}
       </h2>
       {subtitle && (
         <p
           className={cn(
-            "max-w-2xl text-[17px] leading-relaxed text-text-muted",
+            "max-w-2xl text-[17px] leading-relaxed text-body",
             align === "center" && "mx-auto",
           )}
         >

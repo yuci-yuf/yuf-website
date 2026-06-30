@@ -4,15 +4,15 @@ import type { LegalPage } from "@/lib/content";
 export function LegalContent({ data }: { data: LegalPage }) {
   return (
     <>
-      <Section className="bg-primary-950 text-white" containerClassName="max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-400">
+      <Section className="bg-festival-gradient text-white" containerClassName="max-w-3xl">
+        <p className="text-sm font-semibold uppercase tracking-widest text-highlight-400">
           {data.updated}
         </p>
         <h1 className="mt-3 font-heading text-4xl font-bold sm:text-5xl">
           {data.title}
         </h1>
         {data.intro && (
-          <p className="mt-5 text-base leading-relaxed text-primary-200">
+          <p className="mt-5 text-base leading-relaxed text-white/85">
             {data.intro}
           </p>
         )}
@@ -22,7 +22,7 @@ export function LegalContent({ data }: { data: LegalPage }) {
         <div className="flex flex-col gap-10">
           {data.sections.map((section) => (
             <div key={section.heading} className="flex flex-col gap-4">
-              <h2 className="font-heading text-2xl font-bold text-text">
+              <h2 className="font-heading text-2xl font-bold text-heading">
                 {section.heading}
               </h2>
               {section.blocks.map((block, i) =>

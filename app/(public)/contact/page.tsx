@@ -30,7 +30,7 @@ export default function ContactPage() {
           {/* Sidebar */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
-              <h3 className="font-heading text-xl font-bold text-text">
+              <h3 className="font-heading text-xl font-bold text-heading">
                 Get in touch with us
               </h3>
               <ul className="flex flex-col gap-5 text-sm">

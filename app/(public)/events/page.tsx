@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/public/Hero";
-import { MarqueeTicker } from "@/components/public/MarqueeTicker";
 import { EventsExplorer } from "@/components/public/EventsExplorer";
 import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { eventsContent, tickerItems } from "@/lib/content";
+import { eventsContent } from "@/lib/content";
 import { getEvents, getCategoryOrder } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
@@ -35,7 +34,6 @@ export default async function EventsPage() {
   return (
     <>
       <Hero data={eventsContent.hero} />
-      <MarqueeTicker items={tickerItems} />
 
       <Section>
         <SectionHeading

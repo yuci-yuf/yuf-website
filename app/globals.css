@@ -54,13 +54,15 @@
   --color-highlight-500: #ff8a2a;
   --color-highlight-600: #ef7a1a;
 
-  /* ── Festival CTA blues (home hero) ──
-     The reference hero uses a royal-blue primary button (#1E75D6, hover
-     #165F9C) and a bright cyan secondary (#27E0D2). */
-  --color-festival-blue: #1e75d6;
-  --color-festival-blue-dark: #165f9c;
-  --color-festival-cyan: #27e0d2;
-  --color-festival-purple: #7c4ddb;
+  /* ── Festival accents (sampled from the reference hero image) ──
+     The multi-hue gradient + decorative shapes: royal blue → azure → cyan →
+     teal, with violet, magenta, and orange accents. */
+  --color-festival-blue: #1e7fd4;
+  --color-festival-blue-dark: #1c4fc6;
+  --color-festival-cyan: #1ec6c0;
+  --color-festival-purple: #7b34e2;
+  --color-festival-magenta: #e0259c;
+  --color-festival-orange: #fb8b1e;
 
   /* ── Semantic ── */
   --color-success: #22c55e;
@@ -176,6 +178,19 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Festival hero theme — sampled exactly from the reference hero image: a
+   diagonal royal blue → azure → cyan → teal gradient, with a violet glow at
+   top-left, a teal-green glow at bottom-right, and a warm orange hint on the
+   right. Reused across every page hero/banner so the whole site shares it. */
+.bg-festival-gradient {
+  background-color: #1aa6ce;
+  background-image:
+    radial-gradient(120% 100% at 12% 8%, rgba(123, 52, 226, 0.55) 0%, transparent 46%),
+    radial-gradient(90% 90% at 92% 96%, rgba(30, 198, 192, 0.5) 0%, transparent 50%),
+    radial-gradient(70% 80% at 96% 28%, rgba(251, 139, 30, 0.26) 0%, transparent 46%),
+    linear-gradient(120deg, #1c4fc6 0%, #1e7fd4 32%, #1aa6ce 62%, #1ec6c0 100%);
 }
 
 /* Radix Select/Dropdown locks body scroll on open, which removes the page

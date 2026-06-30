@@ -17,7 +17,7 @@ export function StepsToRegister({ steps }: { steps: RegistrationStep[] }) {
               aria-hidden
             />
           </div>
-          <h3 className="font-heading text-lg font-bold text-text">
+          <h3 className="font-heading text-lg font-bold text-heading">
             {step.title}
           </h3>
           <p className="text-sm leading-relaxed text-text-muted">

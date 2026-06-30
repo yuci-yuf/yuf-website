@@ -40,7 +40,7 @@ export function FeatureGrid({
               </span>
             )
           )}
-          <h3 className="font-heading text-xl font-bold text-text">
+          <h3 className="font-heading text-xl font-bold text-heading">
             {card.title}
           </h3>
           <p className="text-sm leading-relaxed text-text-muted">

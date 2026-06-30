@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Eye, Heart, Sparkles, Music, Cpu, Dumbbell, Mic, Users, Globe, MapPin, Trophy, Quote } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 import { aboutContent, siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { HeroBackdrop } from "@/components/public/HeroBackdrop";
@@ -13,10 +13,6 @@ export const metadata: Metadata = {
   description:
     "Learn about Youth United Council of India (YUCI) — our mission, what we do, and how YUF empowers the next generation of leaders, innovators, and changemakers.",
 };
-
-/* ── Icon map for activity cards ── */
-const activityIcons = [Music, Cpu, Dumbbell, Mic];
-const whyJoinIcons = [Sparkles, Eye, Heart];
 
 export default function AboutPage() {
   return (
@@ -42,7 +38,7 @@ export default function AboutPage() {
               <p className="font-heading text-2xl font-bold leading-snug text-white">
                 {aboutContent.about.subhead}
               </p>
-              <p className="text-sm leading-relaxed text-primary-100/80">
+              <p className="text-sm leading-relaxed text-white/85">
                 A nationwide movement by the Youth United Council of India,
                 empowering young changemakers to lead, innovate, and inspire.
               </p>
@@ -62,12 +58,12 @@ export default function AboutPage() {
 
               <div className="mt-6 flex flex-col gap-6 lg:pb-4 lg:pl-2">
                 <FadeUp delay={0.15}>
-                  <p className="max-w-full text-[13px] font-semibold leading-relaxed text-primary-100 sm:max-w-[200px]">
+                  <p className="max-w-full text-[13px] font-semibold leading-relaxed text-white sm:max-w-[200px]">
                     {aboutContent.hero.subtitle}
                   </p>
                 </FadeUp>
                 <FadeUp delay={0.2}>
-                  <p className="max-w-full text-[13px] leading-relaxed text-primary-200/80 sm:max-w-[280px]">
+                  <p className="max-w-full text-[13px] leading-relaxed text-white/80 sm:max-w-[280px]">
                     At Youth United Council of India (YUCI), we believe in the limitless potential of young people. As a nonprofit organization, we empower youth worldwide by fostering inclusivity, nurturing talent, and creating impactful platforms like the Youth United Festival (YUF) that inspire leadership, creativity, and positive change.
                   </p>
                 </FadeUp>
@@ -107,8 +103,8 @@ export default function AboutPage() {
                   <h2 className="font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     Our Philosophy
                   </h2>
-                  <p className="text-[14px] leading-relaxed text-primary-100/90">
-                    "We strive to inspire active youth participation and encourage meaningful conversations across a wide range of fields—from performing arts to innovation."
+                  <p className="text-[14px] leading-relaxed text-white/90">
+                    &ldquo;We strive to inspire active youth participation and encourage meaningful conversations across a wide range of fields—from performing arts to innovation.&rdquo;
                   </p>
                 </FadeUp>
               </div>
@@ -120,21 +116,21 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           2. WHO WE ARE — Split text + quote
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-16 lg:py-24">
+      <section className="bg-surface-alt py-16 lg:py-24">
         <Container>
           <div className="grid gap-10 lg:gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
-              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.about.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
                 {aboutContent.about.title}
               </h2>
               <p className="text-lg font-semibold text-primary-700">
                 {aboutContent.about.subhead}
               </p>
               {aboutContent.about.body.map((p, i) => (
-                <p key={i} className="text-[16px] leading-relaxed text-gray-500">
+                <p key={i} className="text-[16px] leading-relaxed text-body">
                   {p}
                 </p>
               ))}
@@ -168,14 +164,14 @@ export default function AboutPage() {
           <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             {/* Left — statement */}
             <FadeUp className="flex flex-col gap-6">
-              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 Our Belief
               </span>
-              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
                 Change begins where
                 <br className="hidden sm:block" /> youth find their voice
               </h2>
-              <p className="max-w-md text-[16px] leading-relaxed text-gray-500">
+              <p className="max-w-md text-[16px] leading-relaxed text-body">
                 Every young person carries a spark to transform their community.
                 At YUF, we provide the stage, the mentorship, and the
                 opportunities that turn that spark into lasting impact — across
@@ -215,32 +211,28 @@ export default function AboutPage() {
         <Container>
           <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             <FadeUp className="flex flex-col gap-6">
-              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.mission.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
                 {aboutContent.mission.title}
               </h2>
               {aboutContent.mission.body.map((p, i) => (
-                <p key={i} className="text-[16px] leading-relaxed text-gray-500">
+                <p key={i} className="text-[16px] leading-relaxed text-body">
                   {p}
                 </p>
               ))}
             </FadeUp>
 
             <StaggerContainer stagger={0.12} className="grid gap-6 sm:grid-cols-2">
-              {aboutContent.mission.cards.map((card, i) => {
-                const Icon = i === 0 ? Eye : Heart;
+              {aboutContent.mission.cards.map((card) => {
                 return (
                   <StaggerItem key={card.title}>
-                    <div className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
-                        <Icon size={22} />
-                      </div>
-                      <h3 className="font-heading text-lg font-bold text-gray-900">
+                    <div className="flex flex-col gap-4 rounded-3xl border border-border bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                      <h3 className="font-heading text-lg font-bold text-heading">
                         {card.title}
                       </h3>
-                      <p className="text-sm leading-relaxed text-gray-500">
+                      <p className="text-sm leading-relaxed text-body">
                         {card.description}
                       </p>
                     </div>
@@ -255,13 +247,13 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           4. MEET THE PRINCIPAL — Advisor spotlight
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-16 lg:py-24">
+      <section className="bg-surface-alt py-16 lg:py-24">
         <Container>
           <FadeUp className="mb-10 text-center lg:mb-14">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               Leadership
             </span>
-            <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
               Meet The Principal Advisor
             </h2>
           </FadeUp>
@@ -281,20 +273,20 @@ export default function AboutPage() {
 
             <FadeUp delay={0.15} className="flex flex-col gap-5 text-center lg:text-left">
               <div>
-                <h3 className="font-heading text-2xl font-bold text-gray-900">
+                <h3 className="font-heading text-2xl font-bold text-heading">
                   {siteConfig.advisor.name}
                 </h3>
-                <p className="mt-1 text-sm text-gray-400">
+                <p className="mt-1 text-sm text-text-muted">
                   {siteConfig.advisor.title}
                 </p>
-                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-primary-600">
+                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-600">
                   {siteConfig.advisor.badge}
                 </span>
               </div>
 
               <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-6 shadow-sm">
                 <Quote size={20} className="mb-2 text-primary-400" />
-                <p className="text-[15px] italic leading-relaxed text-gray-600">
+                <p className="text-[15px] italic leading-relaxed text-body">
                   &ldquo;{siteConfig.advisor.quote}&rdquo;
                 </p>
               </blockquote>
@@ -309,30 +301,26 @@ export default function AboutPage() {
       <section className="bg-white py-16 lg:py-24">
         <Container>
           <FadeUp className="mb-10 flex flex-col items-center gap-4 text-center lg:mb-14">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               {aboutContent.activities.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
               {aboutContent.activities.title}
             </h2>
-            <p className="max-w-xl text-[16px] leading-relaxed text-gray-500">
+            <p className="max-w-xl text-[16px] leading-relaxed text-body">
               {aboutContent.activities.subtitle}
             </p>
           </FadeUp>
 
           <StaggerContainer stagger={0.08} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {aboutContent.activities.cards.map((card, i) => {
-              const Icon = activityIcons[i % activityIcons.length];
+            {aboutContent.activities.cards.map((card) => {
               return (
                 <StaggerItem key={card.title}>
-                  <div className="group flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
-                      <Icon size={22} />
-                    </div>
-                    <h3 className="font-heading text-base font-bold text-gray-900">
+                  <div className="group flex flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                    <h3 className="font-heading text-base font-bold text-heading">
                       {card.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-gray-500">
+                    <p className="text-sm leading-relaxed text-body">
                       {card.description}
                     </p>
                   </div>
@@ -346,33 +334,29 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           6. WHY JOIN US — 3-col benefit cards
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-slate-50/60 py-16 lg:py-24">
+      <section className="bg-surface-alt py-16 lg:py-24">
         <Container>
           <FadeUp className="mb-10 flex flex-col items-center gap-4 text-center lg:mb-14">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               {aboutContent.whyJoinUs.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
               {aboutContent.whyJoinUs.title}
             </h2>
-            <p className="max-w-xl text-[16px] leading-relaxed text-gray-500">
+            <p className="max-w-xl text-[16px] leading-relaxed text-body">
               {aboutContent.whyJoinUs.subtitle}
             </p>
           </FadeUp>
 
           <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {aboutContent.whyJoinUs.cards.map((card, i) => {
-              const Icon = whyJoinIcons[i % whyJoinIcons.length];
+            {aboutContent.whyJoinUs.cards.map((card) => {
               return (
                 <StaggerItem key={card.title}>
-                  <div className="group flex flex-col gap-5 rounded-3xl border border-gray-100 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
-                      <Icon size={22} />
-                    </div>
-                    <h3 className="font-heading text-lg font-bold text-gray-900">
+                  <div className="group flex flex-col gap-5 rounded-3xl border border-border bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                    <h3 className="font-heading text-lg font-bold text-heading">
                       {card.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-gray-500">
+                    <p className="text-sm leading-relaxed text-body">
                       {card.description}
                     </p>
                   </div>
@@ -391,14 +375,14 @@ export default function AboutPage() {
           <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             {/* Left — impact text + image */}
             <FadeUp className="flex flex-col gap-6">
-              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.impact.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
                 {aboutContent.impact.title}
               </h2>
               {aboutContent.impact.body.map((p, i) => (
-                <p key={i} className="text-[16px] leading-relaxed text-gray-500">
+                <p key={i} className="text-[16px] leading-relaxed text-body">
                   {p}
                 </p>
               ))}
@@ -430,21 +414,16 @@ export default function AboutPage() {
             <FadeUp delay={0.15}>
               <div className="grid grid-cols-2 gap-6">
                 {aboutContent.impact.stats.map((stat) => {
-                  const icons = [Users, Globe, MapPin, Trophy];
-                  const Icon = icons[aboutContent.impact.stats.indexOf(stat) % icons.length];
                   return (
                     <div
                       key={stat.label}
-                      className="flex flex-col gap-3 rounded-3xl border border-gray-100 bg-white p-7 shadow-sm"
+                      className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-7 shadow-sm"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-                        <Icon size={18} />
-                      </div>
-                      <span className="font-heading text-3xl font-bold text-gray-900">
+                      <span className="font-heading text-3xl font-bold text-heading">
                         {stat.number}
                         <span className="text-primary-500">{stat.suffix}</span>
                       </span>
-                      <span className="text-sm text-gray-400">{stat.label}</span>
+                      <span className="text-sm text-text-muted">{stat.label}</span>
                     </div>
                   );
                 })}
@@ -481,7 +460,7 @@ export default function AboutPage() {
                 <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
                   <Link
                     href="/register"
-                    className="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-gray-50"
+                    className="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50"
                   >
                     Register Now
                     <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />

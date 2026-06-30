@@ -103,7 +103,7 @@ export function RegistrationForm({
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
         <CheckCircle2 size={48} className="text-success" />
-        <h2 className="font-heading text-2xl font-bold text-text">Registration received!</h2>
+        <h2 className="font-heading text-2xl font-bold text-heading">Registration received!</h2>
         <p className="text-text-muted">
           Thanks for registering for <strong className="text-text">{selectedEvent?.title}</strong>.
           Your spot is reserved with a pending payment status — our team will reach
@@ -138,11 +138,11 @@ export function RegistrationForm({
           ))}
         </ol>
 
-        <h2 className="font-heading text-2xl font-bold text-text">Registration</h2>
+        <h2 className="font-heading text-2xl font-bold text-heading">Registration</h2>
 
         {/* Personal details */}
         <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
+          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
             Personal Details
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -163,7 +163,7 @@ export function RegistrationForm({
 
         {/* Institution */}
         <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
+          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
             Institution Details
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -189,7 +189,7 @@ export function RegistrationForm({
 
         {/* Event selection */}
         <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-text">
+          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
             Event Selection
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -321,7 +321,7 @@ export function RegistrationForm({
       {/* ── Sidebar summary ── */}
       <aside className="flex flex-col gap-6">
         <div className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <h3 className="font-heading text-lg font-bold text-text">
+          <h3 className="font-heading text-lg font-bold text-heading">
             Registration Summary
           </h3>
           {selectedEvent ? (
@@ -352,7 +352,7 @@ export function RegistrationForm({
           )}
           <div className="flex items-baseline justify-between border-b border-border pb-4">
             <span className="text-sm text-text-muted">Per participant</span>
-            <span className="font-heading text-2xl font-bold text-text">{feeLabel}</span>
+            <span className="font-heading text-2xl font-bold text-heading">{feeLabel}</span>
           </div>
           <ul className="flex flex-col gap-2.5">
             {siteConfig.registrationPerks.map((perk) => (
@@ -372,7 +372,7 @@ export function RegistrationForm({
         </div>
 
         <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <h3 className="font-heading text-base font-bold text-text">Event Locations</h3>
+          <h3 className="font-heading text-base font-bold text-heading">Event Locations</h3>
           <ul className="flex flex-col gap-2">
             {registerContent.locations.map((l) => (
               <li key={l.city} className="flex items-center gap-2 text-sm text-text-muted">

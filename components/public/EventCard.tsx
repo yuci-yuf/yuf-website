@@ -31,7 +31,7 @@ export function EventCard({ event }: { event: EventItem }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <h3 className="font-heading text-xl font-bold text-text">
+        <h3 className="font-heading text-xl font-bold text-heading">
           <Link href={`/events/${event.id}`} className="hover:text-primary-700 transition-colors">
             {event.title}
           </Link>

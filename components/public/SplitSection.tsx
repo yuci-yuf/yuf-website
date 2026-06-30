@@ -45,10 +45,10 @@ export function SplitSection({
               imageSide === "left" && "lg:order-2",
             )}
           >
-            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
+            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               {label}
             </span>
-            <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">
+            <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
               {title}
             </h2>
             {subhead && (
