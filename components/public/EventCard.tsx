@@ -1,12 +1,53 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  MapPin,
+  Trophy,
+  Timer,
+  Palette,
+  Lightbulb,
+  PartyPopper,
+  type LucideIcon,
+} from "lucide-react";
 import type { EventItem } from "@/types";
 
+/**
+ * Per-category visual identity, all sampled from the festival palette so the
+ * grid reads as variety (not rainbow). Used for the imageless placeholder
+ * gradient, the icon, and the hover accent bar. Falls back to the brand blue.
+ */
+const CATEGORY_STYLE: Record<
+  string,
+  { icon: LucideIcon; from: string; to: string; accent: string }
+> = {
+  "Sports & Games": { icon: Trophy, from: "#1e7fd4", to: "#0e2f63", accent: "#1e7fd4" },
+  Athletics: { icon: Timer, from: "#15938f", to: "#0c4f4d", accent: "#1ec6c0" },
+  "Arts & Culturals": { icon: Palette, from: "#7b34e2", to: "#2e0f59", accent: "#9a5cf0" },
+  Technical: { icon: Lightbulb, from: "#1787b3", to: "#0a2b3a", accent: "#3cbce2" },
+  "Fun Events": { icon: PartyPopper, from: "#fb8b1e", to: "#7a3f08", accent: "#fb8b1e" },
+};
+
+const FALLBACK = { icon: Trophy, from: "#1e7fd4", to: "#0e2f63", accent: "#1e7fd4" };
+
 export function EventCard({ event }: { event: EventItem }) {
+  const style = CATEGORY_STYLE[event.category] ?? FALLBACK;
+  const Icon = style.icon;
+
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-hover">
-      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary-600 to-primary-900">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover">
+      {/* Category-colored accent bar, revealed on hover. */}
+      <span
+        aria-hidden
+        className="absolute inset-x-0 top-0 z-20 h-1 origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+        style={{ backgroundColor: style.accent }}
+      />
+
+      <div
+        className="relative aspect-[16/10] overflow-hidden"
+        style={{ backgroundImage: `linear-gradient(135deg, ${style.from}, ${style.to})` }}
+      >
         {event.image ? (
           <Image
             src={event.image}
@@ -16,39 +57,82 @@ export function EventCard({ event }: { event: EventItem }) {
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <span className="absolute bottom-4 left-4 font-heading text-2xl font-bold text-white/90">
-            {event.title.charAt(0)}
-          </span>
+          <>
+            {/* Diagonal stripe texture */}
+            <span
+              aria-hidden
+              className="absolute inset-0 opacity-[0.14]"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 18px)",
+              }}
+            />
+            {/* Oversized watermark icon */}
+            <Icon
+              aria-hidden
+              strokeWidth={1.25}
+              className="absolute -bottom-5 -right-4 h-36 w-36 text-white/10"
+            />
+            {/* Centered icon chip */}
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/25 bg-white/15 text-white shadow-lg backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+                <Icon size={28} />
+              </span>
+            </span>
+          </>
         )}
-        {/* Bottom gradient overlay for readability */}
+
+        {/* Bottom scrim for badge/legibility */}
         <div
-          className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary-950/50 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-primary-950/55 to-transparent"
           aria-hidden
         />
-        <span className="absolute left-4 top-4 z-10 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-primary-800 backdrop-blur-sm">
+        <span className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-800 shadow-sm backdrop-blur-sm">
           {event.tag}
         </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
+        {/* Schedule meta — date + venue (when present) */}
+        {(event.date || event.venue) && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-text-muted">
+            {event.date && (
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar size={14} className="text-primary-500" />
+                {event.date}
+              </span>
+            )}
+            {event.venue && (
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                <MapPin size={14} className="shrink-0 text-primary-500" />
+                <span className="truncate">{event.venue}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         <h3 className="font-heading text-xl font-bold text-heading">
-          <Link href={`/events/${event.id}`} className="hover:text-primary-700 transition-colors">
+          <Link
+            href={`/events/${event.id}`}
+            className="transition-colors hover:text-primary-700"
+          >
+            {/* Full-card click target without nesting links */}
+            <span className="absolute inset-0 z-10" aria-hidden />
             {event.title}
           </Link>
         </h3>
-        <p className="flex-1 text-sm leading-relaxed text-text-muted">
+
+        <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-text-muted">
           {event.description}
         </p>
-        <Link
-          href={`/events/${event.id}`}
-          className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-600"
-        >
+
+        <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 transition-colors group-hover:text-accent-600">
           View Details
           <ArrowRight
             size={16}
             className="transition-transform group-hover:translate-x-1"
           />
-        </Link>
+        </span>
       </div>
     </article>
   );
