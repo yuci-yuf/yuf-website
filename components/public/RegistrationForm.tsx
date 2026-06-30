@@ -39,7 +39,10 @@ export function RegistrationForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!selectedEvent) return;
+    // Guard: only events still open for registration can be submitted. The
+    // dropdown is already filtered to these, but this blocks a stale/deep-link
+    // selection of a closed event.
+    if (!selectedEvent || selectedEvent.registrationOpen === false) return;
     const data = new FormData(e.currentTarget);
     setStatus("submitting");
     try {

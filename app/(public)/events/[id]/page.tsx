@@ -122,26 +122,47 @@ export default async function EventDetailPage({
 
           {/* Register card */}
           <aside className="h-fit rounded-2xl border border-border bg-surface p-6 shadow-card lg:sticky lg:top-28">
-            <h3 className="font-heading text-lg font-bold text-text">
-              Ready to participate?
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-text-muted">
-              Secure your spot for {event.title} at Youth United Festival 2026.
-            </p>
-            {typeof event.registrationFee === "number" && (
-              <p className="mt-4 text-sm text-text">
-                <span className="font-semibold">Registration fee:</span>{" "}
-                ₹{event.registrationFee}
-              </p>
+            {event.registrationOpen !== false ? (
+              <>
+                <h3 className="font-heading text-lg font-bold text-text">
+                  Ready to participate?
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                  Secure your spot for {event.title} at Youth United Festival 2026.
+                </p>
+                {typeof event.registrationFee === "number" && (
+                  <p className="mt-4 text-sm text-text">
+                    <span className="font-semibold">Registration fee:</span>{" "}
+                    ₹{event.registrationFee}
+                  </p>
+                )}
+                <Button
+                  href={`/register?event=${event.id}`}
+                  size="lg"
+                  variant="secondary"
+                  className="mt-6 w-full"
+                >
+                  Register Now
+                </Button>
+              </>
+            ) : (
+              <>
+                <h3 className="font-heading text-lg font-bold text-text">
+                  Registration closed
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                  Sign-ups for {event.title} are no longer being accepted.
+                </p>
+                <Button
+                  href="/events"
+                  size="lg"
+                  variant="outline"
+                  className="mt-6 w-full"
+                >
+                  Browse other events
+                </Button>
+              </>
             )}
-            <Button
-              href={`/register?event=${event.id}`}
-              size="lg"
-              variant="secondary"
-              className="mt-6 w-full"
-            >
-              Register Now
-            </Button>
           </aside>
         </div>
       </Section>

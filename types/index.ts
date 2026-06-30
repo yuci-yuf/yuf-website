@@ -126,6 +126,12 @@ export interface EventItem {
   image?: string;
   registrationFee?: number;
   isActive: boolean;
+  /**
+   * Whether the event currently accepts registrations. Independent of
+   * `isActive` (site visibility) and `status` — lets a past/visible event have
+   * its registration closed. Treated as open unless explicitly `false`.
+   */
+  registrationOpen?: boolean;
   order: number;
   /** Scheduling state used to group events on the Events page. Defaults to "upcoming". */
   status?: EventStatus;

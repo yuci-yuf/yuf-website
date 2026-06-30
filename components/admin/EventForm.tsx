@@ -19,6 +19,17 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Make a slug unique against the existing event ids by appending -2, -3, …
+ * Lets two events share a title while still getting distinct URL slugs.
+ */
+function uniqueSlug(base: string, existing: string[]): string {
+  if (!base || !existing.includes(base)) return base;
+  let n = 2;
+  while (existing.includes(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}
+
 /** Split a textarea into trimmed, non-empty lines. */
 function toLines(text: string): string[] {
   return text
@@ -77,8 +88,6 @@ export function EventForm({
   const isNew = event === null;
 
   const [title, setTitle] = useState(event?.title ?? "");
-  const [id, setId] = useState(event?.id ?? "");
-  const [idTouched, setIdTouched] = useState(!isNew);
   // Empty for new events so the "Select a category…" placeholder shows; the
   // submit handler enforces that a category is chosen.
   const [category, setCategory] = useState(event?.category ?? "");
@@ -91,6 +100,9 @@ export function EventForm({
   const [status, setStatus] = useState<EventStatus>(event?.status ?? "upcoming");
   const [order, setOrder] = useState(String(event?.order ?? ""));
   const [isActive, setIsActive] = useState(event?.isActive ?? true);
+  const [registrationOpen, setRegistrationOpen] = useState(
+    event?.registrationOpen ?? true,
+  );
   // `date` holds the ISO value for the date picker; converted to/from the
   // stored display label via isoToLabel/labelToIso.
   const [date, setDate] = useState(labelToIso(event?.date ?? ""));
@@ -101,27 +113,21 @@ export function EventForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-derive the id from the title until the admin edits it manually.
-  function handleTitle(value: string) {
-    setTitle(value);
-    if (isNew && !idTouched) setId(slugify(value));
-  }
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const finalId = isNew ? slugify(id || title) : event!.id;
-    if (!finalId) {
-      setError("An event id (slug) is required.");
-      return;
-    }
-    if (isNew && existingIds.includes(finalId)) {
-      setError(`An event with id "${finalId}" already exists. Choose another.`);
-      return;
-    }
     if (!title.trim()) {
       setError("Title is required.");
+      return;
+    }
+    // The id (URL slug) is derived from the title and made unique so two
+    // events can share a title; for existing events it never changes.
+    const finalId = isNew
+      ? uniqueSlug(slugify(title), existingIds)
+      : event!.id;
+    if (!finalId) {
+      setError("Could not derive a URL slug from the title. Add some letters or numbers.");
       return;
     }
     if (!category.trim()) {
@@ -137,6 +143,7 @@ export function EventForm({
       image: image.trim() || undefined,
       registrationFee: fee.trim() ? Number(fee) : undefined,
       isActive,
+      registrationOpen,
       order: order.trim() ? Number(order) : 0,
       status,
       date: date ? isoToLabel(date) : undefined,
@@ -177,29 +184,10 @@ export function EventForm({
             <Input
               id="ev-title"
               value={title}
-              onChange={(e) => handleTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
           </Field>
-
-          <Field label="Event ID (URL slug)" htmlFor="ev-id" required>
-            <Input
-              id="ev-id"
-              value={id}
-              onChange={(e) => {
-                setIdTouched(true);
-                setId(slugify(e.target.value));
-              }}
-              disabled={!isNew}
-              placeholder="auto-generated from title"
-            />
-          </Field>
-          {!isNew && (
-            <p className="-mt-3 text-xs text-text-muted">
-              The id is part of the public URL and can&apos;t be changed after
-              creation.
-            </p>
-          )}
 
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Category" htmlFor="ev-category" required>
@@ -331,15 +319,26 @@ export function EventForm({
             />
           </Field>
 
-          <label className="flex items-center gap-2 text-sm text-text">
-            <input
-              type="checkbox"
-              checked={isActive}
-              onChange={(e) => setIsActive(e.target.checked)}
-              className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-400"
-            />
-            Active (visible on the public site)
-          </label>
+          <div className="flex flex-col gap-3">
+            <label className="flex items-center gap-2 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-400"
+              />
+              Active (visible on the public site)
+            </label>
+            <label className="flex items-center gap-2 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={registrationOpen}
+                onChange={(e) => setRegistrationOpen(e.target.checked)}
+                className="h-4 w-4 rounded border-border text-primary-600 focus:ring-primary-400"
+              />
+              Registration open (accepts new sign-ups)
+            </label>
+          </div>
 
           {error && (
             <p className="rounded-lg bg-error/10 px-3 py-2 text-sm text-error">

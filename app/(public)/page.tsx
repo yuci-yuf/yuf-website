@@ -12,12 +12,15 @@ import {
   registrationSteps,
   tickerItems,
 } from "@/lib/content";
-import { getEvents } from "@/lib/cms-data";
+import { getEvents, getGalleryPhotos } from "@/lib/cms-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const events = await getEvents();
+  const [events, galleryPhotos] = await Promise.all([
+    getEvents(),
+    getGalleryPhotos(),
+  ]);
   const previewEvents = events.filter((e) => e.isActive).slice(0, 3);
 
   return (
@@ -62,7 +65,7 @@ export default async function HomePage() {
 
       <StepsTimeline steps={registrationSteps} />
 
-<GalleryMosaic />
+<GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
 
       <LogoStrip partners={partners} />
     </>

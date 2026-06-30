@@ -21,7 +21,10 @@ export default async function RegisterPage() {
     getEvents(),
     getCategoryOrder(),
   ]);
-  const activeEvents = events.filter((e) => e.isActive);
+  // Only events that are visible AND still accepting sign-ups are registrable.
+  const activeEvents = events.filter(
+    (e) => e.isActive && e.registrationOpen !== false,
+  );
   // Only offer categories that have at least one active event.
   const presentCategories = Array.from(
     new Set(activeEvents.map((e) => e.category)),

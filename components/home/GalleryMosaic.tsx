@@ -7,17 +7,31 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FadeUp } from "./MotionWrapper";
 
-const galleryImages = [
-  { src: "/images/recognition/award_1.jpg", alt: "YUCI Award Ceremony", span: "col-span-2 row-span-2" },
-  { src: "/images/events/event-1.png", alt: "Acapella Competition", span: "" },
-  { src: "/images/events/event-4.png", alt: "Creative Fashion Show", span: "" },
-  { src: "/images/sections/join-us.jpg", alt: "Join YUF", span: "" },
-  { src: "/images/recognition/award_2.jpg", alt: "Governor Award", span: "" },
-  { src: "/images/events/event-5.png", alt: "Makeup & Saree Draping", span: "col-span-2" },
-  { src: "/images/gallery/pondicherry-juniors.jpg", alt: "Youth United Festival for Juniors — Pondicherry 2025", span: "col-span-2" },
+// Mosaic span pattern, applied to the uploaded photos by position so the
+// admin-managed gallery keeps the same editorial layout. Photos beyond the
+// pattern fall back to a regular single cell.
+const SPANS = [
+  "col-span-2 row-span-2",
+  "",
+  "",
+  "",
+  "",
+  "col-span-2",
+  "col-span-2",
 ];
 
-export function GalleryMosaic() {
+export function GalleryMosaic({
+  photos,
+}: {
+  photos: { src: string; alt: string }[];
+}) {
+  if (photos.length === 0) return null;
+
+  const galleryImages = photos.map((p, i) => ({
+    ...p,
+    span: SPANS[i] ?? "",
+  }));
+
   return (
     <section className="bg-slate-50/60 py-16 sm:py-24 lg:py-32">
       <Container>
