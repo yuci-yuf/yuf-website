@@ -15,7 +15,18 @@ service cloud.firestore {
     // site). Only admins may create/update/delete them via the admin panel.
     match /events/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      // Admins may edit freely. The public registration flow may also update an
+      // event, but ONLY to bump the registration counter by exactly one and
+      // touch nothing else — this lets the capacity check + increment run in a
+      // transaction without exposing any other field to anonymous writes.
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['registrationCount']) &&
+        request.resource.data.registrationCount ==
+          ((resource.data.registrationCount is number
+            ? resource.data.registrationCount : 0) + 1)
+      );
     }
     match /eventCategories/{id} {
       allow read: if true;

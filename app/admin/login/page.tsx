@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/Button";
-import { Field, Input } from "@/components/ui/Field";
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { siteConfig } from "@/lib/content";
 
 export default function AdminLoginPage() {
@@ -58,7 +59,8 @@ export default function AdminLoginPage() {
 
           {error && <p className="text-sm text-error">{error}</p>}
 
-          <Button type="submit" size="lg" disabled={busy} icon={<LogIn size={18} />}>
+          <Button type="submit" size="lg" disabled={busy}>
+            <LogIn size={18} />
             {busy ? "Signing in…" : "Sign In"}
           </Button>
         </form>

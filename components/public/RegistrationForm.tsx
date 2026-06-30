@@ -4,11 +4,30 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ShieldCheck, Lock, Clock, Phone, MapPin, CheckCircle2 } from "lucide-react";
 import type { EventItem } from "@/types";
-import { Field, Input, Select, Textarea } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { siteConfig, registerContent } from "@/lib/content";
-import { submitRegistration } from "@/lib/submissions";
+import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
+
+/**
+ * Remaining capacity for an event. Returns null when the event has no limit
+ * (unlimited), otherwise the number of spots left (clamped at 0).
+ */
+function spotsLeft(ev: EventItem | undefined): number | null {
+  if (!ev || typeof ev.registrationLimit !== "number") return null;
+  return Math.max(0, ev.registrationLimit - (ev.registrationCount ?? 0));
+}
 
 const steps = ["Personal Info", "Event Selection", "Review", "Payment"];
 
@@ -35,7 +54,12 @@ export function RegistrationForm({
   const fee = selectedEvent?.registrationFee;
   const feeLabel = fee != null ? `₹ ${fee.toLocaleString("en-IN")}` : "—";
 
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const selectedSpotsLeft = spotsLeft(selectedEvent);
+  const selectedFull = selectedSpotsLeft === 0;
+
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error" | "full"
+  >("idle");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +67,11 @@ export function RegistrationForm({
     // dropdown is already filtered to these, but this blocks a stale/deep-link
     // selection of a closed event.
     if (!selectedEvent || selectedEvent.registrationOpen === false) return;
+    // Block submit if the event is already full (server enforces this too).
+    if (spotsLeft(selectedEvent) === 0) {
+      setStatus("full");
+      return;
+    }
     const data = new FormData(e.currentTarget);
     setStatus("submitting");
     try {
@@ -66,7 +95,7 @@ export function RegistrationForm({
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error("Registration failed:", err);
-      setStatus("error");
+      setStatus(err instanceof RegistrationFullError ? "full" : "error");
     }
   }
 
@@ -80,7 +109,9 @@ export function RegistrationForm({
           Your spot is reserved with a pending payment status — our team will reach
           out with payment and confirmation details.
         </p>
-        <Button href="/events" variant="outline">Browse more events</Button>
+        <Button asChild variant="outline">
+          <Link href="/events">Browse more events</Link>
+        </Button>
       </div>
     );
   }
@@ -137,11 +168,17 @@ export function RegistrationForm({
           </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Location" htmlFor="location" required>
-              <Select id="location" name="location" required defaultValue="">
-                <option value="" disabled>Select a location</option>
-                {registerContent.locations.map((l) => (
-                  <option key={l.city} value={l.city}>{l.city}</option>
-                ))}
+              <Select name="location" required>
+                <SelectTrigger id="location">
+                  <SelectValue placeholder="Select a location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {registerContent.locations.map((l) => (
+                    <SelectItem key={l.city} value={l.city}>
+                      {l.city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </Field>
             <Field label="College / School" htmlFor="institution" required>
@@ -158,36 +195,53 @@ export function RegistrationForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Event Category" htmlFor="category" required>
               <Select
-                id="category"
-                name="category"
-                required
                 value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
+                onValueChange={(v) => {
+                  setCategory(v);
                   setEventId("");
                 }}
               >
-                <option value="" disabled>Select a category</option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </Field>
             <Field label="Event" htmlFor="event" required>
               <Select
-                id="event"
-                name="event"
-                required
                 value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
+                onValueChange={setEventId}
                 disabled={!category}
               >
-                <option value="" disabled>
-                  {category ? "Select an event" : "Select a category first"}
-                </option>
-                {eventsInCategory.map((ev) => (
-                  <option key={ev.id} value={ev.id}>{ev.title}</option>
-                ))}
+                <SelectTrigger id="event">
+                  <SelectValue
+                    placeholder={
+                      category ? "Select an event" : "Select a category first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {eventsInCategory.map((ev) => {
+                    const left = spotsLeft(ev);
+                    const full = left === 0;
+                    return (
+                      <SelectItem key={ev.id} value={ev.id} disabled={full}>
+                        {ev.title}
+                        {full
+                          ? " — Full"
+                          : left !== null && left <= 10
+                            ? ` — ${left} left`
+                            : ""}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
               </Select>
             </Field>
           </div>
@@ -240,14 +294,23 @@ export function RegistrationForm({
             Something went wrong saving your registration. Please try again.
           </p>
         )}
+        {status === "full" && (
+          <p className="text-sm text-error">
+            Sorry — this event just filled up. Please pick another event.
+          </p>
+        )}
 
         <Button
           type="submit"
           size="lg"
-          disabled={status === "submitting"}
-          icon={<Lock size={18} />}
+          disabled={status === "submitting" || selectedFull}
         >
-          {status === "submitting" ? "Submitting…" : "Pay & Complete Registration"}
+          <Lock size={18} />
+          {status === "submitting"
+            ? "Submitting…"
+            : selectedFull
+              ? "Event Full"
+              : "Pay & Complete Registration"}
         </Button>
 
         <p className="text-center text-xs text-text-muted">
@@ -269,6 +332,18 @@ export function RegistrationForm({
               <span className="font-heading font-bold text-primary-800">
                 {selectedEvent.title}
               </span>
+              {selectedSpotsLeft !== null && (
+                <span
+                  className={cn(
+                    "mt-1 text-xs font-semibold",
+                    selectedFull ? "text-error" : "text-primary-700",
+                  )}
+                >
+                  {selectedFull
+                    ? "This event is full"
+                    : `${selectedSpotsLeft} spot${selectedSpotsLeft === 1 ? "" : "s"} left`}
+                </span>
+              )}
             </div>
           ) : (
             <p className="rounded-lg bg-surface-alt p-4 text-sm text-text-muted">

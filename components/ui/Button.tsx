@@ -1,85 +1,64 @@
-import Link from "next/link";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { Slot } from "radix-ui"
 
-type Variant = "primary" | "secondary" | "outline" | "ghost";
-type Size = "sm" | "md" | "lg";
+import { cn } from "@/lib/utils"
 
-const variants: Record<Variant, string> = {
-  primary:
-    "bg-primary-600 text-white hover:bg-primary-700 shadow-card hover:shadow-hover",
-  secondary:
-    "bg-accent-500 text-white hover:bg-accent-600 shadow-card hover:shadow-hover",
-  outline:
-    "border border-border bg-surface text-text hover:border-primary-400 hover:text-primary-700",
-  ghost: "text-text hover:bg-primary-50 hover:text-primary-700",
-};
-
-const sizes: Record<Size, string> = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-sm",
-  lg: "h-13 px-8 text-base",
-};
-
-const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
-
-interface CommonProps {
-  variant?: Variant;
-  size?: Size;
-  icon?: ReactNode;
-  className?: string;
-  children: ReactNode;
-}
-
-type ButtonAsButton = CommonProps &
-  Omit<ComponentPropsWithoutRef<"button">, keyof CommonProps> & { href?: never };
-
-type ButtonAsLink = CommonProps &
-  Omit<ComponentPropsWithoutRef<"a">, keyof CommonProps | "href"> & {
-    href: string;
-  };
-
-export function Button(props: ButtonAsButton): React.JSX.Element;
-export function Button(props: ButtonAsLink): React.JSX.Element;
-export function Button({
-  variant = "primary",
-  size = "md",
-  icon,
-  className,
-  children,
-  ...rest
-}: ButtonAsButton | ButtonAsLink) {
-  const classes = cn(base, variants[variant], sizes[size], className);
-
-  if ("href" in rest && rest.href !== undefined) {
-    const { href, ...linkRest } = rest as ButtonAsLink;
-    const isInternal = href.startsWith("/") || href.startsWith("#");
-    if (isInternal) {
-      return (
-        <Link href={href} className={classes} {...(linkRest as object)}>
-          {icon}
-          {children}
-        </Link>
-      );
-    }
-    return (
-      <a
-        href={href}
-        className={classes}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {icon}
-        {children}
-      </a>
-    );
+const buttonVariants = cva(
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-11 px-4 py-2 has-[>svg]:px-3",
+        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-9 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
+        lg: "h-12 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-11",
+        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
   }
+)
+
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot.Root : "button"
 
   return (
-    <button className={classes} {...(rest as ButtonAsButton)}>
-      {icon}
-      {children}
-    </button>
-  );
+    <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
 }
+
+export { Button, buttonVariants }

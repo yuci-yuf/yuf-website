@@ -1,6 +1,8 @@
+import Link from "next/link";
 import type { CTABanner as CTABannerData } from "@/types";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
+import { ctaButtonVariant } from "@/lib/utils";
 
 export function CTABanner({ data }: { data: CTABannerData }) {
   return (
@@ -40,19 +42,19 @@ export function CTABanner({ data }: { data: CTABannerData }) {
             {data.buttons.map((b) => (
               <Button
                 key={b.label}
-                href={b.href}
+                asChild
                 size="lg"
-                variant={b.variant === "outline" ? "outline" : "secondary"}
-                icon={
-                  b.icon ? <span aria-hidden>{b.icon}</span> : undefined
-                }
+                variant={ctaButtonVariant(b.variant)}
                 className={
                   b.variant === "outline"
                     ? "border-white/25 bg-white/5 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
                     : "shadow-lg hover:shadow-glow"
                 }
               >
-                {b.label}
+                <Link href={b.href}>
+                  {b.icon && <span aria-hidden>{b.icon}</span>}
+                  {b.label}
+                </Link>
               </Button>
             ))}
           </div>

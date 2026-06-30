@@ -23,6 +23,14 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
       typeof data.registrationFee === "number"
         ? (data.registrationFee as number)
         : undefined,
+    registrationLimit:
+      typeof data.registrationLimit === "number"
+        ? (data.registrationLimit as number)
+        : undefined,
+    registrationCount:
+      typeof data.registrationCount === "number"
+        ? (data.registrationCount as number)
+        : 0,
     isActive: data.isActive !== false,
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,

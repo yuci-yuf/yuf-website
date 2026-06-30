@@ -1,7 +1,9 @@
+import Link from "next/link";
 import type { Hero as HeroData } from "@/types";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
 import { HeroBackdrop } from "@/components/public/HeroBackdrop";
+import { ctaButtonVariant } from "@/lib/utils";
 
 export function Hero({ data }: { data: HeroData }) {
   return (
@@ -48,17 +50,19 @@ export function Hero({ data }: { data: HeroData }) {
               {data.buttons.map((b) => (
                 <Button
                   key={b.label}
-                  href={b.href}
+                  asChild
                   size="lg"
-                  variant={b.variant ?? "primary"}
-                  icon={b.icon ? <span aria-hidden>{b.icon}</span> : undefined}
+                  variant={ctaButtonVariant(b.variant)}
                   className={
                     b.variant === "outline"
                       ? "border-white/25 bg-white/5 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
                       : "shadow-lg hover:shadow-glow"
                   }
                 >
-                  {b.label}
+                  <Link href={b.href}>
+                    {b.icon && <span aria-hidden>{b.icon}</span>}
+                    {b.label}
+                  </Link>
                 </Button>
               ))}
             </div>

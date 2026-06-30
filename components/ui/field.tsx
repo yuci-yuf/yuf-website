@@ -1,75 +1,32 @@
-import type {
-  ComponentPropsWithoutRef,
-  ReactNode,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from "react";
-import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
 
-const fieldBase =
-  "w-full rounded-lg border border-border bg-surface px-4 py-3 text-base text-text placeholder:text-text-muted/70 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 sm:py-2.5 sm:text-sm";
-
-export function FieldLabel({
-  htmlFor,
-  children,
-  required,
-}: {
-  htmlFor: string;
-  children: ReactNode;
-  required?: boolean;
-}) {
-  return (
-    <label htmlFor={htmlFor} className="text-sm font-medium text-text">
-      {children}
-      {required && <span className="ml-0.5 text-error">*</span>}
-    </label>
-  );
-}
-
-export function Input({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"input">) {
-  return <input className={cn(fieldBase, className)} {...props} />;
-}
-
-export function Textarea({
-  className,
-  ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea className={cn(fieldBase, "min-h-28 resize-y sm:min-h-32", className)} {...props} />
-  );
-}
-
-export function Select({
-  className,
-  children,
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select className={cn(fieldBase, "cursor-pointer", className)} {...props}>
-      {children}
-    </select>
-  );
-}
-
+/**
+ * Layout helper: a labelled form field (shadcn `Label` + control + spacing).
+ * shadcn ships no `Field` wrapper — pairing `Label` with a control by hand is
+ * the documented pattern — so this thin helper just keeps call sites tidy. It
+ * contains no styled inputs; the control is passed as children.
+ */
 export function Field({
   label,
   htmlFor,
   required,
+  description,
   children,
 }: {
   label: string;
   htmlFor: string;
   required?: boolean;
+  description?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <FieldLabel htmlFor={htmlFor} required={required}>
+      <Label htmlFor={htmlFor}>
         {label}
-      </FieldLabel>
+        {required && <span className="ml-0.5 text-error">*</span>}
+      </Label>
+      {description && <p className="text-sm text-text-muted">{description}</p>}
       {children}
     </div>
   );

@@ -10,7 +10,8 @@ import {
   addDoc,
   collection,
   doc,
-  getDoc,
+  increment,
+  runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -48,34 +49,72 @@ export interface RegistrationSubmission {
 }
 
 /**
+ * Thrown by `submitRegistration` when the event's `registrationLimit` has been
+ * reached. The form catches this to show a "this event is full" message rather
+ * than a generic error.
+ */
+export class RegistrationFullError extends Error {
+  constructor(message = "This event is full.") {
+    super(message);
+    this.name = "RegistrationFullError";
+  }
+}
+
+/**
  * Saves a registration with `pending` payment/status. The Razorpay payment
  * flow (Phase 3) will instead create the doc after a verified payment and set
  * paymentStatus/status to "paid"/"confirmed".
  *
- * The amount stored is re-read from the event document at submit time, so a fee
- * the admin changed after the page loaded is always honoured — the client's
- * `amountPaid` is only a fallback if the event can't be read.
+ * Runs inside a Firestore transaction so the capacity check and the count
+ * increment are atomic — two people submitting the last spot at once can't both
+ * succeed. The event's `registrationFee` is also re-read here so a fee the admin
+ * changed after the page loaded is always honoured.
+ *
+ * Throws `RegistrationFullError` if `registrationLimit` is set and already met.
  */
 export async function submitRegistration(
   data: RegistrationSubmission,
 ): Promise<string> {
-  let amountPaid = data.amountPaid;
-  try {
-    const snap = await getDoc(doc(db, "events", data.eventId));
-    if (snap.exists() && typeof snap.data().registrationFee === "number") {
-      amountPaid = snap.data().registrationFee as number;
-    }
-  } catch (e) {
-    // Fall back to the client-provided amount if the lookup fails.
-    console.error("submitRegistration: fee re-check failed", e);
-  }
+  const eventRef = doc(db, "events", data.eventId);
+  const regRef = doc(collection(db, "registrations"));
 
-  const ref = await addDoc(collection(db, "registrations"), {
-    ...data,
-    amountPaid,
-    paymentStatus: "pending",
-    status: "pending",
-    createdAt: serverTimestamp(),
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(eventRef);
+    const ev = snap.exists() ? snap.data() : null;
+
+    // Honour the latest fee from the event doc; fall back to the submitted
+    // amount if the event can't be read.
+    const amountPaid =
+      ev && typeof ev.registrationFee === "number"
+        ? (ev.registrationFee as number)
+        : data.amountPaid;
+
+    // Enforce capacity when a limit is configured.
+    const limit =
+      ev && typeof ev.registrationLimit === "number"
+        ? (ev.registrationLimit as number)
+        : null;
+    const count =
+      ev && typeof ev.registrationCount === "number"
+        ? (ev.registrationCount as number)
+        : 0;
+    if (limit !== null && count >= limit) {
+      throw new RegistrationFullError();
+    }
+
+    tx.set(regRef, {
+      ...data,
+      amountPaid,
+      paymentStatus: "pending",
+      status: "pending",
+      createdAt: serverTimestamp(),
+    });
+    // Only bump the counter when the event doc exists (so the public update
+    // rule, which requires the event to already exist, is satisfied).
+    if (ev) {
+      tx.update(eventRef, { registrationCount: increment(1) });
+    }
   });
-  return ref.id;
+
+  return regRef.id;
 }

@@ -125,6 +125,17 @@ export interface EventItem {
   description: string;
   image?: string;
   registrationFee?: number;
+  /**
+   * Maximum number of registrations accepted. Omitted/undefined means
+   * unlimited capacity.
+   */
+  registrationLimit?: number;
+  /**
+   * Running count of submitted registrations, maintained atomically by the
+   * public registration flow (see lib/submissions.ts). Used together with
+   * `registrationLimit` to know when an event is full. Defaults to 0.
+   */
+  registrationCount?: number;
   isActive: boolean;
   /**
    * Whether the event currently accepts registrations. Independent of

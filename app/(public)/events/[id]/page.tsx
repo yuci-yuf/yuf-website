@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, MapPin, Tag } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
@@ -67,7 +67,9 @@ export default async function EventDetailPage({
           </Link>
           <div className="mt-6 flex flex-col gap-5">
             <div className="flex flex-wrap items-center gap-3">
-              <Badge tone="solid">{event.category}</Badge>
+              <Badge className="bg-white/15 px-4 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
+                {event.category}
+              </Badge>
               <span className="inline-flex items-center gap-1.5 text-sm text-primary-200">
                 <Tag size={15} /> {event.tag}
               </span>
@@ -136,13 +138,8 @@ export default async function EventDetailPage({
                     ₹{event.registrationFee}
                   </p>
                 )}
-                <Button
-                  href={`/register?event=${event.id}`}
-                  size="lg"
-                  variant="secondary"
-                  className="mt-6 w-full"
-                >
-                  Register Now
+                <Button asChild size="lg" className="mt-6 w-full">
+                  <Link href={`/register?event=${event.id}`}>Register Now</Link>
                 </Button>
               </>
             ) : (
@@ -153,13 +150,8 @@ export default async function EventDetailPage({
                 <p className="mt-2 text-sm leading-relaxed text-text-muted">
                   Sign-ups for {event.title} are no longer being accepted.
                 </p>
-                <Button
-                  href="/events"
-                  size="lg"
-                  variant="outline"
-                  className="mt-6 w-full"
-                >
-                  Browse other events
+                <Button asChild size="lg" variant="outline" className="mt-6 w-full">
+                  <Link href="/events">Browse other events</Link>
                 </Button>
               </>
             )}

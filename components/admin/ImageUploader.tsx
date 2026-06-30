@@ -6,7 +6,7 @@ import {
   isCloudinaryConfigured,
   uploadToCloudinary,
 } from "@/lib/cloudinary-upload";
-import { Input } from "@/components/ui/Field";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export function ImageUploader({

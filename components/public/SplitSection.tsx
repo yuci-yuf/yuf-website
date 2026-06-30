@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Check } from "lucide-react";
 import type { CTAButton, FeatureCard } from "@/types";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/Container";
-import { cn } from "@/lib/utils";
+import { cn, ctaButtonVariant } from "@/lib/utils";
 
 interface SplitSectionProps {
   label: string;
@@ -91,13 +92,13 @@ export function SplitSection({
                 {buttons.map((b) => (
                   <Button
                     key={b.label}
-                    href={b.href}
-                    variant={b.variant ?? "primary"}
-                    icon={
-                      b.icon ? <span aria-hidden>{b.icon}</span> : undefined
-                    }
+                    asChild
+                    variant={ctaButtonVariant(b.variant)}
                   >
-                    {b.label}
+                    <Link href={b.href}>
+                      {b.icon && <span aria-hidden>{b.icon}</span>}
+                      {b.label}
+                    </Link>
                   </Button>
                 ))}
               </div>

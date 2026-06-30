@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* ──────────────────────────────────────────────────────────────
    YUF Design System — single source of truth.
@@ -45,6 +46,39 @@
   --color-error: #ef4444;
   --color-info: #1fa8d7;
 
+  /* ── shadcn/ui token aliases ──
+     shadcn components ship with class names like `bg-primary`,
+     `border-input`, `ring-ring`, `text-muted-foreground`. Map those names
+     onto the YUCI palette above so CLI-generated components render in-brand
+     with no per-component edits (and future `shadcn add` runs just work). */
+  --color-background: var(--color-surface);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-text);
+  --color-primary: var(--color-primary-600);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-surface-alt);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface-alt);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-accent: var(--color-primary-50);
+  --color-accent-foreground: var(--color-primary-800);
+  --color-destructive: var(--color-error);
+  --color-destructive-foreground: #ffffff;
+  /* `--color-border` is already defined above (neutral surface border). */
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary-300);
+
+  /* Chart series colors (shadcn `chart` component) — YUCI blues + accent.
+     Literal hex (not nested var()) so they resolve reliably at runtime. */
+  --color-chart-1: #1fa8d7;
+  --color-chart-2: #1ba0c9;
+  --color-chart-3: #146b94;
+  --color-chart-4: #15809f;
+  --color-chart-5: #64d1ec;
+
   /* ── Typography ── */
   --font-heading: var(--font-jakarta), system-ui, sans-serif;
   --font-body: var(--font-poppins), system-ui, sans-serif;
@@ -81,6 +115,13 @@
 }
 
 @layer base {
+  /* Tailwind v4 defaults `border-color` to currentColor, so a bare `border`
+     (as shadcn components use) renders in the dark text color. Restore the
+     soft token border as the default so those components look right. */
+  * {
+    border-color: var(--color-border);
+  }
+
   body {
     background: var(--color-surface);
     color: var(--color-text);
@@ -105,4 +146,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Radix Select/Dropdown locks body scroll on open, which removes the page
+   scrollbar and shifts the layout. Keep the scrollbar and cancel the gap it
+   adds. (Documented shadcn/Radix fix via the data-scroll-locked attribute.) */
+body[data-scroll-locked] {
+  margin-right: 0 !important;
+  overflow: auto !important;
 }

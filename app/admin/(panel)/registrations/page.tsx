@@ -8,8 +8,15 @@ import {
   EmptyState,
   formatDate,
 } from "@/components/admin/AdminUI";
-import { Input, Select } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { getRegistrations, setRegistrationStatus } from "@/lib/admin-data";
 import type { Registration } from "@/types";
 
@@ -20,7 +27,8 @@ export default function RegistrationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  // "all" is the sentinel for no filter (Radix Select disallows empty values).
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     getRegistrations()
@@ -40,7 +48,7 @@ export default function RegistrationsPage() {
         `${r.firstName} ${r.lastName}`.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
         r.phone.toLowerCase().includes(q);
-      const matchesStatus = !statusFilter || r.status === statusFilter;
+      const matchesStatus = statusFilter === "all" || r.status === statusFilter;
       return matchesQ && matchesStatus;
     });
   }, [rows, search, statusFilter]);
@@ -84,7 +92,8 @@ export default function RegistrationsPage() {
         title="Registrations"
         description={`${filtered.length} of ${rows.length} shown`}
         action={
-          <Button variant="outline" size="sm" onClick={exportCsv} icon={<Download size={16} />}>
+          <Button variant="outline" size="sm" onClick={exportCsv}>
+            <Download size={16} />
             Export CSV
           </Button>
         }
@@ -101,15 +110,18 @@ export default function RegistrationsPage() {
               className="pl-9"
             />
           </div>
-          <Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-48"
-          >
-            <option value="">All statuses</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s} className="capitalize">{s}</option>
-            ))}
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s} className="capitalize">
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
@@ -156,12 +168,20 @@ export default function RegistrationsPage() {
                     <td className="px-4 py-3">
                       <Select
                         value={r.status}
-                        onChange={(e) => handleStatusChange(r.id, e.target.value as Registration["status"])}
-                        className="h-9 py-1 text-xs"
+                        onValueChange={(v) =>
+                          handleStatusChange(r.id, v as Registration["status"])
+                        }
                       >
-                        {STATUSES.map((s) => (
-                          <option key={s} value={s} className="capitalize">{s}</option>
-                        ))}
+                        <SelectTrigger className="h-9 w-32 py-1 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATUSES.map((s) => (
+                            <SelectItem key={s} value={s} className="capitalize">
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
                       </Select>
                     </td>
                   </tr>

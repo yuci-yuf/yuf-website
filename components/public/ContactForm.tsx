@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
-import { Field, Input, Select, Textarea } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { submitContact } from "@/lib/submissions";
 import { contactContent } from "@/lib/content";
 
@@ -73,20 +82,32 @@ export function ContactForm() {
       </div>
 
       <Field label="Subject" htmlFor="subject" required>
-        <Select id="subject" name="subject" required defaultValue="">
-          <option value="" disabled>Select a subject</option>
-          {contactContent.subjects.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
+        <Select name="subject" required>
+          <SelectTrigger id="subject">
+            <SelectValue placeholder="Select a subject" />
+          </SelectTrigger>
+          <SelectContent>
+            {contactContent.subjects.map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </Field>
 
-      <Field label="Message" htmlFor="message" required>
+      <Field
+        label="Message"
+        htmlFor="message"
+        required
+        description="We'd love to hear from you! Whether you have questions, need more details about YUF, or want to get involved, feel free to write here. We'll get back to you as soon as possible."
+      >
         <Textarea
           id="message"
           name="message"
           required
-          placeholder="We'd love to hear from you! Whether you have questions, need more details about YUF, or want to get involved, feel free to write here. We'll get back to you as soon as possible."
+          className="min-h-40"
+          placeholder="Write your message here…"
         />
       </Field>
 
@@ -96,12 +117,8 @@ export function ContactForm() {
         </p>
       )}
 
-      <Button
-        type="submit"
-        size="lg"
-        disabled={status === "submitting"}
-        icon={<Send size={18} />}
-      >
+      <Button type="submit" size="lg" disabled={status === "submitting"}>
+        <Send size={18} />
         {status === "submitting" ? "Sending…" : "Send Message"}
       </Button>
     </form>

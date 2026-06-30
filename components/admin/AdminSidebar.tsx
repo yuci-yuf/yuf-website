@@ -9,7 +9,6 @@ import {
   Mail,
   LogOut,
   ExternalLink,
-  Tags,
   Images,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +20,6 @@ const nav = [
   { label: "Registrations", href: "/admin/registrations", icon: ClipboardList },
   { label: "Contacts", href: "/admin/contacts", icon: Mail },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
-  { label: "Categories", href: "/admin/categories", icon: Tags },
   { label: "Gallery", href: "/admin/gallery", icon: Images },
 ];
 

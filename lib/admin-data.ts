@@ -104,8 +104,12 @@ export async function setRegistrationStatus(
 // in URLs (e.g. /events/<id>), so we write with setDoc on a chosen id rather
 // than addDoc. The public site reads these (with lib/content.ts as fallback).
 
-/** Editable fields for an event (everything except the id). */
-export type EventInput = Omit<EventItem, "id">;
+/**
+ * Editable fields for an event (everything except the id). `registrationCount`
+ * is system-managed by the public registration flow, not admin-editable, so it
+ * is excluded here.
+ */
+export type EventInput = Omit<EventItem, "id" | "registrationCount">;
 
 export async function getAdminEvents(): Promise<EventItem[]> {
   const q = query(collection(db, "events"), orderBy("order", "asc"));
@@ -117,7 +121,11 @@ export async function createEvent(
   id: string,
   data: EventInput,
 ): Promise<void> {
-  await setDoc(doc(db, "events", id), { ...stripUndefined(data) });
+  // Seed registrationCount so the public capacity check has a number to read.
+  await setDoc(doc(db, "events", id), {
+    ...stripUndefined(data),
+    registrationCount: 0,
+  });
 }
 
 export async function updateEvent(
@@ -143,6 +151,14 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
       typeof data.registrationFee === "number"
         ? (data.registrationFee as number)
         : undefined,
+    registrationLimit:
+      typeof data.registrationLimit === "number"
+        ? (data.registrationLimit as number)
+        : undefined,
+    registrationCount:
+      typeof data.registrationCount === "number"
+        ? (data.registrationCount as number)
+        : 0,
     isActive: data.isActive !== false,
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,

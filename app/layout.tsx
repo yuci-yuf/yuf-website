@@ -59,9 +59,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${poppins.variable} ${jakartaSans.variable} ${bricolage.variable} h-full`}
+      className={`${poppins.variable} ${jakartaSans.variable} ${bricolage.variable}`}
     >
-      <body className="min-h-full flex flex-col bg-surface text-text">
+      <body className="min-h-screen flex flex-col bg-surface text-text">
         {children}
       </body>
     </html>
