@@ -101,7 +101,7 @@ export default async function EventDetailPage({
       </section>
 
       {/* Body */}
-      <Section containerClassName="max-w-4xl">
+      <Section tone="glow" containerClassName="max-w-4xl">
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           <div className="flex flex-col gap-5">
             <h2 className="font-heading text-2xl font-bold text-heading">
@@ -168,7 +168,7 @@ export default async function EventDetailPage({
 
       {/* Related events */}
       {related.length > 0 && (
-        <Section className="bg-surface-alt">
+        <Section tone="tint">
           <h2 className="mb-10 font-heading text-2xl font-bold text-heading">
             More in {event.category}
           </h2>

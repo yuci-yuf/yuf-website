@@ -23,7 +23,7 @@ export default function ContactPage() {
     <>
       <Hero data={contactContent.hero} />
 
-      <Section id="contact-form">
+      <Section id="contact-form" tone="aqua">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
           <ContactForm />
 
@@ -82,7 +82,7 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      <Section className="bg-surface-alt">
+      <Section tone="tint">
         <SectionHeading
           label={contactContent.helpCards.label}
           title={contactContent.helpCards.title}

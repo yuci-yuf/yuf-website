@@ -35,7 +35,7 @@ export default async function EventsPage() {
     <>
       <Hero data={eventsContent.hero} />
 
-      <Section>
+      <Section tone="glow">
         <SectionHeading
           label={eventsContent.intro.label}
           title={eventsContent.intro.title}

@@ -37,7 +37,7 @@ export default async function RegisterPage() {
   return (
     <>
       <Hero data={registerContent.hero} />
-      <Section>
+      <Section tone="glow">
         {activeEvents.length > 0 ? (
           <Suspense fallback={<div className="h-64 sm:h-96" />}>
             <RegistrationForm events={activeEvents} categories={categories} />

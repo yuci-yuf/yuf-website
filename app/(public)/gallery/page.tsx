@@ -21,7 +21,7 @@ export default async function GalleryPage() {
     <>
       <Hero data={galleryContent.hero} />
 
-      <Section>
+      <Section tone="aqua">
         <SectionHeading
           label={galleryContent.highlights.label}
           title={galleryContent.highlights.title}

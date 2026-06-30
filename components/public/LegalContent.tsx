@@ -18,7 +18,7 @@ export function LegalContent({ data }: { data: LegalPage }) {
         )}
       </Section>
 
-      <Section containerClassName="max-w-3xl">
+      <Section tone="aqua" containerClassName="max-w-3xl">
         <div className="flex flex-col gap-10">
           {data.sections.map((section) => (
             <div key={section.heading} className="flex flex-col gap-4">

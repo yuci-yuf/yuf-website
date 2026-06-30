@@ -12,31 +12,31 @@
   /* ── Primary brand (YUCI ocean blue) ──
      Anchored on the logo: Light Cyan #9DE0EF (200), Sky Blue #64D1EC (300),
      Primary Blue #1FA8D7 (500), Deep Ocean #146B94 (700). */
-  --color-primary-50: #edfbff;
-  --color-primary-100: #d2f3fc;
-  --color-primary-200: #9de0ef;
-  --color-primary-300: #64d1ec;
-  --color-primary-400: #3cbce2;
-  --color-primary-500: #1fa8d7;
-  --color-primary-600: #1787b3;
-  --color-primary-700: #146b94;
-  --color-primary-800: #115774;
-  --color-primary-900: #0f475f;
-  --color-primary-950: #082b3d;
+  --color-primary-50: #e3f0f7;
+  --color-primary-100: #bfdcec;
+  --color-primary-200: #8ac1da;
+  --color-primary-300: #4ea2c2;
+  --color-primary-400: #2a83a6;
+  --color-primary-500: #166787;
+  --color-primary-600: #11536e;
+  --color-primary-700: #0e4258;
+  --color-primary-800: #0c3547;
+  --color-primary-900: #0a2b3a;
+  --color-primary-950: #051824;
 
   /* ── Accent (luminous sky cyan) ──
      The logo's bright Sky Blue #64D1EC, used for glows & highlights. */
-  --color-accent-50: #effcfe;
-  --color-accent-100: #d4f5fb;
-  --color-accent-400: #64d1ec;
-  --color-accent-500: #2fb6da;
-  --color-accent-600: #1c9bc2;
-  --color-accent-700: #15809f;
+  --color-accent-50: #ddf0f6;
+  --color-accent-100: #b6e0ec;
+  --color-accent-400: #3bb0cf;
+  --color-accent-500: #1f93b6;
+  --color-accent-600: #167a98;
+  --color-accent-700: #11627c;
 
   /* ── Surface / neutral (cool, faint cyan tint) ── */
-  --color-surface: #f8fbff;
-  --color-surface-alt: #f1f8fb;
-  --color-border: #d9e7ee;
+  --color-surface: #e8f1f7;
+  --color-surface-alt: #d5e6f0;
+  --color-border: #bcd2e0;
   --color-text: #102330;
   --color-text-muted: #4c729a;
 
@@ -57,12 +57,12 @@
   /* ── Festival accents (sampled from the reference hero image) ──
      The multi-hue gradient + decorative shapes: royal blue → azure → cyan →
      teal, with violet, magenta, and orange accents. */
-  --color-festival-blue: #1e7fd4;
-  --color-festival-blue-dark: #1c4fc6;
-  --color-festival-cyan: #1ec6c0;
-  --color-festival-purple: #7b34e2;
-  --color-festival-magenta: #e0259c;
-  --color-festival-orange: #fb8b1e;
+  --color-festival-blue: #155fa6;
+  --color-festival-blue-dark: #133a8c;
+  --color-festival-cyan: #15938f;
+  --color-festival-purple: #591fac;
+  --color-festival-magenta: #ad1976;
+  --color-festival-orange: #d9740f;
 
   /* ── Semantic ── */
   --color-success: #22c55e;
@@ -185,12 +185,74 @@ html {
    top-left, a teal-green glow at bottom-right, and a warm orange hint on the
    right. Reused across every page hero/banner so the whole site shares it. */
 .bg-festival-gradient {
-  background-color: #1aa6ce;
+  background-color: #11607b;
   background-image:
-    radial-gradient(120% 100% at 12% 8%, rgba(123, 52, 226, 0.55) 0%, transparent 46%),
-    radial-gradient(90% 90% at 92% 96%, rgba(30, 198, 192, 0.5) 0%, transparent 50%),
-    radial-gradient(70% 80% at 96% 28%, rgba(251, 139, 30, 0.26) 0%, transparent 46%),
-    linear-gradient(120deg, #1c4fc6 0%, #1e7fd4 32%, #1aa6ce 62%, #1ec6c0 100%);
+    radial-gradient(120% 100% at 12% 8%, rgba(89, 31, 172, 0.6) 0%, transparent 46%),
+    radial-gradient(90% 90% at 92% 96%, rgba(21, 147, 143, 0.52) 0%, transparent 50%),
+    radial-gradient(70% 80% at 96% 28%, rgba(217, 116, 15, 0.28) 0%, transparent 46%),
+    linear-gradient(120deg, #133a8c 0%, #155fa6 32%, #11607b 62%, #15938f 100%);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Section tones — soft, premium background washes derived ONLY from
+   the hero palette (primary ocean blue, accent cyan, festival violet
+   /teal/orange). Applied via the <Section tone="…"> primitive to give
+   the site a presentation-style rhythm instead of flat white. Kept
+   low-saturation so text contrast (text-heading / text-body) holds.
+   ────────────────────────────────────────────────────────────── */
+
+/* Soft cyan-gray neutral — the quiet alternating band. */
+.section-tint {
+  background-color: var(--color-surface-alt);
+  background-image: linear-gradient(
+    180deg,
+    rgba(100, 209, 236, 0.2) 0%,
+    rgba(225, 240, 247, 0.5) 100%
+  );
+}
+
+/* Aqua wash — a sky-cyan fade from the top, for content sections. */
+.section-aqua {
+  background-color: var(--color-surface-alt);
+  background-image: linear-gradient(
+    180deg,
+    rgba(120, 200, 226, 0.42) 0%,
+    rgba(225, 240, 247, 0.32) 60%,
+    rgba(241, 248, 251, 0.3) 100%
+  );
+}
+
+/* Festival mesh — violet / teal / orange glows on a tinted base, for the
+   "PPT slide" feel. Decorative; kept readable behind dark heading/body text. */
+.section-glow {
+  background-color: var(--color-surface-alt);
+  background-image:
+    radial-gradient(60% 50% at 8% 0%, rgba(123, 52, 226, 0.16) 0%, transparent 62%),
+    radial-gradient(58% 48% at 96% 4%, rgba(30, 198, 192, 0.2) 0%, transparent 62%),
+    radial-gradient(56% 46% at 84% 100%, rgba(251, 139, 30, 0.12) 0%, transparent 64%),
+    linear-gradient(180deg, rgba(157, 224, 239, 0.18) 0%, rgba(241, 248, 251, 0.25) 100%);
+}
+
+/* Brand band — a stronger primary tint for sections that should advance. */
+.section-brand {
+  background-color: var(--color-primary-100);
+  background-image: linear-gradient(
+    160deg,
+    rgba(100, 209, 236, 0.55) 0%,
+    rgba(157, 224, 239, 0.5) 55%,
+    rgba(255, 220, 190, 0.4) 100%
+  );
+}
+
+/* Hairline gradient divider, for crisp section separation. */
+.divider-accent {
+  height: 1px;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(100, 209, 236, 0.7) 50%,
+    transparent 100%
+  );
 }
 
 /* Radix Select/Dropdown locks body scroll on open, which removes the page
