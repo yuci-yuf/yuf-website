@@ -1,38 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Calendar,
-  MapPin,
-  Trophy,
-  Timer,
-  Palette,
-  Lightbulb,
-  PartyPopper,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
-
-/**
- * Per-category visual identity, all sampled from the festival palette so the
- * grid reads as variety (not rainbow). Used for the imageless placeholder
- * gradient, the icon, and the hover accent bar. Falls back to the brand blue.
- */
-const CATEGORY_STYLE: Record<
-  string,
-  { icon: LucideIcon; from: string; to: string; accent: string }
-> = {
-  "Sports & Games": { icon: Trophy, from: "#1e7fd4", to: "#0e2f63", accent: "#1e7fd4" },
-  Athletics: { icon: Timer, from: "#15938f", to: "#0c4f4d", accent: "#1ec6c0" },
-  "Arts & Culturals": { icon: Palette, from: "#7b34e2", to: "#2e0f59", accent: "#9a5cf0" },
-  Technical: { icon: Lightbulb, from: "#1787b3", to: "#0a2b3a", accent: "#3cbce2" },
-  "Fun Events": { icon: PartyPopper, from: "#fb8b1e", to: "#7a3f08", accent: "#fb8b1e" },
-};
-
-const FALLBACK = { icon: Trophy, from: "#1e7fd4", to: "#0e2f63", accent: "#1e7fd4" };
+import { categoryStyle } from "@/lib/category-style";
 
 export function EventCard({ event }: { event: EventItem }) {
-  const style = CATEGORY_STYLE[event.category] ?? FALLBACK;
+  const style = categoryStyle(event.category);
   const Icon = style.icon;
 
   return (
