@@ -16,6 +16,7 @@ import type {
   Partner,
   RegistrationStep,
   SiteConfig,
+  Testimonial,
 } from "@/types";
 
 export const siteConfig: SiteConfig = {
@@ -286,6 +287,35 @@ export const homeContent = {
       { title: "Collaborate & Learn", description: "Gain valuable insights from workshops, expert talks, and networking with driven peers." },
       { title: "Make an Impact", description: "Contribute to community service initiatives and create meaningful, lasting change in society." },
     ] satisfies FeatureCard[],
+  },
+  testimonials: {
+    label: "Testimonials",
+    title: "Inspiring Words From Dignitaries & Public Leaders",
+    subtitle:
+      "Hear what governors, legislators, and global leaders have said about the Youth United Festival and the young changemakers it brings together.",
+    items: [
+      {
+        name: "Dr. Tamilisai Soundararajan",
+        role: "Lieutenant Governor of Puducherry & Governor of Telangana",
+        quote:
+          "The Youth United Festival is more than just a sports event — it's a platform that nurtures discipline, teamwork, and leadership among our young generation. I wholeheartedly support this initiative by the NGO.",
+        image: "/images/testimonials/tamilisai-soundararajan.png",
+      },
+      {
+        name: "Amb. Dunston P",
+        role: "The Private Office of His Royal Highness Sheikh Ahmed Bin Faisal Al Qassimi",
+        quote:
+          "A platform for young minds to come together, celebrate their talents, and ignite positive change! Let's unite, inspire, and create the future we all dream of. Your energy, your voice, your vision — together, we can achieve greatness!",
+        image: "/images/testimonials/dunston-p.png",
+      },
+      {
+        name: "Shri. Embalam R. Selvam",
+        role: "Speaker of Puducherry Legislative Assembly",
+        quote:
+          "This festival is all about celebrating your creativity, energy, and vision for the future. Together, we have the power to inspire change, break barriers, and build a brighter tomorrow. Let's unite, dream big, and make a difference!",
+        image: "/images/testimonials/embalam-selvam.png",
+      },
+    ] satisfies Testimonial[],
   },
   partners: {
     label: "Our Community",

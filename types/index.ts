@@ -173,6 +173,19 @@ export interface GalleryImage {
   createdAt: string | null;
 }
 
+// ── Testimonials ──
+
+export interface Testimonial {
+  /** Speaker's name, e.g. "Dr. Tamilisai Soundararajan". */
+  name: string;
+  /** Role / office, shown as the small uppercase line above the quote. */
+  role: string;
+  /** The testimonial text. */
+  quote: string;
+  /** Portrait image path (optional — falls back to an initial avatar). */
+  image?: string;
+}
+
 // ── Partners ──
 
 export interface Partner {

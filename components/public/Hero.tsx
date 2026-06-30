@@ -24,7 +24,7 @@ export function Hero({ data }: { data: HeroData }) {
           )}
 
           <h1
-            className="animate-[fade-up_0.6s_ease-out_both] font-heading text-4xl font-extrabold leading-[1.07] tracking-tight text-white sm:text-6xl lg:text-7xl"
+            className="animate-[fade-up_0.6s_ease-out_both] font-heading text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-7xl"
             style={{ animationDelay: "0.2s" }}
           >
             {data.title}{" "}

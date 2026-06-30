@@ -6,6 +6,7 @@ import { InitiativesRow } from "@/components/home/InitiativesRow";
 import { EventShowcase } from "@/components/home/EventShowcase";
 import { StepsTimeline } from "@/components/home/StepsTimeline";
 import { GalleryMosaic } from "@/components/home/GalleryMosaic";
+import { Testimonials } from "@/components/home/Testimonials";
 import {
   homeContent,
   partners,
@@ -66,6 +67,13 @@ export default async function HomePage() {
       <StepsTimeline steps={registrationSteps} />
 
 <GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
+
+      <Testimonials
+        label={homeContent.testimonials.label}
+        title={homeContent.testimonials.title}
+        subtitle={homeContent.testimonials.subtitle}
+        items={homeContent.testimonials.items}
+      />
 
       <LogoStrip partners={partners} />
     </>

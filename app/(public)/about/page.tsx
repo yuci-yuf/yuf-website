@@ -26,7 +26,7 @@ export default function AboutPage() {
           {/* ── Top row: ABOUT + tagline ── */}
           <div className="mb-6 flex flex-wrap items-end justify-between gap-x-10 gap-y-4 lg:mb-10 lg:pl-1">
             <FadeUp>
-              <h1 className="font-heading text-[3.5rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
+              <h1 className="font-heading text-[2.75rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
                 About
               </h1>
             </FadeUp>
@@ -51,7 +51,7 @@ export default function AboutPage() {
             {/* Left Column */}
             <div className="flex flex-col">
               <FadeUp delay={0.05}>
-                <h1 className="font-heading text-[3.5rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
+                <h1 className="font-heading text-[2.75rem] font-black uppercase leading-[0.85] tracking-tighter text-white sm:text-[5rem] md:text-[7.5rem] lg:text-[10rem]">
                   Us
                 </h1>
               </FadeUp>

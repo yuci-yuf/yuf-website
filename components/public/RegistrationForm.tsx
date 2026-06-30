@@ -1,8 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ShieldCheck, Lock, Clock, Phone, MapPin, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import {
+  ShieldCheck,
+  Lock,
+  Clock,
+  Phone,
+  CheckCircle2,
+} from "lucide-react";
 import type { EventItem } from "@/types";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -14,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { siteConfig, registerContent } from "@/lib/content";
 import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
@@ -29,7 +35,31 @@ function spotsLeft(ev: EventItem | undefined): number | null {
   return Math.max(0, ev.registrationLimit - (ev.registrationCount ?? 0));
 }
 
-const steps = ["Personal Info", "Event Selection", "Review", "Payment"];
+const EMAIL_RE = /^\S+@\S+\.\S+$/;
+
+interface FormValues {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  location: string;
+  institution: string;
+  ageCategory: string;
+  message: string;
+}
+
+const EMPTY: FormValues = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  location: "",
+  institution: "",
+  ageCategory: "",
+  message: "",
+};
+
+type Errors = Partial<Record<keyof FormValues | "category" | "event", string>>;
 
 export function RegistrationForm({
   events,
@@ -42,8 +72,19 @@ export function RegistrationForm({
   const preselectedId = searchParams.get("event");
   const preselected = events.find((e) => e.id === preselectedId);
 
+  const [values, setValues] = useState<FormValues>(EMPTY);
   const [category, setCategory] = useState<string>(preselected?.category ?? "");
   const [eventId, setEventId] = useState<string>(preselected?.id ?? "");
+  const [errors, setErrors] = useState<Errors>({});
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error" | "full"
+  >("idle");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const setField = (key: keyof FormValues, value: string) => {
+    setValues((v) => ({ ...v, [key]: value }));
+    setErrors((e) => ({ ...e, [key]: undefined }));
+  };
 
   const eventsInCategory = useMemo(
     () => events.filter((e) => e.category === category),
@@ -57,38 +98,55 @@ export function RegistrationForm({
   const selectedSpotsLeft = spotsLeft(selectedEvent);
   const selectedFull = selectedSpotsLeft === 0;
 
-  const [status, setStatus] = useState<
-    "idle" | "submitting" | "success" | "error" | "full"
-  >("idle");
+  function validate(): Errors {
+    const e: Errors = {};
+    if (!category) e.category = "Please choose a category.";
+    if (!eventId) e.event = "Please choose an event.";
+    if (!values.ageCategory) e.ageCategory = "Please choose an age group.";
+    if (!values.firstName.trim()) e.firstName = "Please enter the student's first name.";
+    if (!values.lastName.trim()) e.lastName = "Please enter the student's last name.";
+    if (values.phone.trim().length < 7) e.phone = "Please enter a valid phone number.";
+    if (!EMAIL_RE.test(values.email)) e.email = "Please enter a valid email address.";
+    if (!values.location) e.location = "Please select your city.";
+    if (!values.institution.trim()) e.institution = "Please enter the school or college name.";
+    return e;
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Guard: only events still open for registration can be submitted. The
-    // dropdown is already filtered to these, but this blocks a stale/deep-link
-    // selection of a closed event.
+
+    const found = validate();
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      // Scroll the first problem into view so nothing is missed.
+      const firstKey = Object.keys(found)[0];
+      const el = formRef.current?.querySelector<HTMLElement>(
+        `[data-field="${firstKey}"]`,
+      );
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     if (!selectedEvent || selectedEvent.registrationOpen === false) return;
-    // Block submit if the event is already full (server enforces this too).
     if (spotsLeft(selectedEvent) === 0) {
       setStatus("full");
       return;
     }
-    const data = new FormData(e.currentTarget);
+
     setStatus("submitting");
     try {
-      // Razorpay checkout (Phase 3) will run before this write; for now we
-      // persist the registration with a pending payment status.
       await submitRegistration({
-        firstName: String(data.get("firstName") ?? ""),
-        lastName: String(data.get("lastName") ?? ""),
-        email: String(data.get("email") ?? ""),
-        phone: String(data.get("phone") ?? ""),
-        location: String(data.get("location") ?? ""),
-        institution: String(data.get("institution") ?? ""),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        location: values.location,
+        institution: values.institution,
         eventCategory: selectedEvent.category,
         eventId: selectedEvent.id,
         eventTitle: selectedEvent.title,
-        ageCategory: String(data.get("ageCategory") ?? ""),
-        message: String(data.get("message") ?? ""),
+        ageCategory: values.ageCategory,
+        message: values.message,
         amountPaid: fee ?? 0,
       });
       setStatus("success");
@@ -101,13 +159,17 @@ export function RegistrationForm({
 
   if (status === "success") {
     return (
-      <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
-        <CheckCircle2 size={48} className="text-success" />
-        <h2 className="font-heading text-2xl font-bold text-heading">Registration received!</h2>
+      <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-3xl border border-border bg-surface p-10 text-center shadow-card">
+        <CheckCircle2 size={52} className="text-success" />
+        <h2 className="font-heading text-2xl font-bold text-heading">
+          You&apos;re registered!
+        </h2>
         <p className="text-text-muted">
-          Thanks for registering for <strong className="text-text">{selectedEvent?.title}</strong>.
-          Your spot is reserved with a pending payment status — our team will reach
-          out with payment and confirmation details.
+          Thanks for registering for{" "}
+          <strong className="text-text">{selectedEvent?.title}</strong>. We&apos;ve
+          saved your spot. Our team will call{" "}
+          <strong className="text-text">{values.phone}</strong> with the payment and
+          confirmation details — no payment is needed right now.
         </p>
         <Button asChild variant="outline">
           <Link href="/events">Browse more events</Link>
@@ -117,92 +179,43 @@ export function RegistrationForm({
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
-      {/* ── Form ── */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-8 rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8"
-      >
-        {/* Progress indicator */}
-        <ol className="flex flex-wrap items-center gap-x-2 gap-y-3">
-          {steps.map((label, i) => (
-            <li key={label} className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">
-                {i + 1}
-              </span>
-              <span className="text-sm font-medium text-text-muted">{label}</span>
-              {i < steps.length - 1 && (
-                <span className="mx-1 hidden h-px w-6 bg-border sm:inline-block" aria-hidden />
-              )}
-            </li>
-          ))}
-        </ol>
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      noValidate
+      className="mx-auto flex max-w-2xl flex-col gap-6"
+    >
+      {/* Intro / reassurance */}
+      <div className="flex flex-col gap-2 text-center">
+        <h2 className="font-heading text-3xl font-bold text-heading">
+          Register for YUF 2026
+        </h2>
+        <p className="text-text-muted">
+          It only takes a couple of minutes. Fill in the details below — fields
+          marked <span className="text-error">*</span> are required. You don&apos;t
+          pay anything now; our team will call you about payment.
+        </p>
+      </div>
 
-        <h2 className="font-heading text-2xl font-bold text-heading">Registration</h2>
-
-        {/* Personal details */}
-        <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
-            Personal Details
-          </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="First Name" htmlFor="firstName" required>
-              <Input id="firstName" name="firstName" required autoComplete="given-name" placeholder="Enter your first name" />
-            </Field>
-            <Field label="Last Name" htmlFor="lastName" required>
-              <Input id="lastName" name="lastName" required autoComplete="family-name" placeholder="Enter your last name" />
-            </Field>
-            <Field label="Phone Number" htmlFor="phone" required>
-              <Input id="phone" name="phone" type="tel" required autoComplete="tel" placeholder="Enter your phone number" />
-            </Field>
-            <Field label="Email Address" htmlFor="email" required>
-              <Input id="email" name="email" type="email" required autoComplete="email" placeholder="Enter your email" />
-            </Field>
-          </div>
-        </fieldset>
-
-        {/* Institution */}
-        <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
-            Institution Details
-          </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Location" htmlFor="location" required>
-              <Select name="location" required>
-                <SelectTrigger id="location">
-                  <SelectValue placeholder="Select a location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {registerContent.locations.map((l) => (
-                    <SelectItem key={l.city} value={l.city}>
-                      {l.city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="College / School" htmlFor="institution" required>
-              <Input id="institution" name="institution" required placeholder="Enter your college or school name" />
-            </Field>
-          </div>
-        </fieldset>
-
-        {/* Event selection */}
-        <fieldset className="flex flex-col gap-5">
-          <legend className="mb-2 flex items-center gap-2 font-heading text-lg font-bold text-heading">
-            Event Selection
-          </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Event Category" htmlFor="category" required>
+      {/* ── 1. Choose the event ── */}
+      <SectionCard step={1} title="Choose the event">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Event category" htmlFor="category" required>
+            <>
               <Select
                 value={category}
                 onValueChange={(v) => {
                   setCategory(v);
                   setEventId("");
+                  setErrors((e) => ({ ...e, category: undefined, event: undefined }));
                 }}
               >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                <SelectTrigger
+                  id="category"
+                  data-field="category"
+                  aria-invalid={!!errors.category}
+                >
+                  <SelectValue placeholder="Choose a category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
@@ -212,17 +225,28 @@ export function RegistrationForm({
                   ))}
                 </SelectContent>
               </Select>
-            </Field>
-            <Field label="Event" htmlFor="event" required>
+              <ErrorText>{errors.category}</ErrorText>
+            </>
+          </Field>
+
+          <Field label="Event" htmlFor="event" required>
+            <>
               <Select
                 value={eventId}
-                onValueChange={setEventId}
+                onValueChange={(v) => {
+                  setEventId(v);
+                  setErrors((e) => ({ ...e, event: undefined }));
+                }}
                 disabled={!category}
               >
-                <SelectTrigger id="event">
+                <SelectTrigger
+                  id="event"
+                  data-field="event"
+                  aria-invalid={!!errors.event}
+                >
                   <SelectValue
                     placeholder={
-                      category ? "Select an event" : "Select a category first"
+                      category ? "Choose an event" : "Choose a category first"
                     }
                   />
                 </SelectTrigger>
@@ -243,66 +267,223 @@ export function RegistrationForm({
                   })}
                 </SelectContent>
               </Select>
-            </Field>
-          </div>
-
-          {/* Age category */}
-          <div className="flex flex-col gap-2.5">
-            <span className="text-sm font-medium text-text">
-              Age Category <span className="text-error">*</span>
-            </span>
-            <div className="flex flex-wrap gap-3">
-              {siteConfig.ageCategories.map((age) => (
-                <label
-                  key={age.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700"
-                >
-                  <input type="radio" name="ageCategory" value={age.value} required className="accent-primary-600" />
-                  {age.label}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <Field label="Message / Special Requests" htmlFor="message">
-            <Textarea
-              id="message"
-              name="message"
-              placeholder="Any special requests, accessibility needs, or additional information you'd like to share..."
-            />
+              <ErrorText>{errors.event}</ErrorText>
+            </>
           </Field>
-        </fieldset>
-
-        {/* Fee + payment */}
-        <div className="flex flex-col gap-4 rounded-xl bg-surface-alt p-5">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 font-medium text-text">
-              Amount to Pay
-            </span>
-            <span className="font-heading text-xl font-bold text-primary-700">
-              {feeLabel}
-            </span>
-          </div>
-          <p className="flex items-center gap-2 text-xs text-text-muted">
-            <ShieldCheck size={16} className="text-success" />
-            Secure payment powered by Razorpay. We accept UPI, cards, net banking &amp; wallets.
-          </p>
         </div>
 
+        {/* Age group — big, tappable choices */}
+        <fieldset className="flex flex-col gap-2.5" data-field="ageCategory">
+          <span className="text-sm font-medium text-text">
+            Age group <span className="text-error">*</span>
+          </span>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {siteConfig.ageCategories.map((age) => (
+              <label
+                key={age.value}
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-center text-sm font-medium transition-colors hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700"
+              >
+                <input
+                  type="radio"
+                  name="ageCategory"
+                  value={age.value}
+                  checked={values.ageCategory === age.value}
+                  onChange={(e) => setField("ageCategory", e.target.value)}
+                  className="sr-only"
+                />
+                {age.label}
+              </label>
+            ))}
+          </div>
+          <ErrorText>{errors.ageCategory}</ErrorText>
+        </fieldset>
+
+        {/* Live fee line, once an event is chosen */}
+        {selectedEvent && (
+          <div
+            className={cn(
+              "flex items-center justify-between rounded-xl px-4 py-3 text-sm",
+              selectedFull ? "bg-error/10 text-error" : "bg-primary-50 text-primary-800",
+            )}
+          >
+            <span className="font-medium">
+              {selectedFull ? "This event is full — please pick another." : "Registration fee"}
+            </span>
+            {!selectedFull && (
+              <span className="font-heading text-base font-bold">{feeLabel}</span>
+            )}
+          </div>
+        )}
+      </SectionCard>
+
+      {/* ── 2. Your details ── */}
+      <SectionCard step={2} title="Your details">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Student's first name" htmlFor="firstName" required>
+            <>
+              <Input
+                id="firstName"
+                data-field="firstName"
+                value={values.firstName}
+                onChange={(e) => setField("firstName", e.target.value)}
+                autoComplete="given-name"
+                aria-invalid={!!errors.firstName}
+                placeholder="e.g. Aarav"
+              />
+              <ErrorText>{errors.firstName}</ErrorText>
+            </>
+          </Field>
+          <Field label="Student's last name" htmlFor="lastName" required>
+            <>
+              <Input
+                id="lastName"
+                data-field="lastName"
+                value={values.lastName}
+                onChange={(e) => setField("lastName", e.target.value)}
+                autoComplete="family-name"
+                aria-invalid={!!errors.lastName}
+                placeholder="e.g. Sharma"
+              />
+              <ErrorText>{errors.lastName}</ErrorText>
+            </>
+          </Field>
+          <Field
+            label="Contact phone number"
+            htmlFor="phone"
+            required
+            description="We'll call this number about the registration."
+          >
+            <>
+              <Input
+                id="phone"
+                data-field="phone"
+                type="tel"
+                value={values.phone}
+                onChange={(e) => setField("phone", e.target.value)}
+                autoComplete="tel"
+                aria-invalid={!!errors.phone}
+                placeholder="10-digit mobile number"
+              />
+              <ErrorText>{errors.phone}</ErrorText>
+            </>
+          </Field>
+          <Field
+            label="Email address"
+            htmlFor="email"
+            required
+            description="Confirmation is sent here."
+          >
+            <>
+              <Input
+                id="email"
+                data-field="email"
+                type="email"
+                value={values.email}
+                onChange={(e) => setField("email", e.target.value)}
+                autoComplete="email"
+                aria-invalid={!!errors.email}
+                placeholder="name@example.com"
+              />
+              <ErrorText>{errors.email}</ErrorText>
+            </>
+          </Field>
+          <Field label="City" htmlFor="location" required>
+            <>
+              <Select
+                value={values.location}
+                onValueChange={(v) => setField("location", v)}
+              >
+                <SelectTrigger
+                  id="location"
+                  data-field="location"
+                  aria-invalid={!!errors.location}
+                >
+                  <SelectValue placeholder="Select your city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {registerContent.locations.map((l) => (
+                    <SelectItem key={l.city} value={l.city}>
+                      {l.city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <ErrorText>{errors.location}</ErrorText>
+            </>
+          </Field>
+          <Field label="School / College name" htmlFor="institution" required>
+            <>
+              <Input
+                id="institution"
+                data-field="institution"
+                value={values.institution}
+                onChange={(e) => setField("institution", e.target.value)}
+                aria-invalid={!!errors.institution}
+                placeholder="Name of the school or college"
+              />
+              <ErrorText>{errors.institution}</ErrorText>
+            </>
+          </Field>
+        </div>
+
+        <Field
+          label="Anything we should know? (optional)"
+          htmlFor="message"
+        >
+          <Textarea
+            id="message"
+            value={values.message}
+            onChange={(e) => setField("message", e.target.value)}
+            placeholder="Any special requests or accessibility needs."
+          />
+        </Field>
+      </SectionCard>
+
+      {/* ── 3. Confirm ── */}
+      <SectionCard step={3} title="Confirm & finish">
+        <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
+          <Row label="Event">
+            {selectedEvent ? selectedEvent.title : "Not selected yet"}
+          </Row>
+          <Row label="Fee">{feeLabel}</Row>
+          <div className="border-t border-border pt-4">
+            <p className="mb-2 text-sm font-medium text-text">What&apos;s included</p>
+            <ul className="flex flex-col gap-1.5">
+              {siteConfig.registrationPerks.map((perk) => (
+                <li
+                  key={perk}
+                  className="flex items-start gap-2 text-sm text-text-muted"
+                >
+                  <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-success" />
+                  {perk}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="flex items-center gap-2 text-xs text-text-muted">
+          <ShieldCheck size={16} className="text-success" />
+          No payment now. Your details are kept private and used only for this
+          registration.
+        </p>
+
         {status === "error" && (
-          <p className="text-sm text-error">
-            Something went wrong saving your registration. Please try again.
+          <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+            Something went wrong saving your registration. Please check your
+            connection and try again.
           </p>
         )}
         {status === "full" && (
-          <p className="text-sm text-error">
-            Sorry — this event just filled up. Please pick another event.
+          <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+            Sorry — this event just filled up. Please pick another event above.
           </p>
         )}
 
         <Button
           type="submit"
           size="lg"
+          className="w-full"
           disabled={status === "submitting" || selectedFull}
         >
           <Lock size={18} />
@@ -310,79 +491,73 @@ export function RegistrationForm({
             ? "Submitting…"
             : selectedFull
               ? "Event Full"
-              : "Pay & Complete Registration"}
+              : "Complete Registration"}
         </Button>
 
         <p className="text-center text-xs text-text-muted">
-          By registering you agree to our Terms &amp; Conditions and Privacy Policy.
+          By registering you agree to our{" "}
+          <Link href="/terms-and-conditions" className="text-primary-700 underline">
+            Terms &amp; Conditions
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy-policy" className="text-primary-700 underline">
+            Privacy Policy
+          </Link>
+          .
         </p>
-      </form>
 
-      {/* ── Sidebar summary ── */}
-      <aside className="flex flex-col gap-6">
-        <div className="flex flex-col gap-5 rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <h3 className="font-heading text-lg font-bold text-heading">
-            Registration Summary
-          </h3>
-          {selectedEvent ? (
-            <div className="flex flex-col gap-1 rounded-lg bg-primary-50 p-4">
-              <span className="text-xs font-medium uppercase tracking-wide text-primary-600">
-                {selectedEvent.category}
-              </span>
-              <span className="font-heading font-bold text-primary-800">
-                {selectedEvent.title}
-              </span>
-              {selectedSpotsLeft !== null && (
-                <span
-                  className={cn(
-                    "mt-1 text-xs font-semibold",
-                    selectedFull ? "text-error" : "text-primary-700",
-                  )}
-                >
-                  {selectedFull
-                    ? "This event is full"
-                    : `${selectedSpotsLeft} spot${selectedSpotsLeft === 1 ? "" : "s"} left`}
-                </span>
-              )}
-            </div>
-          ) : (
-            <p className="rounded-lg bg-surface-alt p-4 text-sm text-text-muted">
-              Select an event to see your summary.
-            </p>
-          )}
-          <div className="flex items-baseline justify-between border-b border-border pb-4">
-            <span className="text-sm text-text-muted">Per participant</span>
-            <span className="font-heading text-2xl font-bold text-heading">{feeLabel}</span>
-          </div>
-          <ul className="flex flex-col gap-2.5">
-            {siteConfig.registrationPerks.map((perk) => (
-              <li key={perk} className="text-sm text-text-muted">{perk}</li>
-            ))}
-          </ul>
-          <div className="flex flex-col gap-2 border-t border-border pt-4 text-sm text-text-muted">
-            <span className="flex items-center gap-2">
-              <Clock size={16} className="text-accent-600" />
-              Registration closes <strong className="text-text">{siteConfig.registrationDeadline}</strong>
-            </span>
-            <span className="flex items-center gap-2">
-              <Phone size={16} className="text-accent-600" />
-              Need help? Call <strong className="text-text">{siteConfig.contact.phone}</strong>
-            </span>
-          </div>
+        <div className="flex flex-col items-center gap-1 border-t border-border pt-4 text-sm text-text-muted sm:flex-row sm:justify-center sm:gap-6">
+          <span className="flex items-center gap-2">
+            <Clock size={16} className="text-accent-600" />
+            Closes <strong className="text-text">{siteConfig.registrationDeadline}</strong>
+          </span>
+          <span className="flex items-center gap-2">
+            <Phone size={16} className="text-accent-600" />
+            Need help? Call{" "}
+            <strong className="text-text">{siteConfig.contact.phone}</strong>
+          </span>
         </div>
+      </SectionCard>
+    </form>
+  );
+}
 
-        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <h3 className="font-heading text-base font-bold text-heading">Event Locations</h3>
-          <ul className="flex flex-col gap-2">
-            {registerContent.locations.map((l) => (
-              <li key={l.city} className="flex items-center gap-2 text-sm text-text-muted">
-                <MapPin size={16} className="text-primary-600" />
-                <span className="font-medium text-text">{l.city}</span> — {l.region}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+/* ── Sub-components ── */
+
+function SectionCard({
+  step,
+  title,
+  children,
+}: {
+  step: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
+      <div className="flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-festival-blue to-festival-cyan font-heading text-sm font-bold text-white">
+          {step}
+        </span>
+        <h3 className="font-heading text-xl font-bold text-heading">{title}</h3>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ErrorText({ children }: { children?: string }) {
+  if (!children) return null;
+  return <p className="text-xs font-medium text-error">{children}</p>;
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-sm text-text-muted">{label}</span>
+      <span className="text-right font-heading font-bold text-heading">
+        {children}
+      </span>
     </div>
   );
 }

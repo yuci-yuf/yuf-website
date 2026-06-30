@@ -153,8 +153,8 @@ export function HeroSection({
         }}
       />
 
-      {/* ── Decorative gradient arrows (framing the hero) ── */}
-      <div aria-hidden className="absolute inset-0 z-10 overflow-hidden">
+      {/* ── Decorative gradient arrows (framing the hero) — desktop only ── */}
+      <div aria-hidden className="absolute inset-0 z-10 hidden overflow-hidden sm:block">
         {/* Left side — pointing right */}
         <ArrowShape id="arw-l1" from="#ff8a2a" to="#7c4ddb" className="-left-6 top-[8%] h-72 w-48 opacity-90" />
         <ArrowShape id="arw-l2" from="#27e0d2" to="#1e6fd6" className="left-[14%] top-[44%] h-56 w-36 opacity-70" />
@@ -165,8 +165,8 @@ export function HeroSection({
         <ArrowShape id="arw-r3" from="#7c4ddb" to="#c026d3" className="-right-4 bottom-[2%] h-64 w-40 opacity-80" flip />
       </div>
 
-      {/* ── Flowing ribbons (orange & purple) ── */}
-      <div aria-hidden className="absolute inset-0 z-10 overflow-hidden">
+      {/* ── Flowing ribbons (orange & purple) — desktop only ── */}
+      <div aria-hidden className="absolute inset-0 z-10 hidden overflow-hidden sm:block">
         {/* Left */}
         <Ribbon id="rib-l1" from="#ff8a2a" to="#ff5e8a" className="-left-8 bottom-[24%] h-24 w-80 rotate-[18deg] opacity-80" />
         <Ribbon id="rib-l2" from="#7c4ddb" to="#a855f7" className="left-[4%] bottom-[12%] h-20 w-72 rotate-[10deg] opacity-70" />
@@ -175,8 +175,8 @@ export function HeroSection({
         <Ribbon id="rib-r2" from="#ff8a2a" to="#ff5e8a" className="right-[4%] top-[14%] h-20 w-72 rotate-[10deg] opacity-70" flip />
       </div>
 
-      {/* ── Confetti dots ── */}
-      <div aria-hidden className="absolute inset-0 z-10">
+      {/* ── Confetti dots — desktop only (reads as noise on phones) ── */}
+      <div aria-hidden className="absolute inset-0 z-10 hidden sm:block">
         {[
           "left-[20%] top-[18%] bg-highlight-500",
           "left-[30%] top-[70%] bg-festival-cyan",
@@ -204,7 +204,7 @@ export function HeroSection({
 
       {/* ── Centred content ── */}
       <Container className="relative z-30 h-full">
-        <div className="flex min-h-[100svh] flex-col items-center justify-center gap-6 px-2 pb-28 pt-28 text-center">
+        <div className="flex min-h-[100svh] flex-col items-center justify-center gap-5 px-2 pb-24 pt-24 text-center sm:gap-6 sm:pb-28 sm:pt-28">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,20 +252,24 @@ export function HeroSection({
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.7 }}
-            className="mt-6 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3"
+            className="mt-4 grid w-full max-w-3xl grid-cols-3 gap-2.5 sm:mt-6 sm:gap-4"
           >
             {stats.map((stat, i) => {
               const { desc } = STAT_META[i] ?? STAT_META[0];
               return (
                 <div
                   key={stat.label}
-                  className="rounded-2xl border border-white/20 bg-white/12 p-5 text-left shadow-xl shadow-primary-950/20 backdrop-blur-md"
+                  className="rounded-2xl border border-white/20 bg-white/12 p-3 text-center shadow-xl shadow-primary-950/20 backdrop-blur-md sm:p-5 sm:text-left"
                 >
-                  <span className="font-display text-3xl font-extrabold text-white">
+                  <span className="font-display text-2xl font-extrabold text-white sm:text-3xl">
                     {stat.number}
                   </span>
-                  <p className="mt-1 font-semibold text-white">{stat.label}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-white/70">{desc}</p>
+                  <p className="mt-0.5 text-xs font-semibold text-white sm:mt-1 sm:text-base">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1 hidden text-xs leading-relaxed text-white/70 sm:block">
+                    {desc}
+                  </p>
                 </div>
               );
             })}
