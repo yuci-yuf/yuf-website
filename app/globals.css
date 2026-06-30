@@ -34,11 +34,33 @@
   --color-accent-700: #15809f;
 
   /* ── Surface / neutral (cool, faint cyan tint) ── */
-  --color-surface: #ffffff;
+  --color-surface: #f8fbff;
   --color-surface-alt: #f1f8fb;
   --color-border: #d9e7ee;
   --color-text: #102330;
   --color-text-muted: #4c729a;
+
+  /* ── Festival typography colors (per brand spec) ──
+     Deep indigo headings + slate body, used across the home page sections. */
+  --color-heading: #1f2a5e;
+  --color-body: #4b5563;
+
+  /* ── Festival highlight (warm orange) ──
+     Used for energetic accents, confetti, and the "2026" highlight on the
+     home hero to give the page an event / celebration vibe. */
+  --color-highlight-50: #fff5ec;
+  --color-highlight-100: #ffe6d1;
+  --color-highlight-400: #ffa552;
+  --color-highlight-500: #ff8a2a;
+  --color-highlight-600: #ef7a1a;
+
+  /* ── Festival CTA blues (home hero) ──
+     The reference hero uses a royal-blue primary button (#1E75D6, hover
+     #165F9C) and a bright cyan secondary (#27E0D2). */
+  --color-festival-blue: #1e75d6;
+  --color-festival-blue-dark: #165f9c;
+  --color-festival-cyan: #27e0d2;
+  --color-festival-purple: #7c4ddb;
 
   /* ── Semantic ── */
   --color-success: #22c55e;
@@ -101,11 +123,19 @@
 
   /* ── Motion ── */
   --animate-marquee: marquee 30s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
+  --animate-spin-slow: spin 22s linear infinite;
 }
 
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
 }
 
 /* ── Base ── */

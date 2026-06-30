@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FadeUp } from "./MotionWrapper";
+import { FestiveEyebrow, ConfettiDots } from "./FestiveAccents";
 
 // Mosaic span pattern, applied to the uploaded photos by position so the
 // admin-managed gallery keeps the same editorial layout. Photos beyond the
@@ -33,23 +34,22 @@ export function GalleryMosaic({
   }));
 
   return (
-    <section className="bg-slate-50/60 py-16 sm:py-24 lg:py-32">
-      <Container>
+    <section className="relative overflow-hidden bg-slate-50/60 py-16 sm:py-24 lg:py-32">
+      <ConfettiDots />
+      <Container className="relative">
         <FadeUp className="mb-14 flex items-end justify-between">
           <div className="flex flex-col gap-4">
-            <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
-              Gallery
-            </span>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <FestiveEyebrow className="w-fit">Gallery</FestiveEyebrow>
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
               Moments Worth Capturing
             </h2>
           </div>
           <Link
             href="/gallery"
-            className="hidden items-center gap-1.5 text-sm font-semibold text-primary-600 transition-colors hover:text-primary-700 sm:inline-flex"
+            className="group hidden items-center gap-1.5 text-sm font-semibold text-festival-blue transition-colors hover:text-festival-blue-dark sm:inline-flex"
           >
             View Full Gallery
-            <ArrowRight size={15} />
+            <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
         </FadeUp>
 
@@ -71,7 +71,7 @@ export function GalleryMosaic({
                   sizes="(min-width: 1024px) 20vw, 50vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-festival-purple/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </div>
             </motion.div>
           ))}
@@ -80,7 +80,7 @@ export function GalleryMosaic({
         <div className="mt-10 flex justify-center sm:hidden">
           <Link
             href="/gallery"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-festival-blue"
           >
             View Full Gallery <ArrowRight size={15} />
           </Link>

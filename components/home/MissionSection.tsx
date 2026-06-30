@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
+import { FestiveEyebrow, FestiveGlows } from "./FestiveAccents";
 
 interface MissionSectionProps {
   label: string;
@@ -16,14 +17,20 @@ export function MissionSection({
   primaryImage,
 }: MissionSectionProps) {
   return (
-    <section className="bg-white py-16 sm:py-24 lg:py-32">
-      <Container>
+    <section className="relative overflow-hidden bg-white py-16 sm:py-24 lg:py-32">
+      <FestiveGlows />
+      <Container className="relative">
         <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_1fr]">
           {/* Left — Image */}
           <FadeUp className="relative">
+            {/* Festive corner accent behind the image */}
+            <div
+              aria-hidden
+              className="absolute -left-4 -top-4 h-24 w-24 rounded-2xl bg-gradient-to-br from-highlight-400 to-festival-purple opacity-80 blur-[2px]"
+            />
             <div className="relative">
               {/* Primary image */}
-              <div className="relative aspect-[7/5] w-full overflow-hidden rounded-3xl shadow-lg">
+              <div className="relative aspect-[7/5] w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-white/40">
                 <Image
                   src={primaryImage}
                   alt="Youth United Council of India"
@@ -38,13 +45,11 @@ export function MissionSection({
           {/* Right — Content */}
           <StaggerContainer stagger={0.08} className="flex flex-col gap-6">
             <StaggerItem>
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
-                {label}
-              </span>
+              <FestiveEyebrow>{label}</FestiveEyebrow>
             </StaggerItem>
 
             <StaggerItem>
-              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
                 Creating Experiences
                 <br />
                 That Inspire
@@ -53,7 +58,7 @@ export function MissionSection({
 
             {body.map((p, i) => (
               <StaggerItem key={i}>
-                <p className="text-[16px] leading-relaxed text-gray-500">
+                <p className="text-[16px] leading-relaxed text-body">
                   {p}
                 </p>
               </StaggerItem>

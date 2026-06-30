@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { FeatureCard } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
+import { FestiveEyebrow, ConfettiDots } from "./FestiveAccents";
 
 interface InitiativesRowProps {
   label: string;
@@ -17,16 +18,15 @@ export function InitiativesRow({
   cards,
 }: InitiativesRowProps) {
   return (
-    <section className="bg-gradient-to-b from-primary-50/50 to-white py-16 sm:py-24 lg:py-32">
-      <Container>
+    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/50 to-white py-16 sm:py-24 lg:py-32">
+      <ConfettiDots />
+      <Container className="relative">
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
-          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
-            {label}
-          </span>
-          <h2 className="max-w-xl font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <FestiveEyebrow>{label}</FestiveEyebrow>
+          <h2 className="max-w-xl font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
             {title}
           </h2>
-          <p className="max-w-lg text-[16px] leading-relaxed text-gray-500">
+          <p className="max-w-lg text-[16px] leading-relaxed text-body">
             {subtitle}
           </p>
         </FadeUp>
