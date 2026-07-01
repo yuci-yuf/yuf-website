@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Users, Map, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
 interface HeroSectionProps {
@@ -23,14 +23,14 @@ const DIAMONDS_LEFT = [
 const DIAMONDS_RIGHT = [
   { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-32 w-32 lg:h-40 lg:w-40", delay: 0.4 },
   { src: "/images/about/youth-event.jpg", className: "right-[12%] top-[48%] h-28 w-28 lg:h-36 lg:w-36", delay: 1.1 },
-  { src: "/images/recognition/award_1.jpg", className: "right-[1%] bottom-[8%] h-24 w-24 lg:h-32 lg:w-32", delay: 1.7 },
+  { src: "/images/hero/events.jpg", className: "right-[1%] bottom-[8%] h-24 w-24 lg:h-32 lg:w-32", delay: 1.7 },
 ];
 
-/* Supporting line for each stat card (matched to the reference). */
+/* Icon + supporting line for each stat card (matched to the reference). */
 const STAT_META = [
-  { desc: "Young talents from every corner of India" },
-  { desc: "States represented across the festival" },
-  { desc: "Districts joining the celebration" },
+  { Icon: Users, desc: "Young talents from every corner of India" },
+  { Icon: Map, desc: "States represented across the festival" },
+  { Icon: MapPin, desc: "Districts joining the celebration" },
 ];
 
 function DiamondTile({
@@ -230,20 +230,14 @@ export function HeroSection({
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="flex w-full max-w-sm flex-col items-stretch justify-center gap-3 pt-1 sm:max-w-none sm:flex-row sm:items-center sm:gap-4"
+            className="flex justify-center pt-1"
           >
             <Link
               href="/register"
-              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-white px-8 text-[15px] font-bold text-festival-blue shadow-xl shadow-primary-950/25 transition-all hover:bg-primary-50"
+              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-festival-blue to-festival-cyan px-8 text-[15px] font-semibold text-white shadow-xl shadow-festival-blue/30 transition-all hover:brightness-110"
             >
               Register Now
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <Link
-              href="/events"
-              className="inline-flex h-13 items-center justify-center gap-2 rounded-full border-2 border-white bg-white/10 px-8 text-[15px] font-bold text-white backdrop-blur-sm transition-all hover:bg-white/25"
-            >
-              Browse Events
             </Link>
           </motion.div>
 
@@ -255,15 +249,20 @@ export function HeroSection({
             className="mt-4 grid w-full max-w-3xl grid-cols-3 gap-2.5 sm:mt-6 sm:gap-4"
           >
             {stats.map((stat, i) => {
-              const { desc } = STAT_META[i] ?? STAT_META[0];
+              const { Icon, desc } = STAT_META[i] ?? STAT_META[0];
               return (
                 <div
                   key={stat.label}
                   className="rounded-2xl border border-white/20 bg-white/12 p-3 text-center shadow-xl shadow-primary-950/20 backdrop-blur-md sm:p-5 sm:text-left"
                 >
-                  <span className="font-display text-2xl font-extrabold text-white sm:text-3xl">
-                    {stat.number}
-                  </span>
+                  <div className="flex items-start justify-center sm:justify-between">
+                    <span className="font-display text-2xl font-extrabold text-white sm:text-3xl">
+                      {stat.number}
+                    </span>
+                    <span className="hidden h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white sm:flex">
+                      <Icon size={16} />
+                    </span>
+                  </div>
                   <p className="mt-0.5 text-xs font-semibold text-white sm:mt-1 sm:text-base">
                     {stat.label}
                   </p>

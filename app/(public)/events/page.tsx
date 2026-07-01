@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/public/Hero";
 import { EventsExplorer } from "@/components/public/EventsExplorer";
 import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -33,9 +32,7 @@ export default async function EventsPage() {
 
   return (
     <>
-      <Hero data={eventsContent.hero} />
-
-      <Section tone="glow">
+      <Section tone="glow" className="pt-28 sm:pt-32">
         <SectionHeading
           label={eventsContent.intro.label}
           title={eventsContent.intro.title}

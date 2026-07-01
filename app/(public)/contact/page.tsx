@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Phone, Mail, MapPin } from "lucide-react";
-import { Hero } from "@/components/public/Hero";
 import { ContactForm } from "@/components/public/ContactForm";
 import { SocialIcon } from "@/components/public/SocialIcon";
 import { FeatureGrid } from "@/components/public/FeatureGrid";
@@ -21,9 +20,13 @@ const mapsQuery = encodeURIComponent(
 export default function ContactPage() {
   return (
     <>
-      <Hero data={contactContent.hero} />
-
-      <Section id="contact-form" tone="aqua">
+      <Section id="contact-form" tone="aqua" className="pt-28 sm:pt-32">
+        <SectionHeading
+          label={contactContent.hero.badge}
+          title={contactContent.hero.title}
+          subtitle={contactContent.hero.subtitle}
+          className="mb-12"
+        />
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
           <ContactForm />
 

@@ -3,13 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  Lock,
-  Clock,
-  Phone,
-  CheckCircle2,
-} from "lucide-react";
+import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
 import type { EventItem } from "@/types";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -103,13 +97,25 @@ export function RegistrationForm({
     if (!category) e.category = "Please choose a category.";
     if (!eventId) e.event = "Please choose an event.";
     if (!values.ageCategory) e.ageCategory = "Please choose an age group.";
-    if (!values.firstName.trim()) e.firstName = "Please enter the student's first name.";
-    if (!values.lastName.trim()) e.lastName = "Please enter the student's last name.";
-    if (values.phone.trim().length < 7) e.phone = "Please enter a valid phone number.";
-    if (!EMAIL_RE.test(values.email)) e.email = "Please enter a valid email address.";
+    if (!values.firstName.trim())
+      e.firstName = "Please enter the student's first name.";
+    if (!values.lastName.trim())
+      e.lastName = "Please enter the student's last name.";
+    if (!/^[6-9]\d{9}$/.test(values.phone))
+      e.phone = "Enter a valid 10-digit mobile number.";
+    if (!EMAIL_RE.test(values.email.trim()))
+      e.email = "Please enter a valid email address.";
     if (!values.location) e.location = "Please select your city.";
-    if (!values.institution.trim()) e.institution = "Please enter the school or college name.";
+    if (!values.institution.trim())
+      e.institution = "Please enter the school or college name.";
     return e;
+  }
+
+  // Surface a single field's error when the user leaves it, so problems show
+  // up as they go rather than only on submit.
+  function handleBlur(key: keyof Errors) {
+    const all = validate();
+    setErrors((e) => ({ ...e, [key]: all[key] }));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -183,10 +189,10 @@ export function RegistrationForm({
       ref={formRef}
       onSubmit={handleSubmit}
       noValidate
-      className="mx-auto flex max-w-2xl flex-col gap-6"
+      className="mx-auto flex max-w-6xl flex-col gap-8"
     >
       {/* Intro / reassurance */}
-      <div className="flex flex-col gap-2 text-center">
+      <div className="mx-auto flex max-w-2xl flex-col gap-2 text-center">
         <h2 className="font-heading text-3xl font-bold text-heading">
           Register for YUF 2026
         </h2>
@@ -197,6 +203,9 @@ export function RegistrationForm({
         </p>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
+        {/* ── Left column: the input steps ── */}
+        <div className="flex flex-col gap-6">
       {/* ── 1. Choose the event ── */}
       <SectionCard step={1} title="Choose the event">
         <div className="grid gap-5 sm:grid-cols-2">
@@ -326,6 +335,7 @@ export function RegistrationForm({
                 data-field="firstName"
                 value={values.firstName}
                 onChange={(e) => setField("firstName", e.target.value)}
+                onBlur={() => handleBlur("firstName")}
                 autoComplete="given-name"
                 aria-invalid={!!errors.firstName}
                 placeholder="e.g. Aarav"
@@ -340,6 +350,7 @@ export function RegistrationForm({
                 data-field="lastName"
                 value={values.lastName}
                 onChange={(e) => setField("lastName", e.target.value)}
+                onBlur={() => handleBlur("lastName")}
                 autoComplete="family-name"
                 aria-invalid={!!errors.lastName}
                 placeholder="e.g. Sharma"
@@ -358,8 +369,13 @@ export function RegistrationForm({
                 id="phone"
                 data-field="phone"
                 type="tel"
+                inputMode="numeric"
+                maxLength={10}
                 value={values.phone}
-                onChange={(e) => setField("phone", e.target.value)}
+                onChange={(e) =>
+                  setField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))
+                }
+                onBlur={() => handleBlur("phone")}
                 autoComplete="tel"
                 aria-invalid={!!errors.phone}
                 placeholder="10-digit mobile number"
@@ -380,6 +396,7 @@ export function RegistrationForm({
                 type="email"
                 value={values.email}
                 onChange={(e) => setField("email", e.target.value)}
+                onBlur={() => handleBlur("email")}
                 autoComplete="email"
                 aria-invalid={!!errors.email}
                 placeholder="name@example.com"
@@ -418,6 +435,7 @@ export function RegistrationForm({
                 data-field="institution"
                 value={values.institution}
                 onChange={(e) => setField("institution", e.target.value)}
+                onBlur={() => handleBlur("institution")}
                 aria-invalid={!!errors.institution}
                 placeholder="Name of the school or college"
               />
@@ -438,7 +456,10 @@ export function RegistrationForm({
           />
         </Field>
       </SectionCard>
+        </div>
 
+        {/* ── Right column: sticky summary + submit ── */}
+        <div className="lg:sticky lg:top-28">
       {/* ── 3. Confirm ── */}
       <SectionCard step={3} title="Confirm & finish">
         <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
@@ -506,18 +527,9 @@ export function RegistrationForm({
           .
         </p>
 
-        <div className="flex flex-col items-center gap-1 border-t border-border pt-4 text-sm text-text-muted sm:flex-row sm:justify-center sm:gap-6">
-          <span className="flex items-center gap-2">
-            <Clock size={16} className="text-accent-600" />
-            Closes <strong className="text-text">{siteConfig.registrationDeadline}</strong>
-          </span>
-          <span className="flex items-center gap-2">
-            <Phone size={16} className="text-accent-600" />
-            Need help? Call{" "}
-            <strong className="text-text">{siteConfig.contact.phone}</strong>
-          </span>
-        </div>
       </SectionCard>
+        </div>
+      </div>
     </form>
   );
 }
@@ -536,7 +548,7 @@ function SectionCard({
   return (
     <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-festival-blue to-festival-cyan font-heading text-sm font-bold text-white">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-festival-blue font-heading text-sm font-bold text-white shadow-sm ring-1 ring-inset ring-white/25">
           {step}
         </span>
         <h3 className="font-heading text-xl font-bold text-heading">{title}</h3>

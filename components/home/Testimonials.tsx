@@ -54,19 +54,19 @@ export function Testimonials({
   const active = items[index];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-surface to-surface-alt py-16 sm:py-24 lg:py-32">
+    <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">
       {/* Decorative festival glows */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-festival-purple/10 blur-3xl"
+        className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-festival-purple/25 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-festival-cyan/10 blur-3xl"
+        className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-festival-cyan/25 blur-3xl"
       />
 
       <div className="relative mx-auto w-full max-w-6xl px-6 lg:px-8">
-        <SectionHeading label={label} title={title} subtitle={subtitle} className="mb-14" />
+        <SectionHeading label={label} title={title} subtitle={subtitle} className="mb-14" invert />
 
         <div className="mx-auto max-w-4xl">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/80 p-8 shadow-card backdrop-blur-sm sm:p-12">
@@ -77,15 +77,20 @@ export function Testimonials({
               strokeWidth={1.5}
             />
 
-            <div className="grid items-center gap-8 sm:grid-cols-[auto_1fr] sm:gap-10">
-              {/* Portrait (animates with the quote) */}
-              <AnimatePresence initial={false} mode="wait">
+            <AnimatePresence initial={false} mode="wait">
+              <motion.div
+                key={index}
+                initial={reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduced ? undefined : { opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                className="grid items-center gap-8 sm:grid-cols-[auto_1fr] sm:gap-10"
+              >
+                {/* Portrait */}
                 <motion.div
-                  key={`p-${index}`}
                   initial={reduced ? false : { opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={reduced ? undefined : { opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.4, delay: 0.05 }}
                   className="mx-auto sm:mx-0"
                 >
                   <div className="rounded-full bg-gradient-to-br from-festival-blue via-festival-cyan to-festival-purple p-[3px] shadow-lg">
@@ -112,11 +117,9 @@ export function Testimonials({
 
                 {/* Quote + attribution */}
                 <motion.figure
-                  key={`q-${index}`}
                   initial={reduced ? false : { opacity: 0, x: dir >= 0 ? 24 : -24 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={reduced ? undefined : { opacity: 0, x: dir >= 0 ? -24 : 24 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
                   className="flex flex-col gap-4 text-center sm:text-left"
                 >
                   <figcaption className="text-xs font-bold uppercase tracking-[0.18em] text-highlight-600">
@@ -129,8 +132,8 @@ export function Testimonials({
                     {active.name}
                   </p>
                 </motion.figure>
-              </AnimatePresence>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Controls */}
@@ -155,8 +158,8 @@ export function Testimonials({
                     aria-current={i === index}
                     className={
                       i === index
-                        ? "h-2.5 w-6 rounded-full bg-primary-600 transition-all"
-                        : "h-2.5 w-2.5 rounded-full bg-primary-200 transition-all hover:bg-primary-300"
+                        ? "h-2.5 w-6 rounded-full bg-white transition-all"
+                        : "h-2.5 w-2.5 rounded-full bg-white/40 transition-all hover:bg-white/70"
                     }
                   />
                 ))}

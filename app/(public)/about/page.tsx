@@ -155,23 +155,23 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           2.5 BELIEF — Pill collage + statement
           ═══════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-white py-16 lg:py-24">
+      <section className="bg-hero-gradient relative overflow-hidden py-16 lg:py-24">
         {/* Decorative organic blobs */}
-        <div className="pointer-events-none absolute -left-16 top-10 h-48 w-48 rounded-full bg-accent-100/60 blur-2xl" aria-hidden />
-        <div className="pointer-events-none absolute bottom-10 right-1/3 h-40 w-40 rounded-full bg-primary-100/70 blur-2xl" aria-hidden />
+        <div className="pointer-events-none absolute -left-16 top-10 h-48 w-48 rounded-full bg-festival-cyan/25 blur-2xl" aria-hidden />
+        <div className="pointer-events-none absolute bottom-10 right-1/3 h-40 w-40 rounded-full bg-festival-purple/25 blur-2xl" aria-hidden />
 
         <Container>
           <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
             {/* Left — statement */}
             <FadeUp className="flex flex-col gap-6">
-              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
+              <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
                 Our Belief
               </span>
-              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
                 Change begins where
                 <br className="hidden sm:block" /> youth find their voice
               </h2>
-              <p className="max-w-md text-[16px] leading-relaxed text-body">
+              <p className="max-w-md text-[16px] leading-relaxed text-white/85">
                 Every young person carries a spark to transform their community.
                 At YUF, we provide the stage, the mentorship, and the
                 opportunities that turn that spark into lasting impact — across
@@ -179,7 +179,7 @@ export default function AboutPage() {
               </p>
               <Link
                 href="/register"
-                className="group mt-2 inline-flex h-13 w-fit items-center gap-2 rounded-full bg-primary-600 px-7 text-[15px] font-semibold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg"
+                className="group mt-2 inline-flex h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg"
               >
                 Join the Movement
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
@@ -197,7 +197,7 @@ export default function AboutPage() {
               <IndiaMapImage
                 src="/images/about/youth-event.jpg"
                 label="YUF youth across India"
-                className="mx-auto h-[300px] w-full max-w-sm text-primary-700 drop-shadow-xl sm:h-[400px] sm:max-w-md lg:h-[500px] lg:max-w-lg"
+                className="mx-auto h-[300px] w-full max-w-sm text-white/90 drop-shadow-xl sm:h-[400px] sm:max-w-md lg:h-[500px] lg:max-w-lg"
               />
             </FadeUp>
           </div>
@@ -247,13 +247,13 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           4. MEET THE PRINCIPAL — Advisor spotlight
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-surface-alt py-16 lg:py-24">
+      <section className="bg-hero-gradient relative overflow-hidden py-16 lg:py-24">
         <Container>
           <FadeUp className="mb-10 text-center lg:mb-14">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               Leadership
             </span>
-            <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Meet The Principal Advisor
             </h2>
           </FadeUp>
@@ -273,13 +273,13 @@ export default function AboutPage() {
 
             <FadeUp delay={0.15} className="flex flex-col gap-5 text-center lg:text-left">
               <div>
-                <h3 className="font-heading text-2xl font-bold text-heading">
+                <h3 className="font-heading text-2xl font-bold text-white">
                   {siteConfig.advisor.name}
                 </h3>
-                <p className="mt-1 text-sm text-text-muted">
+                <p className="mt-1 text-sm text-white/70">
                   {siteConfig.advisor.title}
                 </p>
-                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-600">
+                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-400">
                   {siteConfig.advisor.badge}
                 </span>
               </div>
@@ -334,16 +334,16 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════
           6. WHY JOIN US — 3-col benefit cards
           ═══════════════════════════════════════════════════════ */}
-      <section className="bg-surface-alt py-16 lg:py-24">
+      <section className="bg-hero-gradient relative overflow-hidden py-16 lg:py-24">
         <Container>
           <FadeUp className="mb-10 flex flex-col items-center gap-4 text-center lg:mb-14">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               {aboutContent.whyJoinUs.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {aboutContent.whyJoinUs.title}
             </h2>
-            <p className="max-w-xl text-[16px] leading-relaxed text-body">
+            <p className="max-w-xl text-[16px] leading-relaxed text-white/85">
               {aboutContent.whyJoinUs.subtitle}
             </p>
           </FadeUp>

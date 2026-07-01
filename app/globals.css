@@ -255,6 +255,18 @@ html {
   );
 }
 
+/* Home-hero background, reused as a dark festival band on select home
+   sections. Single source of truth — mirrors the inline gradient in
+   components/home/HeroSection.tsx (deep royal blue → azure → teal, with
+   violet glows top-left and bottom-right). Put white text over it. */
+.bg-hero-gradient {
+  background-color: #133a8c;
+  background-image:
+    radial-gradient(110% 90% at 18% 22%, rgba(89, 31, 172, 0.6) 0%, transparent 50%),
+    radial-gradient(100% 90% at 88% 78%, rgba(89, 31, 172, 0.5) 0%, transparent 48%),
+    linear-gradient(125deg, #133a8c 0%, #155fa6 38%, #15938f 58%, #1d5fbf 100%);
+}
+
 /* Radix Select/Dropdown locks body scroll on open, which removes the page
    scrollbar and shifts the layout. Keep the scrollbar and cancel the gap it
    adds. (Documented shadcn/Radix fix via the data-scroll-locked attribute.) */

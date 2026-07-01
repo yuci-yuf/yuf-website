@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/public/Hero";
 import { GalleryExplorer } from "@/components/public/GalleryExplorer";
 import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -19,9 +18,7 @@ export default async function GalleryPage() {
   const photos = await getGalleryPhotos();
   return (
     <>
-      <Hero data={galleryContent.hero} />
-
-      <Section tone="aqua">
+      <Section tone="aqua" className="pt-28 sm:pt-32">
         <SectionHeading
           label={galleryContent.highlights.label}
           title={galleryContent.highlights.title}

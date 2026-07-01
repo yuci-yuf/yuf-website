@@ -13,7 +13,7 @@ export function EventShowcase({ events }: { events: EventItem[] }) {
   if (events.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/40 via-white to-highlight-50/40 py-16 sm:py-24 lg:py-32">
+    <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">
       {/* ── Animated background blobs ── */}
       <motion.div
         aria-hidden
@@ -38,14 +38,14 @@ export function EventShowcase({ events }: { events: EventItem[] }) {
       <Container className="relative">
         <FadeUp className="mb-14 flex items-end justify-between">
           <div className="flex flex-col gap-4">
-            <FestiveEyebrow className="w-fit">Popular Events</FestiveEyebrow>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <FestiveEyebrow className="w-fit text-highlight-400">Popular Events</FestiveEyebrow>
+            <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Explore Upcoming Events
             </h2>
           </div>
           <Link
             href="/events"
-            className="group hidden items-center gap-1.5 text-sm font-semibold text-festival-blue transition-colors hover:text-festival-blue-dark sm:inline-flex"
+            className="group hidden items-center gap-1.5 text-sm font-semibold text-white transition-colors hover:text-highlight-300 sm:inline-flex"
           >
             View All Events
             <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
@@ -63,7 +63,7 @@ export function EventShowcase({ events }: { events: EventItem[] }) {
         <div className="mt-10 flex justify-center sm:hidden">
           <Link
             href="/events"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-festival-blue"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-white"
           >
             View All Events <ArrowRight size={15} />
           </Link>

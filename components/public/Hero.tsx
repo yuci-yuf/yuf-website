@@ -7,7 +7,7 @@ import { ctaButtonVariant } from "@/lib/utils";
 
 export function Hero({ data }: { data: HeroData }) {
   return (
-    <section className="relative flex min-h-[34rem] items-center overflow-hidden bg-primary-950 lg:min-h-[40rem]">
+    <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-primary-950">
       <HeroBackdrop />
 
       <Container className="relative z-30 py-24 lg:py-28">

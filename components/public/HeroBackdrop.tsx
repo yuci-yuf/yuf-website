@@ -62,13 +62,14 @@ export function HeroBackdrop() {
       </div>
 
       {/* Festival gradient blanket (blue → cyan → purple), matching the home hero.
-         Kept slightly translucent so the photo collage reads as faint texture. */}
+         Translucent enough that the photo collage shows through as texture while
+         white heading text stays readable. */}
       <div
         aria-hidden
         className="absolute inset-0 z-10"
         style={{
           background:
-            "radial-gradient(120% 100% at 12% 8%, rgba(123,52,226,0.6) 0%, transparent 46%), radial-gradient(90% 90% at 92% 96%, rgba(30,198,192,0.5) 0%, transparent 50%), linear-gradient(120deg, rgba(28,79,198,0.95) 0%, rgba(30,127,212,0.94) 32%, rgba(26,166,206,0.93) 62%, rgba(30,198,192,0.94) 100%)",
+            "radial-gradient(120% 100% at 12% 8%, rgba(89,31,172,0.55) 0%, transparent 46%), radial-gradient(90% 90% at 92% 96%, rgba(21,147,143,0.5) 0%, transparent 50%), linear-gradient(120deg, rgba(19,58,140,0.9) 0%, rgba(21,95,166,0.88) 32%, rgba(19,110,130,0.87) 62%, rgba(21,147,143,0.88) 100%)",
         }}
       />
     </>

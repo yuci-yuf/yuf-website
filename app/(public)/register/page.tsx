@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Hero } from "@/components/public/Hero";
 import { RegistrationForm } from "@/components/public/RegistrationForm";
 import { Section } from "@/components/ui/Section";
-import { registerContent } from "@/lib/content";
 import { getEvents, getCategoryOrder } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
@@ -36,8 +34,7 @@ export default async function RegisterPage() {
 
   return (
     <>
-      <Hero data={registerContent.hero} />
-      <Section tone="glow">
+      <Section tone="glow" className="pt-28 sm:pt-32">
         {activeEvents.length > 0 ? (
           <Suspense fallback={<div className="h-64 sm:h-96" />}>
             <RegistrationForm events={activeEvents} categories={categories} />
