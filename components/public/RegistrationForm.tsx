@@ -548,7 +548,7 @@ function SectionCard({
   return (
     <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-festival-blue font-heading text-sm font-bold text-white shadow-sm ring-1 ring-inset ring-white/25">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 font-heading text-sm font-bold text-white shadow-sm ring-1 ring-inset ring-white/25">
           {step}
         </span>
         <h3 className="font-heading text-xl font-bold text-heading">{title}</h3>

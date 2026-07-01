@@ -16,14 +16,14 @@ interface HeroSectionProps {
 
 /* Real youth-event photos used for the diamond tiles flanking the headline. */
 const DIAMONDS_LEFT = [
-  { src: "/images/hero/pondicherry-event.jpg", className: "left-[2%] top-[20%] h-32 w-32 lg:h-40 lg:w-40", delay: 0 },
-  { src: "/images/about/youth-yoga.jpg", className: "left-[12%] top-[50%] h-28 w-28 lg:h-36 lg:w-36", delay: 0.8 },
-  { src: "/images/gallery/pondicherry-juniors.jpg", className: "left-[1%] bottom-[8%] h-24 w-24 lg:h-32 lg:w-32", delay: 1.4 },
+  { src: "/images/hero/pondicherry-event.jpg", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
+  { src: "/images/about/youth-yoga.jpg", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
+  { src: "/images/gallery/pondicherry-juniors.jpg", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
 ];
 const DIAMONDS_RIGHT = [
-  { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-32 w-32 lg:h-40 lg:w-40", delay: 0.4 },
-  { src: "/images/about/youth-event.jpg", className: "right-[12%] top-[48%] h-28 w-28 lg:h-36 lg:w-36", delay: 1.1 },
-  { src: "/images/hero/events.jpg", className: "right-[1%] bottom-[8%] h-24 w-24 lg:h-32 lg:w-32", delay: 1.7 },
+  { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
+  { src: "/images/about/youth-event.jpg", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
+  { src: "/images/hero/events.jpg", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
 ];
 
 /* Icon + supporting line for each stat card (matched to the reference). */
@@ -50,9 +50,9 @@ function DiamondTile({
       transition={{ delay: 0.4 + delay * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       className={`absolute hidden overflow-hidden rounded-2xl shadow-2xl ring-2 ring-white/40 lg:block ${className}`}
     >
-      <div className="animate-float h-full w-full" style={{ animationDelay: `${delay}s` }}>
+      <div className="h-full w-full">
         <div className="relative h-full w-full -rotate-45 scale-[1.5]">
-          <Image src={src} alt="" fill sizes="180px" className="object-cover" />
+          <Image src={src} alt="" fill sizes="400px" quality={90} className="object-cover" />
         </div>
       </div>
     </motion.div>
@@ -211,8 +211,7 @@ export function HeroSection({
             transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5.5rem]"
           >
-            {title}{" "}
-            <span className="text-highlight-400">{highlight}</span>
+            Youth United<br />Festival <span className="text-highlight-400">{highlight}</span>
           </motion.h1>
 
           <motion.p
@@ -234,7 +233,7 @@ export function HeroSection({
           >
             <Link
               href="/register"
-              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-festival-blue to-festival-cyan px-8 text-[15px] font-semibold text-white shadow-xl shadow-festival-blue/30 transition-all hover:brightness-110"
+              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-xl shadow-black/20 transition-all hover:bg-white/90"
             >
               Register Now
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />

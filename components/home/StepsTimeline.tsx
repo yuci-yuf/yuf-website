@@ -23,7 +23,7 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
         <StaggerContainer stagger={0.12} className="relative">
           {/* Connecting line (desktop) */}
           <div
-            className="absolute left-0 right-0 top-7 z-0 hidden h-0.5 bg-gradient-to-r from-festival-blue/0 via-festival-cyan/60 to-highlight-500/0 lg:block"
+            className="absolute left-0 right-0 top-7 z-0 hidden h-0.5 bg-primary-200 lg:block"
             aria-hidden
           />
 
@@ -31,7 +31,7 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
             {steps.map((step) => (
               <StaggerItem key={step.step}>
                 <div className="group relative flex flex-col items-center gap-5 text-center">
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-festival-blue to-festival-cyan font-heading text-lg font-bold text-white shadow-lg shadow-festival-blue/25 ring-4 ring-white transition-transform duration-300 group-hover:scale-110">
+                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 font-heading text-lg font-bold text-white shadow-lg shadow-primary-600/25 ring-4 ring-white transition-transform duration-300 group-hover:scale-110">
                     {step.step}
                   </div>
                   <h3 className="font-heading text-base font-bold text-heading">
@@ -49,7 +49,7 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
         <FadeUp delay={0.3} className="mt-14 flex justify-center">
           <Link
             href="/register"
-            className="group inline-flex h-13 items-center gap-2 rounded-full bg-gradient-to-r from-festival-blue to-festival-cyan px-8 text-[15px] font-semibold text-white shadow-lg shadow-festival-blue/25 transition-all hover:brightness-110 hover:shadow-xl"
+            className="group inline-flex h-13 items-center gap-2 rounded-full bg-primary-600 px-8 text-[15px] font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-xl"
           >
             Register Now
             <ArrowRight
