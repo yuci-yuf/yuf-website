@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { EventsExplorer } from "@/components/public/EventsExplorer";
 import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -40,7 +41,9 @@ export default async function EventsPage() {
           className="mb-14"
         />
         {activeEvents.length > 0 ? (
-          <EventsExplorer events={activeEvents} categoryOrder={eventCategoryOrder} />
+          <Suspense fallback={null}>
+            <EventsExplorer events={activeEvents} categoryOrder={eventCategoryOrder} />
+          </Suspense>
         ) : (
           <p className="rounded-2xl border border-dashed border-border bg-surface-alt p-12 text-center text-text-muted">
             No events have been published yet. Please check back soon.

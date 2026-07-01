@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Quote } from "lucide-react";
+import { ArrowRight, Quote, Sparkles, Eye, Heart } from "lucide-react";
 import { aboutContent, siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { HeroBackdrop } from "@/components/public/HeroBackdrop";
@@ -87,7 +87,7 @@ export default function AboutPage() {
             {/* Right Column */}
             <div className="flex flex-col gap-6">
               <FadeUp delay={0.2}>
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:rounded-[2.5rem] lg:aspect-[2/1] xl:aspect-[4/3]">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:rounded-[2.5rem] lg:aspect-[2/1] xl:aspect-4/3">
                   <Image
                     src="/images/hero/pondicherry-community.jpg"
                     alt="YUCI Community"
@@ -138,7 +138,7 @@ export default function AboutPage() {
 
             {/* Right — image */}
             <FadeUp delay={0.15} className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-md">
+              <div className="relative aspect-4/3 overflow-hidden rounded-3xl shadow-md">
                 <Image
                   src="/images/sections/who-we-are.jpg"
                   alt="YUCI Team"
@@ -245,52 +245,91 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          4. MEET THE PRINCIPAL — Advisor spotlight
+          4. LEADERSHIP — Principal Advisor + National General Secretary
           ═══════════════════════════════════════════════════════ */}
       <section className="bg-hero-gradient relative overflow-hidden py-16 lg:py-24">
         <Container>
-          <FadeUp className="mb-10 text-center lg:mb-14">
+          <FadeUp className="mb-12 text-center lg:mb-16">
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               Leadership
             </span>
             <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Meet The Principal Advisor
+              Meet Our Leaders
             </h2>
           </FadeUp>
 
-          <div className="mx-auto grid max-w-4xl items-center gap-8 lg:gap-12 lg:grid-cols-[auto_1fr]">
-            <ScaleIn>
-              <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-3xl shadow-md lg:h-64 lg:w-64">
-                <Image
-                  src={siteConfig.advisor.image!}
-                  alt={siteConfig.advisor.name}
-                  fill
-                  sizes="256px"
-                  className="object-cover"
-                />
-              </div>
-            </ScaleIn>
+          <div className="mx-auto flex max-w-4xl flex-col gap-14">
+            {/* Principal Advisor */}
+            <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-[auto_1fr]">
+              <ScaleIn>
+                <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-3xl shadow-md lg:h-64 lg:w-64">
+                  <Image
+                    src={siteConfig.advisor.image!}
+                    alt={siteConfig.advisor.name}
+                    fill
+                    sizes="256px"
+                    className="object-cover"
+                  />
+                </div>
+              </ScaleIn>
 
-            <FadeUp delay={0.15} className="flex flex-col gap-5 text-center lg:text-left">
-              <div>
-                <h3 className="font-heading text-2xl font-bold text-white">
-                  {siteConfig.advisor.name}
-                </h3>
-                <p className="mt-1 text-sm text-white/70">
-                  {siteConfig.advisor.title}
-                </p>
-                <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-400">
-                  {siteConfig.advisor.badge}
-                </span>
-              </div>
+              <FadeUp delay={0.15} className="flex flex-col gap-5 text-center lg:text-left">
+                <div>
+                  <h3 className="font-heading text-2xl font-bold text-white">
+                    {siteConfig.advisor.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-white/70">
+                    {siteConfig.advisor.title}
+                  </p>
+                  <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-400">
+                    {siteConfig.advisor.badge}
+                  </span>
+                </div>
+                <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-6 shadow-sm">
+                  <Quote size={20} className="mb-2 text-primary-400" />
+                  <p className="text-[15px] italic leading-relaxed text-body">
+                    &ldquo;{siteConfig.advisor.quote}&rdquo;
+                  </p>
+                </blockquote>
+              </FadeUp>
+            </div>
 
-              <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-6 shadow-sm">
-                <Quote size={20} className="mb-2 text-primary-400" />
-                <p className="text-[15px] italic leading-relaxed text-body">
-                  &ldquo;{siteConfig.advisor.quote}&rdquo;
-                </p>
-              </blockquote>
-            </FadeUp>
+            <div className="border-t border-white/10" />
+
+            {/* National General Secretary */}
+            <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-[auto_1fr]">
+              <ScaleIn>
+                <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-3xl shadow-md lg:h-64 lg:w-64">
+                  <Image
+                    src="/images/vimal.jpeg"
+                    alt="Vimal Rengasamy"
+                    fill
+                    sizes="256px"
+                    className="object-cover object-top"
+                  />
+                </div>
+              </ScaleIn>
+
+              <FadeUp delay={0.15} className="flex flex-col gap-5 text-center lg:text-left">
+                <div>
+                  <h3 className="font-heading text-2xl font-bold text-white">
+                    Vimal Rengasamy
+                  </h3>
+                  <p className="mt-1 text-sm text-white/70">
+                    National General Secretary, Youth United Council of India
+                  </p>
+                  <span className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-highlight-400">
+                    Founder · Since 2017 &nbsp;·&nbsp; UN Representation · 28+ States
+                  </span>
+                </div>
+                <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-6 shadow-sm">
+                  <Quote size={20} className="mb-2 text-primary-400" />
+                  <p className="text-[15px] italic leading-relaxed text-body">
+                    &ldquo;Youth are the future of India. I am committed to working towards a powerful, self-reliant India by empowering students and young leaders across every state. Through YUCI, we build leadership, skill, and nation-first mindset in the next generation.&rdquo;
+                  </p>
+                </blockquote>
+              </FadeUp>
+            </div>
           </div>
         </Container>
       </section>
@@ -315,8 +354,8 @@ export default function AboutPage() {
           <StaggerContainer stagger={0.08} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {aboutContent.activities.cards.map((card) => {
               return (
-                <StaggerItem key={card.title}>
-                  <div className="group flex flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                <StaggerItem key={card.title} className="h-full">
+                  <div className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
                     <h3 className="font-heading text-base font-bold text-heading">
                       {card.title}
                     </h3>
@@ -349,20 +388,25 @@ export default function AboutPage() {
           </FadeUp>
 
           <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {aboutContent.whyJoinUs.cards.map((card) => {
-              return (
-                <StaggerItem key={card.title}>
-                  <div className="group flex flex-col gap-5 rounded-3xl border border-border bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
-                    <h3 className="font-heading text-lg font-bold text-heading">
-                      {card.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-body">
-                      {card.description}
-                    </p>
+            {[
+              { icon: <Sparkles size={22} />, ...aboutContent.whyJoinUs.cards[0] },
+              { icon: <Eye size={22} />, ...aboutContent.whyJoinUs.cards[1] },
+              { icon: <Heart size={22} />, ...aboutContent.whyJoinUs.cards[2] },
+            ].map((card) => (
+              <StaggerItem key={card.title} className="h-full">
+                <div className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-500">
+                    {card.icon}
                   </div>
-                </StaggerItem>
-              );
-            })}
+                  <h3 className="font-heading text-lg font-bold text-heading">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-body">
+                    {card.description}
+                  </p>
+                </div>
+              </StaggerItem>
+            ))}
           </StaggerContainer>
         </Container>
       </section>
@@ -389,7 +433,7 @@ export default function AboutPage() {
 
               {/* Image collage */}
               <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+                <div className="relative aspect-4/3 overflow-hidden rounded-2xl">
                   <Image
                     src="/images/recognition/award_1.jpg"
                     alt="YUCI Award Ceremony"
@@ -398,7 +442,7 @@ export default function AboutPage() {
                     className="object-cover"
                   />
                 </div>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+                <div className="relative aspect-4/3 overflow-hidden rounded-2xl">
                   <Image
                     src="/images/sections/join-us.jpg"
                     alt="Join YUF"
@@ -439,7 +483,7 @@ export default function AboutPage() {
       <section className="bg-white pb-16 pt-4 lg:pb-24">
         <Container>
           <FadeUp>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 px-8 py-16 sm:px-14 lg:px-20">
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary-600 via-primary-500 to-primary-700 px-8 py-16 sm:px-14 lg:px-20">
               {/* Decorative shapes */}
               <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" aria-hidden />
               <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-primary-400/20 blur-3xl" aria-hidden />

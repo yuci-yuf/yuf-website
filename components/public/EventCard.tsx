@@ -60,9 +60,6 @@ export function EventCard({ event }: { event: EventItem }) {
           className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-primary-950/55 to-transparent"
           aria-hidden
         />
-        <span className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-800 shadow-sm backdrop-blur-sm">
-          {event.tag}
-        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">

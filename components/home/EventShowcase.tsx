@@ -104,9 +104,6 @@ function EventCard({ event }: { event: EventItem }) {
         )}
         {/* Bottom gradient veil for depth, deepens on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-festival-purple/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <span className="absolute left-4 top-4 rounded-full bg-gradient-to-r from-highlight-500 to-highlight-400 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-          {event.tag}
-        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">

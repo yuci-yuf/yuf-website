@@ -1,11 +1,5 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-
-/**
- * Festival section eyebrow — a small uppercase label with a sparkle, in the
- * warm highlight color. Keeps every home section's kicker consistent.
- */
 export function FestiveEyebrow({
   children,
   className = "",
@@ -15,9 +9,8 @@ export function FestiveEyebrow({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-highlight-600 ${className}`}
+      className={`inline-flex items-center text-sm font-bold uppercase tracking-[0.2em] text-highlight-600 ${className}`}
     >
-      <Sparkles size={15} className="text-highlight-500" />
       {children}
     </span>
   );

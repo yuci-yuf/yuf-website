@@ -121,7 +121,6 @@ export interface EventItem {
   title: string;
   /** Admin-defined category name (matches an `EventCategory` doc / seed value). */
   category: string;
-  tag: string;
   description: string;
   image?: string;
   registrationFee?: number;

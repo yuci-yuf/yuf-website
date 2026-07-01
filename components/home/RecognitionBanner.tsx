@@ -36,7 +36,7 @@ export function RecognitionBanner({
               {titleTail && (
                 <>
                   <br />
-                  <span className="bg-gradient-to-r from-accent-100 via-accent-400 to-highlight-400 bg-clip-text text-transparent">
+                  <span className="text-highlight-400">
                     {titleTail}
                   </span>
                 </>

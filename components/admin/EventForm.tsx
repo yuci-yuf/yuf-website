@@ -103,7 +103,6 @@ export function EventForm({
   // Empty for new events so the "Select a category…" placeholder shows; the
   // submit handler enforces that a category is chosen.
   const [category, setCategory] = useState(event?.category ?? "");
-  const [tag, setTag] = useState(event?.tag ?? "");
   const [description, setDescription] = useState(event?.description ?? "");
   const [image, setImage] = useState(event?.image ?? "");
   const [fee, setFee] = useState(
@@ -156,7 +155,6 @@ export function EventForm({
     const data: EventInput = {
       title: title.trim(),
       category: category.trim(),
-      tag: tag.trim(),
       description: description.trim(),
       image: image.trim() || undefined,
       registrationFee: fee.trim() ? Number(fee) : undefined,
@@ -206,15 +204,6 @@ export function EventForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-            />
-          </Field>
-
-          <Field label="Tag" htmlFor="ev-tag">
-            <Input
-              id="ev-tag"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              placeholder="e.g. Music"
             />
           </Field>
 

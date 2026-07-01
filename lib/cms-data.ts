@@ -16,7 +16,6 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
     id,
     title: (data.title as string) ?? "",
     category: (data.category as string) ?? "",
-    tag: (data.tag as string) ?? "",
     description: (data.description as string) ?? "",
     image: (data.image as string) ?? undefined,
     registrationFee:

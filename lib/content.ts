@@ -295,13 +295,6 @@ export const homeContent = {
       "Hear what governors, legislators, and global leaders have said about the Youth United Festival and the young changemakers it brings together.",
     items: [
       {
-        name: "Dr. Tamilisai Soundararajan",
-        role: "Lieutenant Governor of Puducherry & Governor of Telangana",
-        quote:
-          "The Youth United Festival is more than just a sports event — it's a platform that nurtures discipline, teamwork, and leadership among our young generation. I wholeheartedly support this initiative by the NGO.",
-        image: "/images/testimonials/tamilisai-soundararajan.png",
-      },
-      {
         name: "Amb. Dunston P",
         role: "The Private Office of His Royal Highness Sheikh Ahmed Bin Faisal Al Qassimi",
         quote:

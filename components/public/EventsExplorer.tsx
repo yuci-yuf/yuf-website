@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, X, CalendarX } from "lucide-react";
 import type { EventItem, EventStatus } from "@/types";
 import { EventCard } from "./EventCard";
@@ -28,8 +29,18 @@ export function EventsExplorer({
   events: EventItem[];
   categoryOrder: EventItem["category"][];
 }) {
-  const [active, setActive] = useState<string>(ALL);
+  const searchParams = useSearchParams();
+  const [active, setActive] = useState<string>(() => {
+    const cat = searchParams.get("category");
+    return cat && categoryOrder.includes(cat) ? cat : ALL;
+  });
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat && categoryOrder.includes(cat)) setActive(cat);
+    else setActive(ALL);
+  }, [searchParams, categoryOrder]);
 
   // Count per discipline across the full set (stable, drives the pill badges).
   const counts = useMemo(() => {
