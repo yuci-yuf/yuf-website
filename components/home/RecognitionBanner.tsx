@@ -31,7 +31,7 @@ export function RecognitionBanner({
           {/* Left — content */}
           <FadeUp className="flex flex-col gap-7">
             <FestiveEyebrow className="w-fit text-highlight-400">{label}</FestiveEyebrow>
-            <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.5rem] lg:text-[2.75rem] lg:whitespace-nowrap">
+            <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.5rem] lg:text-[2.5rem]">
               {titleHead}
               {titleTail && (
                 <>

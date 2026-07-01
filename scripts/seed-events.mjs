@@ -116,14 +116,6 @@ const SCHEDULE = [
   ["Fun Events", "Guess the Song", "Velammal Bodhi Campus, Ponneri", "15th Sept 2026"],
 ];
 
-const TAGS = {
-  "Sports & Games": "Sports",
-  Athletics: "Athletics",
-  "Arts & Culturals": "Arts & Cultural",
-  Technical: "Technical",
-  "Fun Events": "Fun",
-};
-
 function slugify(s) {
   return s
     .toLowerCase()
@@ -161,7 +153,6 @@ function buildEvents() {
     const data = {
       title,
       category,
-      tag: TAGS[category] ?? category,
       description: describe(category, title),
       isActive: true,
       registrationOpen: true,

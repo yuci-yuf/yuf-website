@@ -89,7 +89,6 @@ export default function AdminEventsPage() {
         (e) =>
           !term ||
           e.title.toLowerCase().includes(term) ||
-          e.tag.toLowerCase().includes(term) ||
           (e.venue ?? "").toLowerCase().includes(term),
       )
       .sort((a, b) => a.order - b.order);

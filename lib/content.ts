@@ -118,35 +118,35 @@ const eventImagePool = [
 
 const eventBase: EventItem[] = [
   // Arts & Culturals
-  { id: "acapella", title: "Acapella Competition", category: "Arts & Culturals", tag: "Music", description: "Showcase your vocal harmony and group singing abilities in this exhilarating acapella competition.", isActive: true, order: 1 },
-  { id: "performing-arts", title: "Performing Arts", category: "Arts & Culturals", tag: "Performance", description: "A stage for young dancers, actors, and musicians to express themselves and captivate audiences.", isActive: true, order: 2 },
-  { id: "costume-designing", title: "Costume Designing", category: "Arts & Culturals", tag: "Fashion", description: "Design and showcase original costumes that blend creativity, culture, and craftsmanship.", isActive: true, order: 3 },
-  { id: "fashion-show", title: "Creative & Fashion Show", category: "Arts & Culturals", tag: "Fashion", description: "Walk the ramp and display your unique sense of style in this exciting fashion showcase.", isActive: true, order: 4 },
-  { id: "makeup-saree", title: "Makeup & Saree Draping", category: "Arts & Culturals", tag: "Beauty", description: "A unique event celebrating the art of Indian beauty culture and traditional saree draping techniques.", isActive: true, order: 5 },
-  { id: "literary-artistic", title: "Literary & Artistic", category: "Arts & Culturals", tag: "Literary", description: "Competitions in poetry, creative writing, debate, painting, and other artistic disciplines.", isActive: true, order: 6 },
-  { id: "media-communication", title: "Media & Communication", category: "Arts & Culturals", tag: "Media", description: "Events for budding journalists, photographers, film-makers, and digital content creators.", isActive: true, order: 7 },
-  { id: "duet", title: "Duet Competition", category: "Arts & Culturals", tag: "Music", description: "Pair up and perform in this soulful duet music competition open to all genres.", isActive: true, order: 8 },
+  { id: "acapella", title: "Acapella Competition", category: "Arts & Culturals", description: "Showcase your vocal harmony and group singing abilities in this exhilarating acapella competition.", isActive: true, order: 1 },
+  { id: "performing-arts", title: "Performing Arts", category: "Arts & Culturals", description: "A stage for young dancers, actors, and musicians to express themselves and captivate audiences.", isActive: true, order: 2 },
+  { id: "costume-designing", title: "Costume Designing", category: "Arts & Culturals", description: "Design and showcase original costumes that blend creativity, culture, and craftsmanship.", isActive: true, order: 3 },
+  { id: "fashion-show", title: "Creative & Fashion Show", category: "Arts & Culturals", description: "Walk the ramp and display your unique sense of style in this exciting fashion showcase.", isActive: true, order: 4 },
+  { id: "makeup-saree", title: "Makeup & Saree Draping", category: "Arts & Culturals", description: "A unique event celebrating the art of Indian beauty culture and traditional saree draping techniques.", isActive: true, order: 5 },
+  { id: "literary-artistic", title: "Literary & Artistic", category: "Arts & Culturals", description: "Competitions in poetry, creative writing, debate, painting, and other artistic disciplines.", isActive: true, order: 6 },
+  { id: "media-communication", title: "Media & Communication", category: "Arts & Culturals", description: "Events for budding journalists, photographers, film-makers, and digital content creators.", isActive: true, order: 7 },
+  { id: "duet", title: "Duet Competition", category: "Arts & Culturals", description: "Pair up and perform in this soulful duet music competition open to all genres.", isActive: true, order: 8 },
 
   // Sports & Games
-  { id: "outdoor-sports", title: "Outdoor Sports", category: "Sports & Games", tag: "Outdoor", description: "A range of outdoor athletic competitions — track, field events, and team sports for all age groups.", isActive: true, order: 9 },
-  { id: "indoor-sports", title: "Indoor Sports", category: "Sports & Games", tag: "Indoor", description: "Exciting indoor competitions including chess, carrom, table tennis, badminton, and more.", isActive: true, order: 10 },
-  { id: "strength-fitness", title: "Strength & Fitness", category: "Sports & Games", tag: "Fitness", description: "Demonstrate physical endurance and strength in fitness challenges designed for youth athletes.", isActive: true, order: 11 },
-  { id: "athletics", title: "Athletics", category: "Sports & Games", tag: "Athletics", description: "Sprint, relay, long jump, shot put, and more — compete in classic track and field events.", isActive: true, order: 12 },
-  { id: "martial-arts", title: "Martial Arts", category: "Sports & Games", tag: "Martial Arts", description: "Showcase discipline, technique, and agility in competitive martial arts demonstrations and bouts.", isActive: true, order: 13 },
-  { id: "tug-of-war", title: "Tug of War", category: "Sports & Games", tag: "Team", description: "A classic team event testing strength, coordination, and teamwork under competitive conditions.", isActive: true, order: 14 },
+  { id: "outdoor-sports", title: "Outdoor Sports", category: "Sports & Games", description: "A range of outdoor athletic competitions — track, field events, and team sports for all age groups.", isActive: true, order: 9 },
+  { id: "indoor-sports", title: "Indoor Sports", category: "Sports & Games", description: "Exciting indoor competitions including chess, carrom, table tennis, badminton, and more.", isActive: true, order: 10 },
+  { id: "strength-fitness", title: "Strength & Fitness", category: "Sports & Games", description: "Demonstrate physical endurance and strength in fitness challenges designed for youth athletes.", isActive: true, order: 11 },
+  { id: "athletics", title: "Athletics", category: "Sports & Games", description: "Sprint, relay, long jump, shot put, and more — compete in classic track and field events.", isActive: true, order: 12 },
+  { id: "martial-arts", title: "Martial Arts", category: "Sports & Games", description: "Showcase discipline, technique, and agility in competitive martial arts demonstrations and bouts.", isActive: true, order: 13 },
+  { id: "tug-of-war", title: "Tug of War", category: "Sports & Games", description: "A classic team event testing strength, coordination, and teamwork under competitive conditions.", isActive: true, order: 14 },
 
   // Innovation & Politics
-  { id: "youth-parliament", title: "Indian Youth Parliament", category: "Innovation", tag: "Parliament", description: "Debate national policies, propose solutions, and experience the democratic process first-hand.", isActive: true, order: 15 },
-  { id: "young-scientist", title: "India's Young Scientist", category: "Innovation", tag: "Science", description: "Present your scientific research, innovations, and inventions to a panel of distinguished judges.", isActive: true, order: 16 },
-  { id: "talent-icon", title: "Youth Talent Icon", category: "Innovation", tag: "Talent", description: "The ultimate talent showcase — demonstrate your unique skill and win the coveted Youth Talent Icon title.", isActive: true, order: 17 },
-  { id: "technical-workshops", title: "Technical Workshops", category: "Innovation", tag: "Tech", description: "Hands-on workshops in coding, robotics, AI, and engineering led by industry professionals.", isActive: true, order: 18 },
-  { id: "non-technical-workshops", title: "Non-Technical Workshops", category: "Innovation", tag: "Workshop", description: "Soft skills, entrepreneurship, public speaking, leadership, and career development sessions.", isActive: true, order: 19 },
-  { id: "business-intelligence", title: "Business Intelligence", category: "Innovation", tag: "Business", description: "Pitch your startup idea, analyze business cases, and compete in entrepreneurship challenges.", isActive: true, order: 20 },
+  { id: "youth-parliament", title: "Indian Youth Parliament", category: "Innovation", description: "Debate national policies, propose solutions, and experience the democratic process first-hand.", isActive: true, order: 15 },
+  { id: "young-scientist", title: "India's Young Scientist", category: "Innovation", description: "Present your scientific research, innovations, and inventions to a panel of distinguished judges.", isActive: true, order: 16 },
+  { id: "talent-icon", title: "Youth Talent Icon", category: "Innovation", description: "The ultimate talent showcase — demonstrate your unique skill and win the coveted Youth Talent Icon title.", isActive: true, order: 17 },
+  { id: "technical-workshops", title: "Technical Workshops", category: "Innovation", description: "Hands-on workshops in coding, robotics, AI, and engineering led by industry professionals.", isActive: true, order: 18 },
+  { id: "non-technical-workshops", title: "Non-Technical Workshops", category: "Innovation", description: "Soft skills, entrepreneurship, public speaking, leadership, and career development sessions.", isActive: true, order: 19 },
+  { id: "business-intelligence", title: "Business Intelligence", category: "Innovation", description: "Pitch your startup idea, analyze business cases, and compete in entrepreneurship challenges.", isActive: true, order: 20 },
 
   // Fun Events
-  { id: "selfie-hunt", title: "Selfie Treasure Hunt", category: "Fun Events", tag: "Fun", description: "A fun-filled campus treasure hunt where teams solve clues and capture selfies at each checkpoint.", isActive: true, order: 21 },
-  { id: "special-sports", title: "Special Sports", category: "Fun Events", tag: "Fun", description: "Unconventional and entertaining sports games bringing laughter, teamwork, and friendly competition.", isActive: true, order: 22 },
-  { id: "collaborate-learn", title: "Collaborate & Learn", category: "Fun Events", tag: "Social", description: "Interactive group activities designed to foster friendships, creativity, and collaborative problem-solving.", isActive: true, order: 23 },
+  { id: "selfie-hunt", title: "Selfie Treasure Hunt", category: "Fun Events", description: "A fun-filled campus treasure hunt where teams solve clues and capture selfies at each checkpoint.", isActive: true, order: 21 },
+  { id: "special-sports", title: "Special Sports", category: "Fun Events", description: "Unconventional and entertaining sports games bringing laughter, teamwork, and friendly competition.", isActive: true, order: 22 },
+  { id: "collaborate-learn", title: "Collaborate & Learn", category: "Fun Events", description: "Interactive group activities designed to foster friendships, creativity, and collaborative problem-solving.", isActive: true, order: 23 },
 ];
 
 export const events: EventItem[] = eventBase.map((e, i) => ({
@@ -240,14 +240,15 @@ export const homeContent = {
   },
   recognition: {
     label: "Recognition",
-    title: "Noble Appreciation From Raj Bhavan",
+    title: "Appreciation From Ministry of Youth Affairs",
     subtitle:
-      "The Youth United Council of India (YUCI) received prestigious recognition for its commendable contributions. Awards of appreciation were presented by esteemed dignitaries:",
+      "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",
     details: [
-      "Sri Jishnu Dev Varma, Governor of Telangana, at Raj Bhavan, Hyderabad.",
-      "Shri K. Kailashnathan, Lieutenant Governor of Puducherry, at Raj Bhavan, Puducherry.",
+      "Dr. Mansukh L. Mandaviya, Ministry of Youth Affairs and Sports, Government of India.",
+      "Dr. Mansukh L. Mandaviya, Ministry of Labour and Employment, Government of India.",
     ],
     images: [
+      "/images/recognition/award_5.jpeg",
       "/images/recognition/award_1.jpg",
       "/images/recognition/award_2.jpg",
       "/images/recognition/award_3.jpg",

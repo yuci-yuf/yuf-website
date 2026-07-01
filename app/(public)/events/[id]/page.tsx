@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPin, Tag } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
@@ -77,9 +77,6 @@ export default async function EventDetailPage({
               <Badge className="bg-white/15 px-4 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
                 {event.category}
               </Badge>
-              <span className="inline-flex items-center gap-1.5 text-sm text-white/80">
-                <Tag size={15} /> {event.tag}
-              </span>
             </div>
             <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
