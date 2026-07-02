@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X, CalendarX } from "lucide-react";
 import type { EventItem, EventStatus } from "@/types";
@@ -30,17 +30,20 @@ export function EventsExplorer({
   categoryOrder: EventItem["category"][];
 }) {
   const searchParams = useSearchParams();
-  const [active, setActive] = useState<string>(() => {
-    const cat = searchParams.get("category");
-    return cat && categoryOrder.includes(cat) ? cat : ALL;
-  });
+  const urlCategory = searchParams.get("category");
   const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    const cat = searchParams.get("category");
-    if (cat && categoryOrder.includes(cat)) setActive(cat);
-    else setActive(ALL);
-  }, [searchParams, categoryOrder]);
+  // Derive the active filter from the ?category URL param, re-syncing whenever
+  // it changes. Done during render (React's "adjust state on prop change"
+  // pattern) rather than in an effect, which would cause cascading renders.
+  const [active, setActive] = useState<string>(ALL);
+  const [seenCategory, setSeenCategory] = useState<string | null>(null);
+  if (urlCategory !== seenCategory) {
+    setSeenCategory(urlCategory);
+    setActive(
+      urlCategory && categoryOrder.includes(urlCategory) ? urlCategory : ALL,
+    );
+  }
 
   // Count per discipline across the full set (stable, drives the pill badges).
   const counts = useMemo(() => {

@@ -13,8 +13,10 @@ import {
   deleteGalleryImage,
 } from "@/lib/admin-data";
 import type { GalleryImage } from "@/types";
+import { useDialog } from "@/components/ui/confirm-dialog";
 
 export default function AdminGalleryPage() {
+  const { confirm, notify } = useDialog();
   const [rows, setRows] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,13 +42,22 @@ export default function AdminGalleryPage() {
   }, []);
 
   async function handleDelete(img: GalleryImage) {
-    if (!confirm("Remove this image from the gallery?")) return;
+    const ok = await confirm({
+      title: "Remove image?",
+      description: "This photo will be removed from the gallery. This can't be undone.",
+      confirmLabel: "Remove",
+      tone: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteGalleryImage(img.id);
       setRows((prev) => prev.filter((r) => r.id !== img.id));
     } catch (err) {
       console.error(err);
-      alert("Failed to delete image.");
+      notify({
+        title: "Delete failed",
+        description: "We couldn't remove the image. Please try again.",
+      });
     }
   }
 

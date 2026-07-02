@@ -202,6 +202,18 @@ export function HeroSection({
         ))}
       </div>
 
+      {/* ── Mobile-only decoration (desktop uses the arrows/ribbons + lg diamonds) ── */}
+      <div aria-hidden className="absolute inset-0 z-10 overflow-hidden sm:hidden">
+        {/* Soft colour orbs for ambient depth */}
+        <div className="animate-float-slow absolute -left-16 top-8 h-52 w-52 rounded-full bg-festival-purple/40 blur-3xl" />
+        <div className="animate-float absolute -right-16 top-1/3 h-52 w-52 rounded-full bg-festival-orange/25 blur-3xl" />
+        <div className="animate-float-slow absolute -left-12 bottom-24 h-48 w-48 rounded-full bg-festival-cyan/35 blur-3xl" />
+
+        {/* A couple of festive dots in the mid-side gaps */}
+        <span className="animate-float absolute left-4 top-1/2 h-2 w-2 rounded-full bg-highlight-400" style={{ opacity: 0.85 }} />
+        <span className="animate-float absolute right-5 top-[46%] h-1.5 w-1.5 rounded-full bg-white" style={{ opacity: 0.75, animationDelay: "0.8s" }} />
+      </div>
+
       {/* ── Centred content ── */}
       <Container className="relative z-30 h-full">
         <div className="flex min-h-[100svh] flex-col items-center justify-center gap-5 px-2 pb-24 pt-24 text-center sm:gap-6 sm:pb-28 sm:pt-28">

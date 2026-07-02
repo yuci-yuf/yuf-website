@@ -46,16 +46,16 @@ export function Navbar() {
               alt={siteConfig.siteName}
               width={120}
               height={60}
-              className="h-10 w-auto object-contain"
+              className="h-9 w-auto object-contain sm:h-10"
               priority
             />
-            <span className="hidden h-7 w-px bg-gray-200 sm:block" aria-hidden />
+            <span className="h-6 w-px bg-border sm:h-7" aria-hidden />
             <Image
               src="/images/yuci-logo.png"
               alt="YUCI"
               width={48}
               height={48}
-              className="hidden h-9 w-auto object-contain sm:block"
+              className="h-8 w-auto object-contain sm:h-9"
               priority
             />
           </Link>

@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ContactsProvider } from "@/contexts/ContactsContext";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { DialogProvider } from "@/components/ui/confirm-dialog";
 
 export default function PanelLayout({
   children,
@@ -31,10 +32,12 @@ export default function PanelLayout({
 
   return (
     <ContactsProvider>
-      <div className="flex min-h-screen">
-        <AdminSidebar />
-        <div className="flex-1 overflow-x-hidden">{children}</div>
-      </div>
+      <DialogProvider>
+        <div className="flex min-h-screen">
+          <AdminSidebar />
+          <div className="flex-1 overflow-x-hidden">{children}</div>
+        </div>
+      </DialogProvider>
     </ContactsProvider>
   );
 }

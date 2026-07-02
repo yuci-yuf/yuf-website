@@ -8,6 +8,21 @@ import { cn } from "@/lib/utils";
 
 type Tab = "photos" | "videos";
 
+/**
+ * Widths vary while every tile keeps the same row height. Rather than repeat
+ * one span pattern (which parks every wide tile on the same side), we cycle a
+ * set of 4-column row layouts that place the wide tile in different positions —
+ * left, right, middle, a pair of wides, then an all-equal row — so the wall
+ * feels irregular. Every row still sums to 4 columns, so there are no gaps.
+ */
+const SPAN_SEQUENCE = [
+  2, 1, 1, // wide left
+  1, 1, 2, // wide right
+  1, 2, 1, // wide middle
+  2, 2, //    two wides
+  1, 1, 1, 1, // all equal
+].map((n) => (n === 2 ? "md:col-span-2" : "md:col-span-1"));
+
 function Lightbox({
   photos,
   index,
@@ -142,23 +157,26 @@ export function GalleryExplorer({
       )}
 
       {tab === "photos" && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 [grid-auto-flow:dense] md:grid-cols-4 md:[grid-auto-rows:14rem]">
           {photos.map((photo, i) => (
             <button
               key={photo.src}
               type="button"
               onClick={() => setLightboxIndex(i)}
-              className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-surface-alt shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              className={cn(
+                "group relative aspect-[4/3] h-full overflow-hidden rounded-2xl border border-border bg-surface-alt shadow-card transition-shadow hover:shadow-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 md:aspect-auto",
+                SPAN_SEQUENCE[i % SPAN_SEQUENCE.length],
+              )}
               aria-label={`View ${photo.alt || "photo"} fullscreen`}
             >
               <Image
                 src={photo.src}
                 alt={photo.alt}
                 fill
-                sizes="(min-width: 768px) 30vw, 50vw"
+                sizes="(min-width: 1024px) 24vw, (min-width: 768px) 30vw, 50vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary-950/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </button>
           ))}
         </div>

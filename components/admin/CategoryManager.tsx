@@ -11,6 +11,7 @@ import {
   deleteCategory,
 } from "@/lib/admin-data";
 import type { EventCategoryDoc } from "@/types";
+import { useDialog } from "@/components/ui/confirm-dialog";
 
 /**
  * Modal for managing event categories (add / rename / delete). Categories only
@@ -28,6 +29,7 @@ export function CategoryManager({
   onClose: () => void;
   onChanged?: () => void;
 }) {
+  const { confirm } = useDialog();
   const [rows, setRows] = useState<EventCategoryDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,12 +109,14 @@ export function CategoryManager({
   }
 
   async function handleDelete(cat: EventCategoryDoc) {
-    if (
-      !confirm(
-        `Delete category "${cat.name}"? Events keep their category label but it will no longer appear in the managed list.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: `Delete "${cat.name}"?`,
+      description:
+        "Events keep their category label, but it will no longer appear in the managed list.",
+      confirmLabel: "Delete",
+      tone: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteCategory(cat.id);
       setRows((prev) => prev.filter((r) => r.id !== cat.id));

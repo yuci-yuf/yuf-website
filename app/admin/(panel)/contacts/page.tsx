@@ -15,10 +15,12 @@ import {
   deleteContactMessage,
 } from "@/lib/admin-data";
 import { useContacts } from "@/contexts/ContactsContext";
+import { useDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 import type { ContactMessage } from "@/types";
 
 export default function ContactsPage() {
+  const { confirm, notify } = useDialog();
   const [rows, setRows] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,12 +57,13 @@ export default function ContactsPage() {
   }
 
   async function handleDelete(msg: ContactMessage) {
-    if (
-      !confirm(
-        `Delete the message from ${msg.firstName} ${msg.lastName}? This cannot be undone.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Delete message?",
+      description: `The message from ${msg.firstName} ${msg.lastName} will be permanently deleted. This cannot be undone.`,
+      confirmLabel: "Delete",
+      tone: "danger",
+    });
+    if (!ok) return;
     const prev = rows;
     setRows((r) => r.filter((m) => m.id !== msg.id)); // optimistic
     try {
@@ -69,7 +72,10 @@ export default function ContactsPage() {
     } catch (e) {
       console.error(e);
       setRows(prev); // restore on failure
-      alert("Failed to delete the message.");
+      notify({
+        title: "Delete failed",
+        description: "We couldn't delete the message. Please try again.",
+      });
     }
   }
 

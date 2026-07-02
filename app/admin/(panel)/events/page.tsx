@@ -24,10 +24,12 @@ import {
   deleteEvent,
 } from "@/lib/admin-data";
 import type { EventCategoryDoc, EventItem } from "@/types";
+import { useDialog } from "@/components/ui/confirm-dialog";
 
 const ALL = "All";
 
 export default function AdminEventsPage() {
+  const { confirm, notify } = useDialog();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [categories, setCategories] = useState<EventCategoryDoc[]>([]);
   const [regCounts, setRegCounts] = useState<Record<string, number>>({});
@@ -95,13 +97,22 @@ export default function AdminEventsPage() {
   }, [events, activeCategory, search]);
 
   async function handleDelete(ev: EventItem) {
-    if (!confirm(`Delete "${ev.title}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: "Delete event?",
+      description: `"${ev.title}" will be permanently deleted. This cannot be undone.`,
+      confirmLabel: "Delete",
+      tone: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteEvent(ev.id);
       setEvents((prev) => prev.filter((e) => e.id !== ev.id));
     } catch (e) {
       console.error(e);
-      alert("Failed to delete event.");
+      notify({
+        title: "Delete failed",
+        description: "We couldn't delete the event. Please try again.",
+      });
     }
   }
 
