@@ -302,11 +302,25 @@ body[data-scroll-locked] {
   overflow: auto !important;
 }
 
-/* Hide the scrollbar on horizontal event strips while keeping scroll/swipe. */
+/* Hide the scrollbar on horizontal event strips while keeping scroll/swipe.
+   Also clears the themed scrollbar-color inherited from the `*` rule above so
+   no orange track/thumb shows through on Firefox/Chromium. */
 @utility no-scrollbar {
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  /* !important: the unlayered universal `* { scrollbar-* }` rule above
+     otherwise beats this @utility (Tailwind puts it in the utilities layer,
+     and unlayered CSS always wins over layered CSS). */
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
   &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
     display: none;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
   }
 }
