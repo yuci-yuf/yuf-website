@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { EventItem } from "@/types";
@@ -30,14 +30,66 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
   const st = CATEGORY_STYLE[group.key];
   const Icon = st?.icon;
 
+  // Pauses the auto-scroll while the user hovers or is manually paging.
+  const pausedRef = useRef(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pauseAuto = (durationMs = 0) => {
+    pausedRef.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    if (durationMs > 0) {
+      resumeTimer.current = setTimeout(() => {
+        pausedRef.current = false;
+      }, durationMs);
+    }
+  };
+
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
     if (!el) return;
+    // Manual paging: pause auto-scroll briefly so it doesn't fight the user.
+    pauseAuto(2000);
     // Scroll by roughly one card width so paging feels natural.
     el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: "smooth" });
   };
 
+  // Endless auto-scroll. Cards are rendered twice, so once we pass the first
+  // copy's width we snap back by exactly that width for a seamless loop.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    const SPEED = 0.40; // px per frame (~15px/s at 60fps)
+    // Accumulate as a float — writing sub-pixel values to scrollLeft rounds
+    // down each frame and would otherwise never advance.
+    let pos = el.scrollLeft;
+
+    const tick = () => {
+      if (!pausedRef.current) {
+        pos += SPEED;
+        // The duplicated set starts at half the total scroll width.
+        const half = el.scrollWidth / 2;
+        if (half > 0 && pos >= half) pos -= half;
+        el.scrollLeft = pos;
+      } else {
+        // Stay in sync if the user manually scrolled while paused.
+        pos = el.scrollLeft;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    };
+  }, []);
+
   if (group.events.length === 0) return null;
+
+  // Duplicate events to create the seamless loop.
+  const loopEvents = [...group.events, ...group.events];
 
   return (
     <div className="flex flex-col gap-5">
@@ -78,15 +130,22 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         </div>
       </div>
 
-      {/* ── Horizontal scroll strip ── */}
+      {/* ── Horizontal scroll strip (endless auto-scroll) ── */}
       <div
         ref={scrollRef}
-        className="no-scrollbar -mx-3 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-3 py-3"
+        onMouseEnter={() => pauseAuto()}
+        onMouseLeave={() => {
+          pausedRef.current = false;
+        }}
+        onTouchStart={() => pauseAuto()}
+        onTouchEnd={() => pauseAuto(2000)}
+        className="no-scrollbar -mx-3 flex gap-5 overflow-x-auto px-3 py-3"
       >
-        {group.events.map((event) => (
+        {loopEvents.map((event, i) => (
           <div
-            key={event.id}
-            className="flex w-70 shrink-0 snap-start *:h-full sm:w-80"
+            key={`${event.id}-${i}`}
+            className="flex w-70 shrink-0 *:h-full sm:w-80"
+            aria-hidden={i >= group.events.length}
           >
             <EventCard event={event} />
           </div>
