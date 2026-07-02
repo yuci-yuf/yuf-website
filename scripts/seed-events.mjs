@@ -116,6 +116,68 @@ const SCHEDULE = [
   ["Fun Events", "Guess the Song", "Velammal Bodhi Campus, Ponneri", "15th Sept 2026"],
 ];
 
+// Event artwork sourced from Unsplash (free to use). Cropped to a wide card
+// ratio with the same query params so every image loads at a consistent size.
+// `IMG(id)` builds the delivery URL; per-title matches fall back to per-category.
+const IMG = (id) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=70`;
+
+// Per-title images (most specific).
+const TITLE_IMAGES = {
+  // Sports & Games
+  "Cricket": IMG("1531415074968-036ba1b575da"),
+  "Throwball": IMG("1612872087720-bb876e2e67d1"),
+  "Volleyball": IMG("1592656094267-764a45160876"),
+  "Kabaddi": IMG("1517649763962-0c623066013b"),
+  "Badminton Doubles": IMG("1626224583764-f87db24ac4ea"),
+  "Badminton Singles": IMG("1519861531473-9200262188bf"),
+  "Chess": IMG("1528819622765-d6bcf132f793"),
+  "Shot Put (Senior)": IMG("1552674605-db6ffd4facb5"),
+  "Long Jump (Senior)": IMG("1461896836934-ffe607ba8211"),
+  "High Jump (Senior)": IMG("1574629810360-7efbbe195018"),
+  "Yoga": IMG("1544367567-0f2fcb009e0b"),
+  "Silambam": IMG("1555597673-b21d5c935865"),
+  "Swimming": IMG("1530549387789-4c1017266635"),
+  "Table Tennis Singles": IMG("1534158914592-062992fbe900"),
+  "Kho-Kho": IMG("1571902943202-507ec2618e8f"),
+  // Athletics
+  "100 Metres": IMG("1571019613454-1cb2f99b2d8b"),
+  "200 Metres": IMG("1546519638-68e109498ffc"),
+  "4×100m Relay (Senior)": IMG("1627627256672-027a4613d028"),
+  // Arts & Culturals
+  "Battle of Bands": IMG("1501386761578-eac5c94b800a"),
+  "Solo Singing": IMG("1516280440614-37939bbacd81"),
+  "Acoustics / Instrumental": IMG("1511671782779-c97d3d27a1d4"),
+  "Solo Dance": IMG("1508700115892-45ecd05ae2ad"),
+  "Group Dance": IMG("1504609773096-104ff2c73ba4"),
+  "Poetry": IMG("1455390582262-044cdead277a"),
+  "Face Painting": IMG("1596464716127-f2a82984de30"),
+  "Pencil Sketching": IMG("1607962837359-5e7e89f86776"),
+  "Painting": IMG("1513364776144-60967b0f800f"),
+  "Youth Talent Icon": IMG("1516450360452-9312f5e86fc7"),
+  // Technical
+  "Quiz": IMG("1503676260728-1c00da094a0b"),
+  "Debate": IMG("1475721027785-f74eccf877e2"),
+  "Indian Youth Parliament": IMG("1529107386315-e1a2ed48a620"),
+  "India's Young Scientist": IMG("1532094349884-543bc11b234d"),
+  // Fun Events
+  "Treasure Hunt": IMG("1533174072545-7a4b6ad7a6c3"),
+  "Guess the Song": IMG("1470225620780-dba8ba36b745"),
+};
+
+// Per-category fallback (used when a title has no explicit image).
+const CATEGORY_IMAGES = {
+  "Sports & Games": IMG("1461896836934-ffe607ba8211"),
+  "Athletics": IMG("1552674605-db6ffd4facb5"),
+  "Arts & Culturals": IMG("1508700115892-45ecd05ae2ad"),
+  "Technical": IMG("1503676260728-1c00da094a0b"),
+  "Fun Events": IMG("1533174072545-7a4b6ad7a6c3"),
+};
+
+function eventImage(category, title) {
+  return TITLE_IMAGES[title] ?? CATEGORY_IMAGES[category] ?? CATEGORY_IMAGES["Sports & Games"];
+}
+
 function slugify(s) {
   return s
     .toLowerCase()
@@ -154,6 +216,7 @@ function buildEvents() {
       title,
       category,
       description: describe(category, title),
+      image: eventImage(category, title),
       isActive: true,
       registrationOpen: true,
       status: "upcoming",

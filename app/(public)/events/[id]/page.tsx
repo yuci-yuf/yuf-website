@@ -45,22 +45,24 @@ export default async function EventDetailPage({
   return (
     <>
       {/* Header */}
-      <section className="bg-festival-gradient relative overflow-hidden py-20 text-white lg:py-28">
+      <section className="bg-festival-gradient relative overflow-hidden py-24 text-white lg:py-36">
         {event.image && (
           <Image
             src={event.image}
-            alt=""
+            alt={event.title}
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-25"
+            className="object-cover"
           />
         )}
+        {/* Scrim: darken + brand tint so white text stays legible over any photo */}
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "radial-gradient(120% 100% at 12% 8%, rgba(123,52,226,0.5) 0%, transparent 46%), linear-gradient(120deg, rgba(28,79,198,0.92) 0%, rgba(30,127,212,0.9) 38%, rgba(26,166,206,0.88) 62%, rgba(30,198,192,0.92) 100%)",
+            background: event.image
+              ? "linear-gradient(120deg, rgba(20,40,90,0.5) 0%, rgba(28,79,198,0.4) 40%, rgba(26,166,206,0.32) 100%), linear-gradient(0deg, rgba(10,20,45,0.55) 0%, transparent 55%)"
+              : "radial-gradient(120% 100% at 12% 8%, rgba(123,52,226,0.5) 0%, transparent 46%), linear-gradient(120deg, rgba(28,79,198,0.92) 0%, rgba(30,127,212,0.9) 38%, rgba(26,166,206,0.88) 62%, rgba(30,198,192,0.92) 100%)",
           }}
           aria-hidden
         />
