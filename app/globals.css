@@ -274,3 +274,12 @@ body[data-scroll-locked] {
   margin-right: 0 !important;
   overflow: auto !important;
 }
+
+/* Hide the scrollbar on horizontal event strips while keeping scroll/swipe. */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

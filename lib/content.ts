@@ -28,6 +28,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
+    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
     { label: "Contact", path: "/contact" },
     { label: "Register Now", path: "/register", isCTA: true },
@@ -43,6 +44,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
+    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
     { label: "Contact Us", path: "/contact" },
   ],
@@ -186,6 +188,53 @@ export const partners: Partner[] = [
   { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
   { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
 ];
+
+// ── Study Abroad page content ──
+export const studyAbroadContent = {
+  hero: {
+    kicker: "Study Abroad",
+    title: "Study Abroad",
+    subtitle: "Empowering the Next Generation of Leaders",
+    lead: "Learn from the masters — free one-on-one counselling with our esteemed international education partners, exclusively for higher secondary students.",
+  },
+  intro: {
+    label: "Study Abroad",
+    title: "Global Education Collaboration: Free Counselling for Students",
+    body: [
+      "We are delighted to announce our collaboration with our esteemed international educational partners. As part of this initiative, they will be offering free one-on-one counselling sessions exclusively for higher secondary students.",
+    ],
+    bullets: [
+      "Opportunities for further studies abroad",
+      "Top-ranking global universities and their admission processes",
+      "Scholarships, application procedures, and career pathways",
+    ],
+    closing: [
+      "This is a valuable opportunity for students to gain personalized insights and make informed decisions about their academic future on an international platform.",
+      "We look forward to empowering our students with the right guidance and global exposure through this collaboration.",
+    ],
+  },
+  benefits: {
+    label: "Why Join",
+    title: "What Students Gain",
+    subtitle: "Personalized, expert-led guidance to help students take confident steps toward a global education.",
+    cards: [
+      { title: "1:1 Expert Counselling", description: "Free personalized sessions with advisors from leading international universities." },
+      { title: "University & Course Guidance", description: "Discover top-ranking global universities and the programmes best suited to your goals." },
+      { title: "Scholarships & Applications", description: "Understand scholarships, application timelines, and admission requirements." },
+      { title: "Career Pathways", description: "Map long-term career opportunities that international study can unlock." },
+    ],
+  },
+  partners: {
+    label: "Our Partners",
+    title: "Meet Our Partners",
+    subtitle: "Driven by enthusiasm and experience, our partners are the backbone of this initiative. From planning to execution, their dedication guarantees a memorable and seamless experience for all students.",
+  },
+  cta: {
+    label: "Ready to Begin?",
+    title: "Take the first step toward studying abroad",
+    body: "Register your interest and secure a free counselling session with our international education partners.",
+  },
+};
 
 // ── Shared registration steps ──
 export const registrationSteps: RegistrationStep[] = [

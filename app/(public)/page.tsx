@@ -10,27 +10,39 @@ import { StepsTimeline } from "@/components/home/StepsTimeline";
 import { GalleryMosaic } from "@/components/home/GalleryMosaic";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Container } from "@/components/ui/Container";
-import { FadeUp, ScaleIn, StaggerContainer, StaggerItem } from "@/components/home/MotionWrapper";
+import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
 import { FestiveEyebrow, ConfettiDots } from "@/components/home/FestiveAccents";
-import { CATEGORY_STYLE } from "@/lib/category-style";
+import { CategoryEventRows, type CategoryGroup } from "@/components/home/CategoryEventRows";
 import {
   homeContent,
   partners,
   registrationSteps,
   tickerItems,
 } from "@/lib/content";
-import { getGalleryPhotos } from "@/lib/cms-data";
+import { getEvents, getGalleryPhotos } from "@/lib/cms-data";
 
 export const dynamic = "force-dynamic";
 
+// Categories to surface on the home page, each shown as a horizontal event
+// strip. `key` matches the real event category; `label` is the display name.
 const EVENT_CATEGORIES = [
-  { key: "Sports & Games",   label: "Sports & Games",   desc: "Cricket, volleyball, throwball, kabaddi & more competitive sports." },
-  { key: "Technical",        label: "Technical",        desc: "Science exhibitions, innovation showcases & tech competitions." },
-  { key: "Arts & Culturals", label: "Non Technical",   desc: "Dance, music, drama & cultural performances from across India." },
+  { key: "Sports & Games",   label: "Sports & Games" },
+  { key: "Technical",        label: "Technical" },
+  { key: "Arts & Culturals", label: "Non Technical" },
 ] as const;
 
 export default async function HomePage() {
-  const galleryPhotos = await getGalleryPhotos();
+  const [events, galleryPhotos] = await Promise.all([
+    getEvents(),
+    getGalleryPhotos(),
+  ]);
+
+  const activeEvents = events.filter((e) => e.isActive);
+  const categoryGroups: CategoryGroup[] = EVENT_CATEGORIES.map(({ key, label }) => ({
+    key,
+    label,
+    events: activeEvents.filter((e) => e.category === key),
+  })).filter((g) => g.events.length > 0);
 
   return (
     <>
@@ -101,65 +113,37 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ── Event Categories ── */}
-      <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24">
-        <ConfettiDots />
-        <Container className="relative">
-          <FadeUp className="mb-14 flex items-end justify-between">
-            <div className="flex flex-col gap-3">
-              <FestiveEyebrow className="text-highlight-400">Explore Events</FestiveEyebrow>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Browse By Category
-              </h2>
+      {/* ── Event Categories — horizontal strips per category ── */}
+      {categoryGroups.length > 0 && (
+        <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24">
+          <ConfettiDots />
+          <Container className="relative">
+            <FadeUp className="mb-14 flex items-end justify-between">
+              <div className="flex flex-col gap-3">
+                <FestiveEyebrow className="text-highlight-400">Explore Events</FestiveEyebrow>
+                <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Browse By Category
+                </h2>
+              </div>
+              <Link
+                href="/events"
+                className="group hidden items-center gap-1.5 text-sm font-semibold text-white transition-colors hover:text-highlight-300 sm:inline-flex"
+              >
+                View All Events
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </FadeUp>
+
+            <CategoryEventRows groups={categoryGroups} />
+
+            <div className="mt-10 flex justify-center sm:hidden">
+              <Link href="/events" className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+                View All Events <ArrowRight size={15} />
+              </Link>
             </div>
-            <Link
-              href="/events"
-              className="group hidden items-center gap-1.5 text-sm font-semibold text-white transition-colors hover:text-highlight-300 sm:inline-flex"
-            >
-              View All Events
-              <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </FadeUp>
-
-          <StaggerContainer stagger={0.1} className="grid gap-5 sm:grid-cols-3">
-            {EVENT_CATEGORIES.map(({ key, label, desc }) => {
-              const st = CATEGORY_STYLE[key];
-              const Icon = st.icon;
-              return (
-                <StaggerItem key={key} className="h-full">
-                  <Link
-                    href={`/events?category=${encodeURIComponent(key)}`}
-                    className="group flex h-full flex-col gap-5 overflow-hidden rounded-3xl bg-white p-7 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <div
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl"
-                      style={{ backgroundColor: st.soft }}
-                    >
-                      <Icon size={22} style={{ color: st.accent }} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <h3 className="font-heading text-lg font-bold text-heading">{label}</h3>
-                      <p className="text-sm leading-relaxed text-body">{desc}</p>
-                    </div>
-                    <span
-                      className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold transition-colors"
-                      style={{ color: st.accent }}
-                    >
-                      Explore <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                    </span>
-                  </Link>
-                </StaggerItem>
-              );
-            })}
-          </StaggerContainer>
-
-          <div className="mt-8 flex justify-center sm:hidden">
-            <Link href="/events" className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
-              View All Events <ArrowRight size={15} />
-            </Link>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+      )}
 
       <StepsTimeline steps={registrationSteps} />
 
