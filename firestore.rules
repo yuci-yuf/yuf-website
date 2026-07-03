@@ -15,18 +15,10 @@ service cloud.firestore {
     // site). Only admins may create/update/delete them via the admin panel.
     match /events/{id} {
       allow read: if true;
-      allow create, delete: if isAdmin();
-      // Admins may edit freely. The public registration flow may also update an
-      // event, but ONLY to bump the registration counter by exactly one and
-      // touch nothing else — this lets the capacity check + increment run in a
-      // transaction without exposing any other field to anonymous writes.
-      allow update: if isAdmin() || (
-        request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['registrationCount']) &&
-        request.resource.data.registrationCount ==
-          ((resource.data.registrationCount is number
-            ? resource.data.registrationCount : 0) + 1)
-      );
+      // Slot reservation + counter increments now run server-side via the
+      // Firebase Admin SDK (which bypasses these rules), so clients get no
+      // write access at all — only admins in the panel.
+      allow write: if isAdmin();
     }
     match /eventCategories/{id} {
       allow read: if true;
@@ -43,8 +35,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
+    // Registrations are CREATED only by the server (Admin SDK) so payment
+    // status, amount, and the reserved slot can't be forged by clients. Admins
+    // may still read/update (status changes) / delete from the panel.
     match /registrations/{id} {
-      allow create: if true;
+      allow create: if false;
       allow read, update, delete: if isAdmin();
     }
 

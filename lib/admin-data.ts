@@ -54,10 +54,13 @@ export async function getRegistrations(): Promise<Registration[]> {
       ageCategory: data.ageCategory ?? "",
       message: data.message ?? "",
       amountPaid: data.amountPaid ?? 0,
+      registrationCode: data.registrationCode ?? "",
+      orderId: data.orderId ?? "",
       paymentId: data.paymentId ?? "",
       paymentStatus: data.paymentStatus ?? "pending",
       status: data.status ?? "pending",
       createdAt: toISO(data.createdAt),
+      paidAt: toISO(data.paidAt),
     } satisfies Registration;
   });
 }

@@ -52,7 +52,33 @@ CLOUDINARY_API_SECRET=
 # One-time admin seeding (server-only)
 SEED_ADMIN_EMAIL=
 SEED_ADMIN_PASSWORD=
+
+# Payments — Razorpay (server-only, except the public key id)
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+NEXT_PUBLIC_RAZORPAY_KEY_ID=
+
+# Firebase Admin SDK — service-account JSON (raw or base64), server-only.
+# Powers the registration/payment API routes (bypasses client rules).
+FIREBASE_ADMIN_SERVICE_ACCOUNT=
 ```
+
+### Payments & registration API
+
+Registration + payment run through **Node API routes** (require a Node host — dev works out of the box):
+
+- `POST /api/registrations/order` — validates input, atomically reserves the event slot,
+  creates a pending registration with a unique code, and opens a Razorpay order.
+- `POST /api/payments/verify` — verifies the checkout callback signature (instant UX).
+- `POST /api/payments/webhook` — **authoritative** confirmation; verifies the Razorpay
+  webhook signature and marks the registration paid/confirmed (idempotent; releases the slot
+  on failure). Point a Razorpay webhook (events `payment.captured`, `payment.failed`) at
+  `https://<host>/api/payments/webhook` using `RAZORPAY_WEBHOOK_SECRET`.
+
+Pricing (base fee + platform fee + GST) is computed server-side in [`lib/pricing.ts`](lib/pricing.ts).
+See [`high-concurrency-registration.md`](high-concurrency-registration.md) for the full design
+(idempotency, capacity, App Check, entry-pass QR + check-in).
 
 > ⚠️ Do not commit `.env.local`. Rotate any secret that has been committed and store production
 > secrets in your host's env / a secret manager.

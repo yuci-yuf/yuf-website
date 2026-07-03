@@ -180,33 +180,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ── Themed scrollbars ──
-   Slim, rounded, brand-blue thumb on a transparent track so it reads on both
-   light sections and the dark festival gradients. */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-highlight-500) rgba(100, 130, 160, 0.28);
-}
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(100, 130, 160, 0.28);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb {
-  /* Festival orange — the one hue that isn't in the blue/teal gradient, so it
-     stays clearly visible on both the dark bands and the light sections. */
-  background-color: var(--color-highlight-500);
-  border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-highlight-600);
-}
-
 /* Festival hero theme — sampled exactly from the reference hero image: a
    diagonal royal blue → azure → cyan → teal gradient, with a violet glow at
    top-left, a teal-green glow at bottom-right, and a warm orange hint on the

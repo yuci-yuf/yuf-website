@@ -16,8 +16,48 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/content";
-import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
+import { computeInvoice, formatINR, GST_RATE } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
+
+// ── Razorpay Checkout (loaded on demand) ──
+interface RazorpayHandlerResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+interface RazorpayOptions {
+  key?: string;
+  order_id: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description?: string;
+  prefill?: { name?: string; email?: string; contact?: string };
+  theme?: { color?: string };
+  handler: (r: RazorpayHandlerResponse) => void;
+  modal?: { ondismiss?: () => void };
+}
+interface RazorpayInstance {
+  open: () => void;
+  on: (event: string, cb: () => void) => void;
+}
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
+
+function loadRazorpay(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") return reject(new Error("no window"));
+    if (window.Razorpay) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Failed to load Razorpay Checkout."));
+    document.body.appendChild(s);
+  });
+}
 
 /**
  * Remaining capacity for an event. Returns null when the event has no limit
@@ -108,6 +148,10 @@ export function RegistrationForm({
     "idle" | "submitting" | "success" | "error" | "full"
   >("idle");
   const formRef = useRef<HTMLFormElement>(null);
+  // One idempotency key per attempt, reused on retry so a re-submit returns the
+  // same reservation/order instead of creating duplicates.
+  const idempotencyKeyRef = useRef<string>("");
+  const [regCode, setRegCode] = useState<string>("");
 
   const setField = (key: keyof FormValues, value: string) => {
     setValues((v) => ({ ...v, [key]: value }));
@@ -133,7 +177,8 @@ export function RegistrationForm({
 
   const selectedEvent = events.find((e) => e.id === eventId);
   const fee = selectedEvent?.registrationFee;
-  const feeLabel = fee != null ? `₹ ${fee.toLocaleString("en-IN")}` : "—";
+  const feeLabel = fee != null ? formatINR(fee) : "—";
+  const invoice = fee != null ? computeInvoice(fee) : null;
 
   const selectedSpotsLeft = spotsLeft(selectedEvent);
   const selectedFull = selectedSpotsLeft === 0;
@@ -200,28 +245,98 @@ export function RegistrationForm({
         ? `${values.institutionName.trim()} (School — ${values.level} standard)`
         : `${values.institutionName.trim()} (College — ${values.level})`;
 
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
+
     setStatus("submitting");
     try {
-      await submitRegistration({
-        firstName,
-        lastName,
-        email: values.email.trim(),
-        phone: values.phone,
-        location: values.location,
-        institution,
-        eventCategory: selectedEvent.category,
-        eventId: selectedEvent.id,
-        eventTitle: selectedEvent.title,
-        ageCategory: values.level,
-        message: "",
-        amountPaid: fee ?? 0,
+      // 1) Reserve a slot + create the pending registration + payment order.
+      const res = await fetch("/api/registrations/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: values.email.trim(),
+          phone: values.phone,
+          location: values.location,
+          institution,
+          ageCategory: values.level,
+          eventId: selectedEvent.id,
+          idempotencyKey: idempotencyKeyRef.current,
+        }),
       });
-      setStatus("success");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (res.status === 409) {
+        setStatus("full");
+        return;
+      }
+      if (!res.ok) {
+        setStatus("error");
+        return;
+      }
+      const order = await res.json();
+
+      // Free event → already confirmed, no payment step.
+      if (order.free) {
+        finishSuccess(order.code);
+        return;
+      }
+
+      // 2) Open Razorpay Checkout.
+      await loadRazorpay();
+      const rzp = new window.Razorpay({
+        key: order.keyId,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Youth United Festival 2026",
+        description: selectedEvent.title,
+        prefill: {
+          name: values.name.trim(),
+          email: values.email.trim(),
+          contact: values.phone,
+        },
+        theme: { color: "#155fa6" },
+        // 3) On success, verify the signature server-side, then confirm.
+        handler: async (resp) => {
+          try {
+            const v = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...resp,
+                registrationId: order.registrationId,
+              }),
+            });
+            if (v.ok) {
+              const d = await v.json();
+              finishSuccess(d.code ?? order.code);
+            } else {
+              setStatus("error");
+            }
+          } catch {
+            setStatus("error");
+          }
+        },
+        modal: {
+          // Dismissed without paying — allow a retry (same idempotency key).
+          ondismiss: () => setStatus("idle"),
+        },
+      });
+      rzp.on("payment.failed", () => setStatus("error"));
+      rzp.open();
     } catch (err) {
       console.error("Registration failed:", err);
-      setStatus(err instanceof RegistrationFullError ? "full" : "error");
+      setStatus("error");
     }
+  }
+
+  function finishSuccess(code?: string) {
+    idempotencyKeyRef.current = "";
+    setRegCode(code ?? "");
+    setStatus("success");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   if (status === "success") {
@@ -229,15 +344,24 @@ export function RegistrationForm({
       <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-3xl border border-border bg-surface p-10 text-center shadow-card">
         <CheckCircle2 size={52} className="text-success" />
         <h2 className="font-heading text-2xl font-bold text-heading">
-          You&apos;re registered!
+          Registration confirmed!
         </h2>
         <p className="text-text-muted">
-          Thanks for registering for{" "}
-          <strong className="text-text">{selectedEvent?.title}</strong>. We&apos;ve
-          saved your spot. Our team will call{" "}
-          <strong className="text-text">{values.phone}</strong> with the payment and
-          confirmation details — no payment is needed right now.
+          You&apos;re all set for{" "}
+          <strong className="text-text">{selectedEvent?.title}</strong>. A
+          confirmation with your entry pass is on its way to{" "}
+          <strong className="text-text">{values.email.trim()}</strong>.
         </p>
+        {regCode && (
+          <div className="rounded-xl bg-primary-50 px-5 py-3 text-center">
+            <p className="text-xs font-medium uppercase tracking-wide text-primary-600">
+              Registration code
+            </p>
+            <p className="font-heading text-xl font-bold tracking-wider text-primary-800">
+              {regCode}
+            </p>
+          </div>
+        )}
         <Button asChild variant="outline">
           <Link href="/events">Browse more events</Link>
         </Button>
@@ -624,7 +748,33 @@ export function RegistrationForm({
               <Row label="Event">
                 {selectedEvent ? selectedEvent.title : "Not selected yet"}
               </Row>
-              <Row label="Fee">{feeLabel}</Row>
+
+              {/* Itemized invoice */}
+              {invoice ? (
+                <div className="flex flex-col gap-2 border-t border-border pt-4 text-sm">
+                  <div className="flex items-center justify-between text-text-muted">
+                    <span>Registration fee</span>
+                    <span>{formatINR(invoice.base)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-text-muted">
+                    <span>Platform fee</span>
+                    <span>{formatINR(invoice.platformFee)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-text-muted">
+                    <span>GST ({Math.round(GST_RATE * 100)}%)</span>
+                    <span>{formatINR(invoice.gst)}</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between border-t border-border pt-3">
+                    <span className="font-medium text-text">Total payable</span>
+                    <span className="font-heading text-lg font-bold text-heading">
+                      {formatINR(invoice.total)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <Row label="Fee">{feeLabel}</Row>
+              )}
+
               <div className="border-t border-border pt-4">
                 <p className="mb-2 text-sm font-medium text-text">
                   What&apos;s included
@@ -648,14 +798,14 @@ export function RegistrationForm({
 
             <p className="flex items-center gap-2 text-xs text-text-muted">
               <ShieldCheck size={16} className="text-success" />
-              No payment now. Your details are kept private and used only for this
-              registration.
+              Secure payment via Razorpay — UPI, cards, net banking &amp; wallets.
+              Your details are kept private.
             </p>
 
             {status === "error" && (
               <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-                Something went wrong saving your registration. Please check your
-                connection and try again.
+                Payment couldn&apos;t be completed. If money was deducted it will be
+                auto-refunded; please try again or contact us.
               </p>
             )}
             {status === "full" && (
@@ -672,10 +822,12 @@ export function RegistrationForm({
             >
               <Lock size={18} />
               {status === "submitting"
-                ? "Submitting…"
+                ? "Starting payment…"
                 : selectedFull
                   ? "Event Full"
-                  : "Complete Registration"}
+                  : invoice
+                    ? `Pay ${formatINR(invoice.total)} & Register`
+                    : "Complete Registration"}
             </Button>
 
             <p className="text-center text-xs text-text-muted">

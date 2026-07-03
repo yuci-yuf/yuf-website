@@ -214,11 +214,19 @@ export interface Registration {
   ageCategory: string;
   message?: string;
   amountPaid: number;
+  /** Human-readable code shown to the participant, e.g. "YUF26-8F3KQ2". */
+  registrationCode?: string;
+  /** Client-supplied key that dedupes retried registration attempts. */
+  idempotencyKey?: string;
+  /** Razorpay order id (set when the payment order is created). */
+  orderId?: string;
   paymentId?: string;
   paymentStatus: PaymentStatus;
   status: RegistrationStatus;
   /** ISO string (converted from Firestore Timestamp on read) */
   createdAt: string | null;
+  /** ISO string — when payment was confirmed. */
+  paidAt?: string | null;
 }
 
 export interface ContactMessage {
