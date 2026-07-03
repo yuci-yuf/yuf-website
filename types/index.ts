@@ -151,6 +151,8 @@ export interface EventItem {
   date?: string;
   /** Venue / city for this event. */
   venue?: string;
+  /** District the event belongs to (e.g. "Ponneri", "Coimbatore"). */
+  district?: string;
   /** Bullet rules/guidelines shown on the detail page. */
   rules?: string[];
 }

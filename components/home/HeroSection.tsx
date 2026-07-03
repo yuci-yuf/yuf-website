@@ -142,7 +142,7 @@ export function HeroSection({
   const loop = [...marqueeItems, ...marqueeItems];
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden">
+    <section className="relative flex min-h-[100svh] flex-col overflow-hidden">
       {/* ── Gradient base: blue → cyan → purple ── */}
       <div
         aria-hidden
@@ -215,8 +215,8 @@ export function HeroSection({
       </div>
 
       {/* ── Centred content ── */}
-      <Container className="relative z-30 h-full">
-        <div className="flex min-h-[100svh] flex-col items-center justify-center gap-5 px-2 pb-24 pt-24 text-center sm:gap-6 sm:pb-28 sm:pt-28">
+      <Container className="relative z-30 flex w-full flex-1 items-center">
+        <div className="flex w-full flex-col items-center justify-center gap-5 px-2 py-6 text-center sm:gap-6 sm:py-10">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -288,7 +288,7 @@ export function HeroSection({
       </Container>
 
       {/* ── Event-name marquee ── */}
-      <div className="absolute inset-x-0 bottom-0 z-30 overflow-hidden border-t border-white/15 bg-primary-950/30 py-3.5 backdrop-blur-sm">
+      <div className="relative z-30 w-full overflow-hidden border-t border-white/15 bg-primary-950/30 py-3.5 backdrop-blur-sm">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-primary-900/60 to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-primary-900/60 to-transparent" />
         <div className="flex w-max animate-[marquee_30s_linear_infinite] items-center gap-10 pr-10">

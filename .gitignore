@@ -49,3 +49,5 @@ scripts/cloudinary-manifest.json
 
 # claude
 CLAUDE.md
+
+high-concurrency-registration.md

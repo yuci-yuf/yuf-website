@@ -7,7 +7,6 @@ import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
 import type { EventItem } from "@/types";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -16,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { siteConfig, registerContent } from "@/lib/content";
+import { siteConfig } from "@/lib/content";
 import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
 
@@ -31,29 +30,55 @@ function spotsLeft(ev: EventItem | undefined): number | null {
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
+/** Cities where the festival runs. */
+const LOCATIONS = ["Chennai", "Coimbatore"];
+/**
+ * Where each location's events are actually held. A participant's chosen
+ * location filters the event list to events whose venue is in that place.
+ * (Chennai's events run in Ponneri; Coimbatore's in Coimbatore.)
+ */
+const LOCATION_VENUES: Record<string, string[]> = {
+  Chennai: ["Ponneri"],
+  Coimbatore: ["Coimbatore"],
+};
+
+/** True if the event's venue belongs to the given location. */
+function eventInLocation(ev: EventItem, location: string): boolean {
+  const venues = LOCATION_VENUES[location] ?? [];
+  if (venues.length === 0) return false;
+  const venue = (ev.venue ?? "").toLowerCase();
+  return venues.some((name) => venue.includes(name.toLowerCase()));
+}
+
+/** School class levels (6th–12th). */
+const SCHOOL_STANDARDS = ["6th", "7th", "8th", "9th", "10th", "11th", "12th"];
+/** College year levels. */
+const COLLEGE_YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+
+type InstitutionType = "" | "school" | "college";
+
 interface FormValues {
-  firstName: string;
-  lastName: string;
+  name: string;
   phone: string;
   email: string;
   location: string;
-  institution: string;
-  ageCategory: string;
-  message: string;
+  institutionType: InstitutionType;
+  institutionName: string; // name of the school / college
+  level: string; // standard (school) or year (college)
 }
 
 const EMPTY: FormValues = {
-  firstName: "",
-  lastName: "",
+  name: "",
   phone: "",
   email: "",
   location: "",
-  institution: "",
-  ageCategory: "",
-  message: "",
+  institutionType: "",
+  institutionName: "",
+  level: "",
 };
 
-type Errors = Partial<Record<keyof FormValues | "category" | "event", string>>;
+type ErrorKey = keyof FormValues | "category" | "event";
+type Errors = Partial<Record<ErrorKey, string>>;
 
 export function RegistrationForm({
   events,
@@ -66,7 +91,16 @@ export function RegistrationForm({
   const preselectedId = searchParams.get("event");
   const preselected = events.find((e) => e.id === preselectedId);
 
-  const [values, setValues] = useState<FormValues>(EMPTY);
+  // Deep-link (?event=): pre-fill location from the event's venue so the
+  // location-filtered dropdowns still include the preselected event.
+  const preselectedLocation = preselected
+    ? (LOCATIONS.find((loc) => eventInLocation(preselected, loc)) ?? "")
+    : "";
+
+  const [values, setValues] = useState<FormValues>({
+    ...EMPTY,
+    location: preselectedLocation,
+  });
   const [category, setCategory] = useState<string>(preselected?.category ?? "");
   const [eventId, setEventId] = useState<string>(preselected?.id ?? "");
   const [errors, setErrors] = useState<Errors>({});
@@ -80,10 +114,22 @@ export function RegistrationForm({
     setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
-  const eventsInCategory = useMemo(
-    () => events.filter((e) => e.category === category),
-    [category, events],
-  );
+  // Categories that actually have events in the chosen location (empty until a
+  // location is picked, so the participant selects location first).
+  const availableCategories = useMemo(() => {
+    if (!values.location) return [];
+    return categories.filter((c) =>
+      events.some((e) => e.category === c && eventInLocation(e, values.location)),
+    );
+  }, [categories, events, values.location]);
+
+  // Events matching BOTH the chosen location and category.
+  const eventsForSelection = useMemo(() => {
+    if (!values.location || !category) return [];
+    return events.filter(
+      (e) => e.category === category && eventInLocation(e, values.location),
+    );
+  }, [events, category, values.location]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
   const fee = selectedEvent?.registrationFee;
@@ -94,26 +140,33 @@ export function RegistrationForm({
 
   function validate(): Errors {
     const e: Errors = {};
-    if (!category) e.category = "Please choose a category.";
-    if (!eventId) e.event = "Please choose an event.";
-    if (!values.ageCategory) e.ageCategory = "Please choose an age group.";
-    if (!values.firstName.trim())
-      e.firstName = "Please enter the student's first name.";
-    if (!values.lastName.trim())
-      e.lastName = "Please enter the student's last name.";
+    if (!values.name.trim()) e.name = "Please enter the student's name.";
     if (!/^[6-9]\d{9}$/.test(values.phone))
       e.phone = "Enter a valid 10-digit mobile number.";
     if (!EMAIL_RE.test(values.email.trim()))
       e.email = "Please enter a valid email address.";
     if (!values.location) e.location = "Please select your city.";
-    if (!values.institution.trim())
-      e.institution = "Please enter the school or college name.";
+    if (!values.institutionType)
+      e.institutionType = "Please choose school or college.";
+    else {
+      if (!values.institutionName.trim())
+        e.institutionName =
+          values.institutionType === "school"
+            ? "Please enter your school name."
+            : "Please enter your college name.";
+      if (!values.level)
+        e.level =
+          values.institutionType === "school"
+            ? "Please select your standard."
+            : "Please select your year.";
+    }
+    if (!category) e.category = "Please choose a category.";
+    if (!eventId) e.event = "Please choose an event.";
     return e;
   }
 
-  // Surface a single field's error when the user leaves it, so problems show
-  // up as they go rather than only on submit.
-  function handleBlur(key: keyof Errors) {
+  // Surface a single field's error when the user leaves it.
+  function handleBlur(key: ErrorKey) {
     const all = validate();
     setErrors((e) => ({ ...e, [key]: all[key] }));
   }
@@ -124,7 +177,6 @@ export function RegistrationForm({
     const found = validate();
     if (Object.keys(found).length > 0) {
       setErrors(found);
-      // Scroll the first problem into view so nothing is missed.
       const firstKey = Object.keys(found)[0];
       const el = formRef.current?.querySelector<HTMLElement>(
         `[data-field="${firstKey}"]`,
@@ -139,20 +191,29 @@ export function RegistrationForm({
       return;
     }
 
+    // Map the friendly fields onto the stored schema.
+    const parts = values.name.trim().split(/\s+/);
+    const firstName = parts[0] ?? "";
+    const lastName = parts.slice(1).join(" ");
+    const institution =
+      values.institutionType === "school"
+        ? `${values.institutionName.trim()} (School — ${values.level} standard)`
+        : `${values.institutionName.trim()} (College — ${values.level})`;
+
     setStatus("submitting");
     try {
       await submitRegistration({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
+        firstName,
+        lastName,
+        email: values.email.trim(),
         phone: values.phone,
         location: values.location,
-        institution: values.institution,
+        institution,
         eventCategory: selectedEvent.category,
         eventId: selectedEvent.id,
         eventTitle: selectedEvent.title,
-        ageCategory: values.ageCategory,
-        message: values.message,
+        ageCategory: values.level,
+        message: "",
         amountPaid: fee ?? 0,
       });
       setStatus("success");
@@ -197,337 +258,441 @@ export function RegistrationForm({
           Register for YUF 2026
         </h2>
         <p className="text-text-muted">
-          It only takes a couple of minutes. Fill in the details below — fields
-          marked <span className="text-error">*</span> are required. You don&apos;t
-          pay anything now; our team will call you about payment.
+          It only takes a couple of minutes. Fields marked{" "}
+          <span className="text-error">*</span> are required. You don&apos;t pay
+          anything now — our team will call you about payment.
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
-        {/* ── Left column: the input steps ── */}
+        {/* ── Left column: input steps ── */}
         <div className="flex flex-col gap-6">
-      {/* ── 1. Choose the event ── */}
-      <SectionCard step={1} title="Choose the event">
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Event category" htmlFor="category" required>
-            <>
-              <Select
-                value={category}
-                onValueChange={(v) => {
-                  setCategory(v);
-                  setEventId("");
-                  setErrors((e) => ({ ...e, category: undefined, event: undefined }));
-                }}
-              >
-                <SelectTrigger
-                  id="category"
-                  data-field="category"
-                  aria-invalid={!!errors.category}
-                >
-                  <SelectValue placeholder="Choose a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <ErrorText>{errors.category}</ErrorText>
-            </>
-          </Field>
-
-          <Field label="Event" htmlFor="event" required>
-            <>
-              <Select
-                value={eventId}
-                onValueChange={(v) => {
-                  setEventId(v);
-                  setErrors((e) => ({ ...e, event: undefined }));
-                }}
-                disabled={!category}
-              >
-                <SelectTrigger
-                  id="event"
-                  data-field="event"
-                  aria-invalid={!!errors.event}
-                >
-                  <SelectValue
-                    placeholder={
-                      category ? "Choose an event" : "Choose a category first"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {eventsInCategory.map((ev) => {
-                    const left = spotsLeft(ev);
-                    const full = left === 0;
-                    return (
-                      <SelectItem key={ev.id} value={ev.id} disabled={full}>
-                        {ev.title}
-                        {full
-                          ? " — Full"
-                          : left !== null && left <= 10
-                            ? ` — ${left} left`
-                            : ""}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-              <ErrorText>{errors.event}</ErrorText>
-            </>
-          </Field>
-        </div>
-
-        {/* Age group — big, tappable choices */}
-        <fieldset className="flex flex-col gap-2.5" data-field="ageCategory">
-          <span className="text-sm font-medium text-text">
-            Age group <span className="text-error">*</span>
-          </span>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {siteConfig.ageCategories.map((age) => (
-              <label
-                key={age.value}
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-center text-sm font-medium transition-colors hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700"
-              >
-                <input
-                  type="radio"
-                  name="ageCategory"
-                  value={age.value}
-                  checked={values.ageCategory === age.value}
-                  onChange={(e) => setField("ageCategory", e.target.value)}
-                  className="sr-only"
+          {/* ── 1. Your details ── */}
+          <SectionCard step={1} title="Your details">
+            <Field label="Name" htmlFor="name" required>
+              <>
+                <Input
+                  id="name"
+                  data-field="name"
+                  value={values.name}
+                  onChange={(e) => setField("name", e.target.value)}
+                  onBlur={() => handleBlur("name")}
+                  autoComplete="name"
+                  aria-invalid={!!errors.name}
+                  placeholder="Student's full name"
                 />
-                {age.label}
-              </label>
-            ))}
-          </div>
-          <ErrorText>{errors.ageCategory}</ErrorText>
-        </fieldset>
+                <ErrorText>{errors.name}</ErrorText>
+              </>
+            </Field>
 
-        {/* Live fee line, once an event is chosen */}
-        {selectedEvent && (
-          <div
-            className={cn(
-              "flex items-center justify-between rounded-xl px-4 py-3 text-sm",
-              selectedFull ? "bg-error/10 text-error" : "bg-primary-50 text-primary-800",
-            )}
-          >
-            <span className="font-medium">
-              {selectedFull ? "This event is full — please pick another." : "Registration fee"}
-            </span>
-            {!selectedFull && (
-              <span className="font-heading text-base font-bold">{feeLabel}</span>
-            )}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* ── 2. Your details ── */}
-      <SectionCard step={2} title="Your details">
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Student's first name" htmlFor="firstName" required>
-            <>
-              <Input
-                id="firstName"
-                data-field="firstName"
-                value={values.firstName}
-                onChange={(e) => setField("firstName", e.target.value)}
-                onBlur={() => handleBlur("firstName")}
-                autoComplete="given-name"
-                aria-invalid={!!errors.firstName}
-                placeholder="e.g. Aarav"
-              />
-              <ErrorText>{errors.firstName}</ErrorText>
-            </>
-          </Field>
-          <Field label="Student's last name" htmlFor="lastName" required>
-            <>
-              <Input
-                id="lastName"
-                data-field="lastName"
-                value={values.lastName}
-                onChange={(e) => setField("lastName", e.target.value)}
-                onBlur={() => handleBlur("lastName")}
-                autoComplete="family-name"
-                aria-invalid={!!errors.lastName}
-                placeholder="e.g. Sharma"
-              />
-              <ErrorText>{errors.lastName}</ErrorText>
-            </>
-          </Field>
-          <Field
-            label="Contact phone number"
-            htmlFor="phone"
-            required
-            description="We'll call this number about the registration."
-          >
-            <>
-              <Input
-                id="phone"
-                data-field="phone"
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                value={values.phone}
-                onChange={(e) =>
-                  setField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))
-                }
-                onBlur={() => handleBlur("phone")}
-                autoComplete="tel"
-                aria-invalid={!!errors.phone}
-                placeholder="10-digit mobile number"
-              />
-              <ErrorText>{errors.phone}</ErrorText>
-            </>
-          </Field>
-          <Field
-            label="Email address"
-            htmlFor="email"
-            required
-            description="Confirmation is sent here."
-          >
-            <>
-              <Input
-                id="email"
-                data-field="email"
-                type="email"
-                value={values.email}
-                onChange={(e) => setField("email", e.target.value)}
-                onBlur={() => handleBlur("email")}
-                autoComplete="email"
-                aria-invalid={!!errors.email}
-                placeholder="name@example.com"
-              />
-              <ErrorText>{errors.email}</ErrorText>
-            </>
-          </Field>
-          <Field label="City" htmlFor="location" required>
-            <>
-              <Select
-                value={values.location}
-                onValueChange={(v) => setField("location", v)}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field
+                label="Phone number"
+                htmlFor="phone"
+                required
+                description="We'll call this number about the registration."
               >
-                <SelectTrigger
-                  id="location"
-                  data-field="location"
-                  aria-invalid={!!errors.location}
-                >
-                  <SelectValue placeholder="Select your city" />
-                </SelectTrigger>
-                <SelectContent>
-                  {registerContent.locations.map((l) => (
-                    <SelectItem key={l.city} value={l.city}>
-                      {l.city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <ErrorText>{errors.location}</ErrorText>
-            </>
-          </Field>
-          <Field label="School / College name" htmlFor="institution" required>
-            <>
-              <Input
-                id="institution"
-                data-field="institution"
-                value={values.institution}
-                onChange={(e) => setField("institution", e.target.value)}
-                onBlur={() => handleBlur("institution")}
-                aria-invalid={!!errors.institution}
-                placeholder="Name of the school or college"
-              />
-              <ErrorText>{errors.institution}</ErrorText>
-            </>
-          </Field>
-        </div>
+                <>
+                  <Input
+                    id="phone"
+                    data-field="phone"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={values.phone}
+                    onChange={(e) =>
+                      setField(
+                        "phone",
+                        e.target.value.replace(/\D/g, "").slice(0, 10),
+                      )
+                    }
+                    onBlur={() => handleBlur("phone")}
+                    autoComplete="tel"
+                    aria-invalid={!!errors.phone}
+                    placeholder="10-digit mobile number"
+                  />
+                  <ErrorText>{errors.phone}</ErrorText>
+                </>
+              </Field>
 
-        <Field
-          label="Anything we should know? (optional)"
-          htmlFor="message"
-        >
-          <Textarea
-            id="message"
-            value={values.message}
-            onChange={(e) => setField("message", e.target.value)}
-            placeholder="Any special requests or accessibility needs."
-          />
-        </Field>
-      </SectionCard>
+              <Field
+                label="Email"
+                htmlFor="email"
+                required
+                description="Confirmation is sent here."
+              >
+                <>
+                  <Input
+                    id="email"
+                    data-field="email"
+                    type="email"
+                    value={values.email}
+                    onChange={(e) => setField("email", e.target.value)}
+                    onBlur={() => handleBlur("email")}
+                    autoComplete="email"
+                    aria-invalid={!!errors.email}
+                    placeholder="name@example.com"
+                  />
+                  <ErrorText>{errors.email}</ErrorText>
+                </>
+              </Field>
+            </div>
+
+            <Field
+              label="Your location"
+              htmlFor="location"
+              required
+              description="Select the city where you'll take part."
+            >
+              <>
+                <Select
+                  value={values.location}
+                  onValueChange={(v) => {
+                    // Changing location changes which events are available,
+                    // so clear any category/event chosen for the old location.
+                    setValues((prev) => ({ ...prev, location: v }));
+                    setCategory("");
+                    setEventId("");
+                    setErrors((e) => ({
+                      ...e,
+                      location: undefined,
+                      category: undefined,
+                      event: undefined,
+                    }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="location"
+                    data-field="location"
+                    aria-invalid={!!errors.location}
+                  >
+                    <SelectValue placeholder="Select location to participate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LOCATIONS.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <ErrorText>{errors.location}</ErrorText>
+              </>
+            </Field>
+
+            {/* School / College toggle */}
+            <fieldset className="flex flex-col gap-2.5" data-field="institutionType">
+              <span className="text-sm font-medium text-text">
+                Are you in school or college?{" "}
+                <span className="text-error">*</span>
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                {(
+                  [
+                    ["school", "School"],
+                    ["college", "College"],
+                  ] as const
+                ).map(([val, label]) => (
+                  <label
+                    key={val}
+                    className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-center text-sm font-medium transition-colors hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700"
+                  >
+                    <input
+                      type="radio"
+                      name="institutionType"
+                      value={val}
+                      checked={values.institutionType === val}
+                      onChange={() => {
+                        setValues((v) => ({
+                          ...v,
+                          institutionType: val,
+                          level: "",
+                        }));
+                        setErrors((e) => ({
+                          ...e,
+                          institutionType: undefined,
+                          level: undefined,
+                        }));
+                      }}
+                      className="sr-only"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              <ErrorText>{errors.institutionType}</ErrorText>
+            </fieldset>
+
+            {/* Conditional detail: name + standard (school) or year (college) */}
+            {values.institutionType && (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field
+                  label={
+                    values.institutionType === "school"
+                      ? "School name"
+                      : "College name"
+                  }
+                  htmlFor="institutionName"
+                  required
+                >
+                  <>
+                    <Input
+                      id="institutionName"
+                      data-field="institutionName"
+                      value={values.institutionName}
+                      onChange={(e) =>
+                        setField("institutionName", e.target.value)
+                      }
+                      onBlur={() => handleBlur("institutionName")}
+                      aria-invalid={!!errors.institutionName}
+                      placeholder={
+                        values.institutionType === "school"
+                          ? "Name of the school"
+                          : "Name of the college"
+                      }
+                    />
+                    <ErrorText>{errors.institutionName}</ErrorText>
+                  </>
+                </Field>
+
+                <Field
+                  label={
+                    values.institutionType === "school"
+                      ? "Which standard?"
+                      : "Which year?"
+                  }
+                  htmlFor="level"
+                  required
+                >
+                  <>
+                    <Select
+                      value={values.level}
+                      onValueChange={(v) => setField("level", v)}
+                    >
+                      <SelectTrigger
+                        id="level"
+                        data-field="level"
+                        aria-invalid={!!errors.level}
+                      >
+                        <SelectValue
+                          placeholder={
+                            values.institutionType === "school"
+                              ? "Select standard (6th–12th)"
+                              : "Select your year"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(values.institutionType === "school"
+                          ? SCHOOL_STANDARDS
+                          : COLLEGE_YEARS
+                        ).map((opt) => (
+                          <SelectItem key={opt} value={opt}>
+                            {values.institutionType === "school"
+                              ? `${opt} standard`
+                              : opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <ErrorText>{errors.level}</ErrorText>
+                  </>
+                </Field>
+              </div>
+            )}
+          </SectionCard>
+
+          {/* ── 2. Choose your event ── */}
+          <SectionCard step={2} title="Choose your event">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Category of event" htmlFor="category" required>
+                <>
+                  <Select
+                    value={category}
+                    onValueChange={(v) => {
+                      setCategory(v);
+                      setEventId("");
+                      setErrors((e) => ({
+                        ...e,
+                        category: undefined,
+                        event: undefined,
+                      }));
+                    }}
+                    disabled={!values.location}
+                  >
+                    <SelectTrigger
+                      id="category"
+                      data-field="category"
+                      aria-invalid={!!errors.category}
+                    >
+                      <SelectValue
+                        placeholder={
+                          values.location
+                            ? "Choose a category"
+                            : "Select your location first"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCategories.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <ErrorText>{errors.category}</ErrorText>
+                </>
+              </Field>
+
+              <Field label="Event" htmlFor="event" required>
+                <>
+                  <Select
+                    value={eventId}
+                    onValueChange={(v) => {
+                      setEventId(v);
+                      setErrors((e) => ({ ...e, event: undefined }));
+                    }}
+                    disabled={!category}
+                  >
+                    <SelectTrigger
+                      id="event"
+                      data-field="event"
+                      aria-invalid={!!errors.event}
+                    >
+                      <SelectValue
+                        placeholder={
+                          !values.location
+                            ? "Select your location first"
+                            : category
+                              ? "Choose an event"
+                              : "Choose a category first"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eventsForSelection.map((ev) => {
+                        const left = spotsLeft(ev);
+                        const full = left === 0;
+                        return (
+                          <SelectItem key={ev.id} value={ev.id} disabled={full}>
+                            {ev.title}
+                            {full
+                              ? " — Full"
+                              : left !== null && left <= 10
+                                ? ` — ${left} left`
+                                : ""}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <ErrorText>{errors.event}</ErrorText>
+                </>
+              </Field>
+            </div>
+
+            {/* Live fee line, once an event is chosen */}
+            {selectedEvent && (
+              <div
+                className={cn(
+                  "flex items-center justify-between rounded-xl px-4 py-3 text-sm",
+                  selectedFull
+                    ? "bg-error/10 text-error"
+                    : "bg-primary-50 text-primary-800",
+                )}
+              >
+                <span className="font-medium">
+                  {selectedFull
+                    ? "This event is full — please pick another."
+                    : "Registration fee"}
+                </span>
+                {!selectedFull && (
+                  <span className="font-heading text-base font-bold">
+                    {feeLabel}
+                  </span>
+                )}
+              </div>
+            )}
+          </SectionCard>
         </div>
 
         {/* ── Right column: sticky summary + submit ── */}
         <div className="lg:sticky lg:top-28">
-      {/* ── 3. Confirm ── */}
-      <SectionCard step={3} title="Confirm & finish">
-        <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
-          <Row label="Event">
-            {selectedEvent ? selectedEvent.title : "Not selected yet"}
-          </Row>
-          <Row label="Fee">{feeLabel}</Row>
-          <div className="border-t border-border pt-4">
-            <p className="mb-2 text-sm font-medium text-text">What&apos;s included</p>
-            <ul className="flex flex-col gap-1.5">
-              {siteConfig.registrationPerks.map((perk) => (
-                <li
-                  key={perk}
-                  className="flex items-start gap-2 text-sm text-text-muted"
-                >
-                  <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-success" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+          <SectionCard step={3} title="Confirm & finish">
+            <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
+              <Row label="Event">
+                {selectedEvent ? selectedEvent.title : "Not selected yet"}
+              </Row>
+              <Row label="Fee">{feeLabel}</Row>
+              <div className="border-t border-border pt-4">
+                <p className="mb-2 text-sm font-medium text-text">
+                  What&apos;s included
+                </p>
+                <ul className="flex flex-col gap-1.5">
+                  {siteConfig.registrationPerks.map((perk) => (
+                    <li
+                      key={perk}
+                      className="flex items-start gap-2 text-sm text-text-muted"
+                    >
+                      <CheckCircle2
+                        size={15}
+                        className="mt-0.5 shrink-0 text-success"
+                      />
+                      {perk}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
 
-        <p className="flex items-center gap-2 text-xs text-text-muted">
-          <ShieldCheck size={16} className="text-success" />
-          No payment now. Your details are kept private and used only for this
-          registration.
-        </p>
+            <p className="flex items-center gap-2 text-xs text-text-muted">
+              <ShieldCheck size={16} className="text-success" />
+              No payment now. Your details are kept private and used only for this
+              registration.
+            </p>
 
-        {status === "error" && (
-          <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-            Something went wrong saving your registration. Please check your
-            connection and try again.
-          </p>
-        )}
-        {status === "full" && (
-          <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-            Sorry — this event just filled up. Please pick another event above.
-          </p>
-        )}
+            {status === "error" && (
+              <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+                Something went wrong saving your registration. Please check your
+                connection and try again.
+              </p>
+            )}
+            {status === "full" && (
+              <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+                Sorry — this event just filled up. Please pick another event.
+              </p>
+            )}
 
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full"
-          disabled={status === "submitting" || selectedFull}
-        >
-          <Lock size={18} />
-          {status === "submitting"
-            ? "Submitting…"
-            : selectedFull
-              ? "Event Full"
-              : "Complete Registration"}
-        </Button>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={status === "submitting" || selectedFull}
+            >
+              <Lock size={18} />
+              {status === "submitting"
+                ? "Submitting…"
+                : selectedFull
+                  ? "Event Full"
+                  : "Complete Registration"}
+            </Button>
 
-        <p className="text-center text-xs text-text-muted">
-          By registering you agree to our{" "}
-          <Link href="/terms-and-conditions" className="text-primary-700 underline">
-            Terms &amp; Conditions
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy-policy" className="text-primary-700 underline">
-            Privacy Policy
-          </Link>
-          .
-        </p>
-
-      </SectionCard>
+            <p className="text-center text-xs text-text-muted">
+              By registering you agree to our{" "}
+              <Link
+                href="/terms-and-conditions"
+                className="text-primary-700 underline"
+              >
+                Terms &amp; Conditions
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy-policy" className="text-primary-700 underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </SectionCard>
         </div>
       </div>
     </form>

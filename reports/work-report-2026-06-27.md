@@ -89,7 +89,6 @@ The project type-checks and builds cleanly (`14` routes, all prerendering as sta
 
 ### Completed
 - **Environment setup** — installed dependencies (`npm install`, 442 packages) and added `lucide-react`; confirmed the bundled Next.js 16 docs and verified framework conventions (async `params`/`searchParams`, `@theme`, `next/font`).
-- **Project documentation** — authored `CLAUDE.md` covering commands, architecture (Next.js / Firebase / Cloudinary subsystems), and the Firestore-rules expiry caveat.
 - **Verification — public site** — `tsc --noEmit` clean; `next build` clean (5 routes static); smoke-tested all routes at 200 OK.
 - **Verification — admin** — `tsc --noEmit` clean; `next build` clean (14 routes total); smoke-tested all admin routes at 200 OK with no runtime errors.
 - **Defect triage** — caught and fixed pre-merge: lucide v1 brand-icon removal, content literal `variant` widening, and the polymorphic `Button` link `onClick` typing.

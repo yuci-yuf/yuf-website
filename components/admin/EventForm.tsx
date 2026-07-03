@@ -121,6 +121,7 @@ export function EventForm({
   // stored display label via isoToLabel/labelToIso.
   const [date, setDate] = useState(labelToIso(event?.date ?? ""));
   const [venue, setVenue] = useState(event?.venue ?? "");
+  const [district, setDistrict] = useState(event?.district ?? "");
   const [details, setDetails] = useState((event?.details ?? []).join("\n"));
   const [rules, setRules] = useState((event?.rules ?? []).join("\n"));
   // Rules are optional per event: the toggle defaults on when the event
@@ -165,6 +166,7 @@ export function EventForm({
       status,
       date: date ? isoToLabel(date) : undefined,
       venue: venue.trim() || undefined,
+      district: district.trim() || undefined,
       details: toLines(details).length ? toLines(details) : undefined,
       rules: hasRules && toLines(rules).length ? toLines(rules) : undefined,
     };
@@ -239,6 +241,15 @@ export function EventForm({
               value={venue}
               onChange={(e) => setVenue(e.target.value)}
               placeholder="e.g. Chennai"
+            />
+          </Field>
+
+          <Field label="District" htmlFor="ev-district">
+            <Input
+              id="ev-district"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              placeholder="e.g. Ponneri"
             />
           </Field>
         </div>

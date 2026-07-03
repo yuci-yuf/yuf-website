@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Youth United Festival 2026 (YUF) Website
 
-## Getting Started
+Marketing site, event catalogue, participant **registration**, and a self-serve **admin CMS**
+for the Youth United Council of India (YUCI). Built as a Next.js App Router app backed by
+Firebase (Firestore + Auth), with images on Cloudinary.
 
-First, run the development server:
+---
+
+## Tech stack
+
+- **Framework:** Next.js 16 (App Router) · React 19 · TypeScript
+- **Styling:** Tailwind CSS v4 (design tokens in [`app/globals.css`](app/globals.css)) · Radix UI + `class-variance-authority` (shadcn-style primitives) · `framer-motion`
+- **Backend (BaaS):** Firebase — **Firestore** (data) + **Auth** (admin login). Client SDK only today; no custom server tier yet.
+- **Media:** Cloudinary (browser uploads + a Node upload script)
+- **Charts:** Recharts (admin dashboard)
+
+---
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` (never commit real secrets). Public Firebase config is safe in the client;
+keep the Cloudinary/admin secrets server-side only.
 
-## Learn More
+```bash
+# Firebase (public client config)
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
 
-To learn more about Next.js, take a look at the following resources:
+# Cloudinary — browser unsigned uploads (public)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Cloudinary — signed uploads for the asset script (server-only, keep secret)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# One-time admin seeding (server-only)
+SEED_ADMIN_EMAIL=
+SEED_ADMIN_PASSWORD=
+```
 
-## Deploy on Vercel
+> ⚠️ Do not commit `.env.local`. Rotate any secret that has been committed and store production
+> secrets in your host's env / a secret manager.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm run upload:assets` | Upload local `assets/` to Cloudinary (writes a manifest) |
+| `npm run upload:preview` | Dry-run of the upload |
+
+Seed helpers under `scripts/` (run with `node scripts/<file>.mjs`) sign in with the seed admin
+credentials and populate Firestore (`seed-events.mjs`, `seed-gallery.mjs`).
+
+---
+
+## Project structure
+
+```
+app/
+  (public)/          Public site — home, about, events, events/[id], gallery,
+                     contact, register, legal pages (shared Navbar/Footer shell)
+  admin/             Admin — /admin/login (public) + (panel) behind an auth gate
+                     (dashboard, registrations, contacts, events, gallery)
+components/
+  home/ public/ admin/ ui/   Section, page, and shared UI components
+lib/
+  firebase.ts        Firebase client init (app / auth / db)
+  cms-data.ts        Public reads of dynamic content (events, categories, gallery)
+  content.ts         Static site copy (hero, about, legal, register steps, config)
+  submissions.ts     Public form writes (contact + registration, transactional)
+  admin-data.ts      Admin CRUD (events, categories, gallery, registrations, contacts)
+types/index.ts       Shared content + Firestore schema types
+firestore.rules      Security rules   ·   firestore.indexes.json   Indexes
+```
+
+**Content model:** dynamic content (events, categories, gallery) is read live from Firestore
+via `lib/cms-data.ts` — empty collections render empty states, there is no fallback to hardcoded
+defaults. Static marketing copy (hero text, legal pages, contact info, registration steps) lives
+in `lib/content.ts`.
+
+---
+
+## Firebase
+
+- **Project:** `yuf-web-db`. Firestore rules/indexes are deployed via `firebase.json`.
+- **Collections:** `events`, `eventCategories`, `gallery` (public read; admin write),
+  `registrations`, `contactSubmissions` (public create; admin read/update/delete), `admins`.
+- **Admin model:** single-admin. Access is granted by creating an `admins/{uid}` document for the
+  account; there is no public sign-up. The client checks this doc in `contexts/AuthContext.tsx`.
+- **Registration capacity:** `submitRegistration` (`lib/submissions.ts`) runs a Firestore
+  transaction that enforces each event's `registrationLimit` against `registrationCount` and
+  atomically increments the counter, so slots can't be oversold.
+
+Deploy rules:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+---
+
+## Roadmap: high-concurrency registration + online payment
+
+Registration currently saves as **pending** (no online payment — the team follows up). The design
+for handling **200–1,000+ simultaneous registrations** with Razorpay payment, verified webhooks,
+unique registration codes, idempotency, abuse protection, and a **QR entry pass + entry-desk
+check-in** is documented in **[`high-concurrency-registration.md`](high-concurrency-registration.md)**.
+
+---
+
+## Notes for contributors
+
+- This Next.js version has breaking changes vs. older docs — see [`AGENTS.md`](AGENTS.md).
+- Use the design tokens in `app/globals.css` (e.g. `text-heading`, `text-body`, `bg-festival-gradient`);
+  avoid hardcoding hex values in components.
+- Static image references point at `public/images/**` and are not build-checked — a wrong filename
+  silently 404s.
