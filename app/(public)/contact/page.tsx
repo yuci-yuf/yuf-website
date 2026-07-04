@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Phone, Mail, MapPin, HelpCircle, Handshake, Users } from "lucide-react";
+import { Mail, MapPin, HelpCircle, Handshake, Users } from "lucide-react";
 import { ContactForm } from "@/components/public/ContactForm";
 import { SocialIcon } from "@/components/public/SocialIcon";
 import { FeatureGrid } from "@/components/public/FeatureGrid";
@@ -37,11 +37,6 @@ export default function ContactPage() {
                 Get in touch with us
               </h3>
               <ul className="flex flex-col gap-5 text-sm">
-                <ContactRow icon={<Phone size={18} />} label="Phone">
-                  <a href={`tel:${siteConfig.contact.phone}`} className="hover:text-primary-700">
-                    {siteConfig.contact.phone}
-                  </a>
-                </ContactRow>
                 <ContactRow icon={<Mail size={18} />} label="Email">
                   <a href={`mailto:${siteConfig.contact.email}`} className="break-all hover:text-primary-700">
                     {siteConfig.contact.email}

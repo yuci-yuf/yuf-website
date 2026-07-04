@@ -226,7 +226,9 @@ export default async function HomePage() {
           (p) =>
             p.name === "Falmouth University" ||
             p.name === "World Youth Book of Records" ||
-            p.name === "Easwari Engineering College",
+            p.name === "Easwari Engineering College" ||
+            p.name === "Velammal Engineering College" ||
+            p.name === "Jain (JGI)",
         )}
       />
     </>

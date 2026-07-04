@@ -55,7 +55,7 @@ export const siteConfig: SiteConfig = {
     { label: "Refund Policy", path: "/refund-policy" },
   ],
   contact: {
-    phone: "+91 93855 38114",
+    phone: "",
     email: "info@youthunitedcouncilofindia.org",
     address:
       "NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India",
@@ -188,6 +188,8 @@ export const partners: Partner[] = [
   { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
   { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
   { name: "Easwari Engineering College", logoUrl: "/images/partners/srm-easwari.png" },
+  { name: "Velammal Engineering College", logoUrl: "/images/partners/velammal.png" },
+  { name: "Jain (JGI)", logoUrl: "/images/partners/jain.png" },
 ];
 
 // ── Study Abroad page content ──
