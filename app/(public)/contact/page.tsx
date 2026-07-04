@@ -22,7 +22,6 @@ export default function ContactPage() {
     <>
       <Section id="contact-form" tone="aqua" className="pt-28 sm:pt-32">
         <SectionHeading
-          label={contactContent.hero.badge}
           title={contactContent.hero.title}
           subtitle={contactContent.hero.subtitle}
           className="mb-12"
@@ -38,7 +37,7 @@ export default function ContactPage() {
               </h3>
               <ul className="flex flex-col gap-5 text-sm">
                 <ContactRow icon={<Mail size={18} />} label="Email">
-                  <a href={`mailto:${siteConfig.contact.email}`} className="break-all hover:text-primary-700">
+                  <a href={`mailto:${siteConfig.contact.email}`} className="whitespace-nowrap hover:text-primary-700">
                     {siteConfig.contact.email}
                   </a>
                 </ContactRow>

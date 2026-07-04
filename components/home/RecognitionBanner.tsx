@@ -21,7 +21,7 @@ function emphasize(text: string, term?: string) {
   return (
     <>
       {text.slice(0, i)}
-      <span className="font-semibold text-highlight-400">{term}</span>
+      <span className="whitespace-nowrap font-semibold text-highlight-400">{term}</span>
       {text.slice(i + term.length)}
     </>
   );

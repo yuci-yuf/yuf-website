@@ -907,8 +907,8 @@ export function RegistrationForm({
               )}
             </div>
 
-            <p className="flex items-center gap-2 text-xs text-text-muted">
-              <ShieldCheck size={16} className="text-success" />
+            <p className="flex items-start gap-2 text-xs text-text-muted">
+              <ShieldCheck size={16} className="mt-0.5 shrink-0 text-success" />
               Secure payment via Razorpay — UPI, cards, net banking &amp; wallets.
               Your details are kept private.
             </p>

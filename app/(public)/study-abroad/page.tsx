@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, GraduationCap, Globe2, Award, Compass } from "lucide-react";
+import { ArrowRight, CheckCircle2, GraduationCap, Globe2, Award, Compass, Mail } from "lucide-react";
 
 const BENEFIT_ICONS = [GraduationCap, Globe2, Award, Compass];
 import { studyAbroadContent, partners } from "@/lib/content";
@@ -207,8 +207,9 @@ export default function StudyAbroadPage() {
                   </Link>
                   <Link
                     href="/contact"
-                    className="inline-flex h-13 items-center gap-2 rounded-full border border-white/30 px-8 text-[15px] font-semibold text-white transition-all hover:bg-white/10"
+                    className="group inline-flex h-13 items-center justify-center gap-2 rounded-full border-2 border-white/70 bg-white/10 px-8 text-[15px] font-semibold text-white shadow-md backdrop-blur-sm transition-all hover:border-white hover:bg-white hover:text-primary-700"
                   >
+                    <Mail size={16} className="transition-transform group-hover:-translate-y-0.5" />
                     Contact Us
                   </Link>
                 </div>

@@ -61,20 +61,19 @@ export default function AboutPage() {
           ═══════════════════════════════════════════════════════ */}
       <section id="who-we-are" className="scroll-mt-24 bg-surface-alt py-16 lg:py-24">
         <Container>
-          <div className="grid gap-10 lg:gap-16 lg:grid-cols-2">
-            <FadeUp className="flex flex-col gap-6">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+            {/* Title — first on mobile, top-left on desktop */}
+            <FadeUp className="order-1 lg:col-start-1 lg:row-start-1">
               <h2 className="font-display text-4xl font-extrabold tracking-tight text-heading sm:text-5xl lg:text-[3rem]">
                 {aboutContent.about.title}
               </h2>
-              {aboutContent.about.body.map((p, i) => (
-                <p key={i} className="text-lg leading-relaxed text-body sm:text-xl">
-                  {p}
-                </p>
-              ))}
             </FadeUp>
 
-            {/* Right — image */}
-            <FadeUp delay={0.15} className="relative">
+            {/* Image — between title and paragraph on mobile; right column on desktop */}
+            <FadeUp
+              delay={0.15}
+              className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center"
+            >
               <div className="relative aspect-4/3 overflow-hidden rounded-3xl shadow-md">
                 <Image
                   src="/images/sections/who-we-are-team.jpg"
@@ -84,6 +83,15 @@ export default function AboutPage() {
                   className="object-cover"
                 />
               </div>
+            </FadeUp>
+
+            {/* Body — below the image on mobile, under the title on desktop */}
+            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-1 lg:row-start-2">
+              {aboutContent.about.body.map((p, i) => (
+                <p key={i} className="text-lg leading-relaxed text-body sm:text-xl">
+                  {p}
+                </p>
+              ))}
             </FadeUp>
           </div>
         </Container>
@@ -111,9 +119,10 @@ export default function AboutPage() {
                 opportunities that turn that spark into lasting impact — across
                 arts, sport, science, and service.
               </p>
+              {/* Desktop: CTA sits with the statement */}
               <Link
                 href="/register"
-                className="group mt-2 inline-flex h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg"
+                className="group mt-2 hidden h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg lg:inline-flex"
               >
                 Join the Movement
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
@@ -133,6 +142,17 @@ export default function AboutPage() {
                 label="YUF youth across India"
                 className="mx-auto h-[300px] w-full max-w-sm text-white/90 drop-shadow-xl sm:h-[400px] sm:max-w-md lg:h-[500px] lg:max-w-lg"
               />
+            </FadeUp>
+
+            {/* Mobile: CTA moves below the image */}
+            <FadeUp className="flex justify-center lg:hidden">
+              <Link
+                href="/register"
+                className="group inline-flex h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg"
+              >
+                Join the Movement
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </FadeUp>
           </div>
         </Container>
@@ -442,8 +462,7 @@ export default function AboutPage() {
                       className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-7 shadow-sm"
                     >
                       <span className="font-display text-3xl font-extrabold text-heading">
-                        {stat.number}
-                        <span className="text-primary-500">{stat.suffix}</span>
+                        {`${stat.number}${stat.suffix}`}
                       </span>
                       <span className="text-sm text-text-muted">{stat.label}</span>
                     </div>
