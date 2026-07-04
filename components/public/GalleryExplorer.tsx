@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryPhoto, GalleryVideo } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -65,19 +64,16 @@ function Lightbox({
         </button>
       )}
 
-      {/* Image */}
+      {/* Image — full-resolution original so it stays sharp at any size */}
       <div
-        className="relative mx-16 max-h-[90vh] max-w-[90vw]"
-        style={{ aspectRatio: "auto" }}
+        className="relative mx-16 flex max-h-[90vh] max-w-[90vw] items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={photo.src}
           alt={photo.alt}
-          width={1400}
-          height={900}
           className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
-          priority
         />
       </div>
 

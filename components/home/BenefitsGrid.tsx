@@ -23,7 +23,7 @@ export function BenefitsGrid({
           <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">
             {label}
           </span>
-          <h2 className="max-w-md font-heading text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="max-w-md font-display text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             {title}
           </h2>
           <p className="max-w-lg text-[16px] leading-relaxed text-gray-500">

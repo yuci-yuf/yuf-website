@@ -76,7 +76,7 @@ export function SectionHeading({
       )}
       <h2
         className={cn(
-          "max-w-3xl font-heading text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]",
+          "max-w-3xl font-display text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl lg:text-[2.9rem]",
           invert ? "text-white" : "text-heading",
         )}
       >

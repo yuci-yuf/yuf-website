@@ -11,7 +11,7 @@ import { GalleryMosaic } from "@/components/home/GalleryMosaic";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
-import { FestiveEyebrow, ConfettiDots } from "@/components/home/FestiveAccents";
+import { FestiveEyebrow, ConfettiDots, FestiveGlows } from "@/components/home/FestiveAccents";
 import { CategoryEventRows, type CategoryGroup } from "@/components/home/CategoryEventRows";
 import {
   homeContent,
@@ -73,8 +73,9 @@ export default async function HomePage() {
       />
 
       {/* ── Dignitary Spotlight ── */}
-      <section className="relative overflow-hidden bg-white py-16 lg:py-24">
-        <Container>
+      <section className="section-aqua relative overflow-hidden py-16 lg:py-24">
+        <FestiveGlows />
+        <Container className="relative">
           <div className="grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
             {/* Left — image */}
             <ScaleIn>
@@ -93,11 +94,11 @@ export default async function HomePage() {
             <FadeUp className="flex flex-col gap-6">
               <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
               <div className="flex flex-col gap-1">
-                <h2 className="font-heading text-3xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.5rem]">
+                <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.5rem]">
                   Dr. Tamilisai Soundararajan
                 </h2>
                 <p className="text-sm font-medium text-text-muted">
-                  Lt. Governor of Puducherry &amp; Governor of Telangana
+                  Former Governor of Telangana &amp; Lt. Governor of Puducherry
                 </p>
               </div>
               <p className="text-[16px] leading-relaxed text-body">
@@ -120,7 +121,7 @@ export default async function HomePage() {
             <FadeUp className="mb-14 flex items-end justify-between">
               <div className="flex flex-col gap-3">
                 <FestiveEyebrow className="text-highlight-400">Explore Events</FestiveEyebrow>
-                <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                   Browse By Category
                 </h2>
               </div>

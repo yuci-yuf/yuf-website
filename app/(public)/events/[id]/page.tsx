@@ -66,7 +66,7 @@ export default async function EventDetailPage({
           }}
           aria-hidden
         />
-        <div className="relative mx-auto w-full max-w-4xl px-6 lg:px-8">
+        <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
           <Link
             href="/events"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 transition-colors hover:text-white"
@@ -80,7 +80,7 @@ export default async function EventDetailPage({
                 {event.category}
               </Badge>
             </div>
-            <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            <h1 className="font-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
             </h1>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/90">
@@ -100,9 +100,9 @@ export default async function EventDetailPage({
       </section>
 
       {/* Body */}
-      <Section tone="glow" containerClassName="max-w-4xl">
-        <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
-          <div className="flex flex-col gap-5">
+      <Section tone="glow">
+        <div className="grid gap-12 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+          <div className="flex max-w-3xl flex-col gap-5">
             <h2 className="font-heading text-2xl font-bold text-heading">
               About this event
             </h2>

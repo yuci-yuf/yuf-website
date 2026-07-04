@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Users, Map, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { AnimatedStat } from "./AnimatedStat";
 
 interface HeroSectionProps {
   title: string;
@@ -216,12 +217,12 @@ export function HeroSection({
 
       {/* ── Centred content ── */}
       <Container className="relative z-30 flex w-full flex-1 items-center">
-        <div className="flex w-full flex-col items-center justify-center gap-5 px-2 py-6 text-center sm:gap-6 sm:py-10">
+        <div className="flex w-full flex-col items-center justify-center gap-4 px-2 py-4 text-center sm:gap-5 sm:py-5">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5.5rem]"
+            className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
           >
             Youth United<br />Festival <span className="text-highlight-400">{highlight}</span>
           </motion.h1>
@@ -257,7 +258,7 @@ export function HeroSection({
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65, duration: 0.7 }}
-            className="mt-4 grid w-full max-w-3xl grid-cols-3 gap-2.5 sm:mt-6 sm:gap-4"
+            className="mt-2 grid w-full max-w-3xl grid-cols-3 gap-2.5 sm:mt-3 sm:gap-4"
           >
             {stats.map((stat, i) => {
               const { Icon, desc } = STAT_META[i] ?? STAT_META[0];
@@ -267,9 +268,10 @@ export function HeroSection({
                   className="rounded-2xl border border-white/20 bg-white/12 p-3 text-center shadow-xl shadow-primary-950/20 backdrop-blur-md sm:p-5 sm:text-left"
                 >
                   <div className="flex items-start justify-center sm:justify-between">
-                    <span className="font-display text-2xl font-extrabold text-white sm:text-3xl">
-                      {stat.number}
-                    </span>
+                    <AnimatedStat
+                      value={stat.number}
+                      className="font-display text-2xl font-extrabold text-white sm:text-3xl"
+                    />
                     <span className="hidden h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white sm:flex">
                       <Icon size={16} />
                     </span>

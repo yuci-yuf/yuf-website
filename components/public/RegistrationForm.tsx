@@ -374,7 +374,7 @@ export function RegistrationForm({
       ref={formRef}
       onSubmit={handleSubmit}
       noValidate
-      className="mx-auto flex max-w-6xl flex-col gap-8"
+      className="mx-auto flex w-full max-w-7xl flex-col gap-8"
     >
       {/* Intro / reassurance */}
       <div className="mx-auto flex max-w-2xl flex-col gap-2 text-center">
@@ -388,11 +388,11 @@ export function RegistrationForm({
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
-        {/* ── Left column: input steps ── */}
-        <div className="flex flex-col gap-6">
-          {/* ── 1. Your details ── */}
-          <SectionCard step={1} title="Your details">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-start">
+        {/* Left column: form inputs */}
+        <div className="flex flex-col gap-8 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
+        {/* ── Your details ── */}
+        <FormSection title="Your details">
             <Field label="Name" htmlFor="name" required>
               <>
                 <Input
@@ -624,10 +624,12 @@ export function RegistrationForm({
                 </Field>
               </div>
             )}
-          </SectionCard>
+        </FormSection>
 
-          {/* ── 2. Choose your event ── */}
-          <SectionCard step={2} title="Choose your event">
+        <div className="h-px bg-border" />
+
+        {/* ── Choose your event ── */}
+        <FormSection title="Choose your event">
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Category of event" htmlFor="category" required>
                 <>
@@ -738,12 +740,14 @@ export function RegistrationForm({
                 )}
               </div>
             )}
-          </SectionCard>
+        </FormSection>
         </div>
 
-        {/* ── Right column: sticky summary + submit ── */}
+        {/* Right column: sticky summary + payment */}
         <div className="lg:sticky lg:top-28">
-          <SectionCard step={3} title="Confirm & finish">
+        <div className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
+        {/* ── Confirm & finish ── */}
+        <FormSection title="Confirm & finish">
             <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
               <Row label="Event">
                 {selectedEvent ? selectedEvent.title : "Not selected yet"}
@@ -844,7 +848,8 @@ export function RegistrationForm({
               </Link>
               .
             </p>
-          </SectionCard>
+        </FormSection>
+        </div>
         </div>
       </div>
     </form>
@@ -853,23 +858,16 @@ export function RegistrationForm({
 
 /* ── Sub-components ── */
 
-function SectionCard({
-  step,
+function FormSection({
   title,
   children,
 }: {
-  step: number;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
-      <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 font-heading text-sm font-bold text-white shadow-sm ring-1 ring-inset ring-white/25">
-          {step}
-        </span>
-        <h3 className="font-heading text-xl font-bold text-heading">{title}</h3>
-      </div>
+    <section className="flex flex-col gap-6">
+      <h3 className="font-heading text-xl font-bold text-heading">{title}</h3>
       {children}
     </section>
   );
