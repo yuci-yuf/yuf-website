@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  CalendarDays,
+  Download,
   Loader2,
   MapPin,
   Pencil,
@@ -13,7 +13,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import { PageHeader, StatusBadge, EmptyState } from "@/components/admin/AdminUI";
+import { PageHeader, StatusBadge, EmptyState, formatDate } from "@/components/admin/AdminUI";
 import { CategoryManager } from "@/components/admin/CategoryManager";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,13 @@ import {
   getRegistrations,
   deleteEvent,
 } from "@/lib/admin-data";
-import type { EventCategoryDoc, EventItem } from "@/types";
+import type {
+  EventCategoryDoc,
+  EventItem,
+  EventLocation,
+  Registration,
+} from "@/types";
+import { getEventLocations } from "@/lib/event-groups";
 import { useDialog } from "@/components/ui/confirm-dialog";
 
 const ALL = "All";
@@ -33,6 +39,7 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [categories, setCategories] = useState<EventCategoryDoc[]>([]);
   const [regCounts, setRegCounts] = useState<Record<string, number>>({});
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [managingCats, setManagingCats] = useState(false);
@@ -48,6 +55,7 @@ export default function AdminEventsPage() {
       .then(([evs, cats, regs]) => {
         setEvents(evs);
         setCategories(cats);
+        setRegistrations(regs);
         const counts: Record<string, number> = {};
         for (const r of regs) {
           if (r.eventId) counts[r.eventId] = (counts[r.eventId] ?? 0) + 1;
@@ -63,7 +71,6 @@ export default function AdminEventsPage() {
 
   useEffect(() => {
     load().finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Category names: prefer the managed list, but include any categories that
@@ -87,19 +94,71 @@ export default function AdminEventsPage() {
     const term = search.trim().toLowerCase();
     return events
       .filter((e) => activeCategory === ALL || e.category === activeCategory)
-      .filter(
-        (e) =>
-          !term ||
-          e.title.toLowerCase().includes(term) ||
-          (e.venue ?? "").toLowerCase().includes(term),
-      )
+      .filter((e) => {
+        if (!term) return true;
+        if (e.title.toLowerCase().includes(term)) return true;
+        // Search across every location's district/venue.
+        return getEventLocations(e).some((loc) =>
+          `${loc.district ?? ""} ${loc.venue ?? ""}`
+            .toLowerCase()
+            .includes(term),
+        );
+      })
       .sort((a, b) => a.order - b.order);
   }, [events, activeCategory, search]);
 
+  /**
+   * Download an event's registrations as CSV. When `loc` is given, only that
+   * location's registrations are exported and the filename is scoped to it —
+   * so you can pull "Kabaddi · Ponneri" separately from "Kabaddi · Coimbatore".
+   */
+  function exportEventCsv(ev: EventItem, loc?: EventLocation) {
+    const rows = registrations.filter(
+      (r) => r.eventId === ev.id && (!loc || r.locationId === loc.id),
+    );
+    const headers = [
+      "Name", "Email", "Phone", "City", "Institution",
+      "Category", "Event", "Loc. Venue", "Loc. Date",
+      "Age", "Amount", "Payment", "Status", "Date",
+    ];
+    const lines = rows.map((r) =>
+      [
+        `${r.firstName} ${r.lastName}`, r.email, r.phone, r.location, r.institution,
+        r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
+        r.ageCategory, r.amountPaid, r.paymentStatus,
+        r.status, formatDate(r.createdAt),
+      ]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(","),
+    );
+    const csv = [headers.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    // Scope the filename to the event (and location, when given) so multiple
+    // exports are distinct, e.g. "kabaddi-ponneri-registrations.csv".
+    const slug = [ev.title, loc?.district || loc?.venue || loc?.date]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    a.download = `${slug || ev.id}-registrations.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleDelete(ev: EventItem) {
+    const regCount = regCounts[ev.id] ?? 0;
     const ok = await confirm({
       title: "Delete event?",
-      description: `"${ev.title}" will be permanently deleted. This cannot be undone.`,
+      description:
+        regCount > 0
+          ? `"${ev.title}" and its ${regCount} registration${
+              regCount === 1 ? "" : "s"
+            } will be permanently deleted. This cannot be undone.`
+          : `"${ev.title}" and any of its registrations will be permanently deleted. This cannot be undone.`,
       confirmLabel: "Delete",
       tone: "danger",
     });
@@ -107,6 +166,14 @@ export default function AdminEventsPage() {
     try {
       await deleteEvent(ev.id);
       setEvents((prev) => prev.filter((e) => e.id !== ev.id));
+      // Drop the removed event's registrations from local state so counts and
+      // the "N shown" totals stay accurate without a reload.
+      setRegistrations((prev) => prev.filter((r) => r.eventId !== ev.id));
+      setRegCounts((prev) => {
+        const next = { ...prev };
+        delete next[ev.id];
+        return next;
+      });
     } catch (e) {
       console.error(e);
       notify({
@@ -195,10 +262,9 @@ export default function AdminEventsPage() {
                   <tr className="border-b border-border text-xs font-semibold uppercase tracking-wide text-text-muted">
                     <th className="px-5 py-3.5">Event</th>
                     <th className="px-5 py-3.5">Category</th>
-                    <th className="px-5 py-3.5">Date</th>
-                    <th className="px-5 py-3.5">Venue</th>
+                    <th className="px-5 py-3.5">Locations</th>
                     <th className="px-5 py-3.5">Status</th>
-                    <th className="px-5 py-3.5 text-center">Registrations</th>
+                    <th className="px-5 py-3.5 text-center">Total</th>
                     <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -222,24 +288,35 @@ export default function AdminEventsPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4 text-sm text-text-muted">
-                        {e.date ? (
-                          <span className="inline-flex items-center gap-1.5">
-                            <CalendarDays size={13} className="shrink-0" />
-                            {e.date}
-                          </span>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                      <td className="px-5 py-4 text-sm text-text-muted">
-                        {e.venue ? (
-                          <span className="inline-flex max-w-55 items-center gap-1.5">
-                            <MapPin size={13} className="shrink-0" />
-                            <span className="truncate">{e.venue}</span>
-                          </span>
-                        ) : (
-                          "—"
-                        )}
+                        {(() => {
+                          const locs = getEventLocations(e);
+                          if (locs.length === 0) return "—";
+                          return (
+                            <ul className="flex flex-col gap-1.5">
+                              {locs.map((loc) => {
+                                const place =
+                                  loc.district || loc.venue || "Location";
+                                return (
+                                  <li
+                                    key={loc.id}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <MapPin size={13} className="shrink-0" />
+                                    <span className="max-w-45 truncate">
+                                      {place}
+                                      {loc.date ? (
+                                        <span className="text-text-muted/70">
+                                          {" "}
+                                          · {loc.date}
+                                        </span>
+                                      ) : null}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          );
+                        })()}
                       </td>
                       <td className="px-5 py-4">
                         <StatusBadge
@@ -251,9 +328,17 @@ export default function AdminEventsPage() {
                       <td className="px-5 py-4 text-center">
                         {(() => {
                           const count = regCounts[e.id] ?? 0;
+                          // Total limit = sum of per-location limits, but only
+                          // when every location is capped (otherwise unlimited).
+                          const locs = getEventLocations(e);
+                          const limits = locs.map((l) => l.registrationLimit);
+                          const totalLimit = limits.every(
+                            (l) => typeof l === "number",
+                          )
+                            ? (limits as number[]).reduce((a, b) => a + b, 0)
+                            : null;
                           const full =
-                            typeof e.registrationLimit === "number" &&
-                            count >= e.registrationLimit;
+                            totalLimit !== null && count >= totalLimit;
                           return (
                             <Link
                               href="/admin/registrations"
@@ -264,14 +349,14 @@ export default function AdminEventsPage() {
                                   : "bg-surface-alt text-text hover:bg-primary-50 hover:text-primary-700",
                               )}
                               title={
-                                typeof e.registrationLimit === "number"
-                                  ? `${count} of ${e.registrationLimit} spots filled`
+                                totalLimit !== null
+                                  ? `${count} of ${totalLimit} spots filled`
                                   : `${count} registrations`
                               }
                             >
                               <Users size={13} />
-                              {typeof e.registrationLimit === "number"
-                                ? `${count}/${e.registrationLimit}`
+                              {totalLimit !== null
+                                ? `${count}/${totalLimit}`
                                 : count}
                               {full && " · Full"}
                             </Link>
@@ -280,6 +365,20 @@ export default function AdminEventsPage() {
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => exportEventCsv(e)}
+                            disabled={(regCounts[e.id] ?? 0) === 0}
+                            className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-alt hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-muted"
+                            aria-label={`Download registrations for ${e.title}`}
+                            title={
+                              (regCounts[e.id] ?? 0) === 0
+                                ? "No registrations yet"
+                                : `Download ${regCounts[e.id]} registration(s) as CSV`
+                            }
+                          >
+                            <Download size={16} />
+                          </button>
                           <Link
                             href={`/admin/events/${e.id}/edit`}
                             className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-alt hover:text-primary-700"

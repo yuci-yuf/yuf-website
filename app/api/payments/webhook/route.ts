@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { getAdminDb, releaseLocationSlot } from "@/lib/firebase-admin";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 
 export const runtime = "nodejs";
@@ -59,14 +59,14 @@ export async function POST(req: Request) {
   } else if (event.event === "payment.failed") {
     // Only release a still-pending hold (never touch a confirmed reg).
     if (data.status === "pending") {
-      await adminDb.runTransaction(async (tx) => {
-        tx.update(ref, { paymentStatus: "failed" });
-        if (data.eventId) {
-          tx.update(adminDb.collection("events").doc(data.eventId), {
-            registrationCount: FieldValue.increment(-1),
-          });
-        }
-      });
+      await ref.update({ paymentStatus: "failed" });
+      if (data.eventId) {
+        await releaseLocationSlot(
+          adminDb,
+          adminDb.collection("events").doc(data.eventId),
+          data.locationId,
+        );
+      }
     }
   }
 

@@ -35,6 +35,7 @@ import {
   doc,
   setDoc,
   writeBatch,
+  deleteField,
 } from "firebase/firestore";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -61,6 +62,105 @@ async function loadEnv() {
     /* rely on system env */
   }
 }
+
+// ── Event handbook content (About / Guidelines / Rules) ──
+// Parsed from the markdown handbooks so they stay the single source of truth.
+const CONTENT_FILES = [
+  "contents/YUF_Sports_Events_Content.md",
+  "contents/YUF_Athletic_Events_Content.md",
+  "contents/YUF_Arts_and_Cultural_Events_Content.md",
+  "contents/YUF_Technical_events_content.md",
+  "contents/YUF_Fun_Events_Content.md",
+];
+
+/**
+ * Normalize a title to a match key so slightly different spellings of the same
+ * event align (e.g. "Badminton (Doubles)" ↔ "Badminton Doubles", "4×100 Metres
+ * Relay (Senior Category)" ↔ "4×100m Relay (Senior)"). Keeps meaningful words
+ * like "singles"/"doubles" but drops noise like "senior", "category", the unit
+ * word "metres/meters/m", and punctuation.
+ */
+function contentKey(title) {
+  return title
+    .toLowerCase()
+    .replace(/×/g, "x")
+    .replace(/[()]/g, " ")
+    .replace(/\bsenior\b/g, " ")
+    .replace(/\bcategory\b/g, " ")
+    .replace(/\bmetres\b|\bmeters\b/g, " ")
+    .replace(/(\d)m\b/g, "$1") // the unit "m" glued to digits (e.g. "100m")
+    .replace(/\bm\b/g, " ") // the unit "m" standalone
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+/**
+ * Parse one handbook markdown file into a map of contentKey → { about,
+ * guidelines[], rules[] }. Event sections start at "## <Title>" (an optional
+ * "N. " prefix is stripped); within a section, "### About the Event",
+ * "### General Guidelines" and "### Rules & Regulations" delimit the parts.
+ */
+function parseHandbook(md) {
+  const out = new Map();
+  // Split into event blocks on "## " headings (but not the "# " doc title).
+  const blocks = md.split(/^##\s+/m).slice(1);
+  for (const block of blocks) {
+    const lines = block.split("\n");
+    const rawTitle = lines[0].trim().replace(/^\d+\.\s*/, ""); // strip "4. "
+    const key = contentKey(rawTitle);
+    if (!key) continue;
+
+    let section = null;
+    const about = [];
+    const guidelines = [];
+    const rules = [];
+    for (const line of lines.slice(1)) {
+      const h = line.match(/^###\s+(.*)/);
+      if (h) {
+        const name = h[1].toLowerCase();
+        section = name.includes("about")
+          ? "about"
+          : name.includes("guideline")
+            ? "guidelines"
+            : name.includes("rule")
+              ? "rules"
+              : null;
+        continue;
+      }
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === "---") continue;
+      if (section === "about") {
+        about.push(trimmed);
+      } else if (section === "guidelines" && trimmed.startsWith("-")) {
+        guidelines.push(trimmed.replace(/^-\s*/, ""));
+      } else if (section === "rules" && trimmed.startsWith("-")) {
+        rules.push(trimmed.replace(/^-\s*/, ""));
+      }
+    }
+    out.set(key, {
+      about: about.join(" ").trim(),
+      guidelines,
+      rules,
+    });
+  }
+  return out;
+}
+
+/** Load + merge all handbooks into one contentKey → content map. */
+async function loadEventContent() {
+  const merged = new Map();
+  for (const rel of CONTENT_FILES) {
+    try {
+      const md = await readFile(join(PROJECT_ROOT, rel), "utf-8");
+      for (const [k, v] of parseHandbook(md)) merged.set(k, v);
+    } catch (e) {
+      console.warn(`• Could not read ${rel}: ${e.message}`);
+    }
+  }
+  return merged;
+}
+
+// Flat registration fee applied to every event (₹).
+const REGISTRATION_FEE = 200;
 
 // ── Categories (drive the filter tabs on /events) ──
 const CATEGORIES = [
@@ -200,32 +300,70 @@ function describe(category, title) {
   }
 }
 
-// Build event docs with deterministic, collision-free IDs.
-function buildEvents() {
-  const usedIds = new Set();
-  return SCHEDULE.map(([category, title, venue, date], i) => {
-    let id = slugify(title);
-    if (usedIds.has(id)) {
-      // Same event name in two places → suffix with a venue keyword.
-      const place = slugify(venue.split(",").pop() || String(i));
-      id = `${id}-${place}`;
-    }
-    usedIds.add(id);
+/** The district is the last comma-separated part of the venue (e.g. "Ponneri"). */
+function districtOf(venue) {
+  if (!venue) return "";
+  const parts = venue.split(",");
+  return parts.length > 1 ? parts[parts.length - 1].trim() : "";
+}
 
-    const data = {
-      title,
-      category,
-      description: describe(category, title),
-      image: eventImage(category, title),
-      isActive: true,
-      registrationOpen: true,
-      status: "upcoming",
-      order: i,
-    };
-    if (venue) data.venue = venue;
-    if (date) data.date = date;
-    return { id, data };
+/** A stable location id from its district/venue/date (mirrors the admin form). */
+function locationId(district, venue, date, fallbackIndex) {
+  const base = [district, venue, date]
+    .filter(Boolean)
+    .join("-");
+  return slugify(base) || `loc-${fallbackIndex + 1}`;
+}
+
+/**
+ * Build event docs, collapsing same-name (title + category) rows into ONE
+ * document with a `locations[]` array. This is the new multi-location model:
+ * shared title/description/image/fee, per-location venue/date/limit. IDs are
+ * deterministic slugs of the title (first occurrence wins the slug).
+ */
+function buildEvents(content) {
+  const byKey = new Map();
+  const order = new Map(); // event id → its display order (first-seen index)
+
+  SCHEDULE.forEach(([category, title, venue, date], i) => {
+    const key = `${slugify(title)}::${slugify(category)}`;
+    const district = districtOf(venue);
+
+    if (!byKey.has(key)) {
+      const id = slugify(title);
+      order.set(id, i);
+
+      // Attach handbook content by matching the title. About → details;
+      // General Guidelines + Rules & Regulations → the combined rules list.
+      const c = content.get(contentKey(title));
+      const data = {
+        title,
+        category,
+        description: c?.about || describe(category, title),
+        image: eventImage(category, title),
+        registrationFee: REGISTRATION_FEE,
+        isActive: true,
+        registrationOpen: true,
+        status: "upcoming",
+        order: i,
+        locations: [],
+      };
+      if (c?.about) data.details = [c.about];
+      if (c?.guidelines?.length) data.guidelines = c.guidelines;
+      if (c?.rules?.length) data.rules = c.rules;
+      byKey.set(key, { id, data, matched: !!c });
+    }
+
+    const entry = byKey.get(key);
+    const locId = locationId(district, venue, date, entry.data.locations.length);
+    const location = { id: locId, registrationCount: 0 };
+    if (district) location.district = district;
+    if (venue) location.venue = venue;
+    if (date) location.date = date;
+    entry.data.locations.push(location);
   });
+
+  return [...byKey.values()];
 }
 
 async function main() {
@@ -243,14 +381,25 @@ async function main() {
     process.exit(1);
   }
 
-  const events = buildEvents();
+  const content = await loadEventContent();
+  const events = buildEvents(content);
+  const matched = events.filter((e) => e.matched).length;
   console.log(
-    `Prepared ${CATEGORIES.length} categories and ${events.length} events.`,
+    `Prepared ${CATEGORIES.length} categories and ${events.length} events ` +
+      `(${matched}/${events.length} matched handbook content).`,
   );
 
   if (DRY_RUN) {
-    for (const { id, data } of events) {
-      console.log(`  [${data.category}] ${id} — ${data.title} (${data.date || "no date"})`);
+    for (const { id, data, matched: m } of events) {
+      const locs = data.locations
+        .map((l) => `${l.district || l.venue || "?"}${l.date ? ` (${l.date})` : ""}`)
+        .join(", ");
+      const tag = m
+        ? `content ✓ (${data.rules?.length ?? 0} rules)`
+        : "NO CONTENT ✗";
+      console.log(
+        `  [${data.category}] ${id} — ${data.title} → ${data.locations.length} loc: ${locs} — ${tag}`,
+      );
     }
     console.log("\n(dry run — nothing written)");
     return;
@@ -272,14 +421,33 @@ async function main() {
   await signInWithEmailAndPassword(auth, email, password);
   console.log("✓ Authenticated.");
 
+  // Preserve images already uploaded via the admin (Cloudinary URLs) so a
+  // re-seed doesn't overwrite them with the script's Unsplash placeholders.
+  // Read existing events first and index their images by doc id.
+  const existingSnap = await getDocs(collection(db, "events"));
+  const existingImages = new Map();
+  existingSnap.forEach((d) => {
+    const img = d.data().image;
+    if (img) existingImages.set(d.id, img);
+  });
+  // Apply a kept image to each event when one exists for its id.
+  let kept = 0;
+  for (const ev of events) {
+    const keptImg = existingImages.get(ev.id);
+    if (keptImg) {
+      ev.data.image = keptImg;
+      kept += 1;
+    }
+  }
+  if (kept > 0) console.log(`• Kept ${kept} existing image(s).`);
+
   // Optional clean slate: delete every existing event first.
   if (REPLACE) {
-    const existing = await getDocs(collection(db, "events"));
-    if (existing.size > 0) {
+    if (existingSnap.size > 0) {
       const del = writeBatch(db);
-      existing.forEach((d) => del.delete(d.ref));
+      existingSnap.forEach((d) => del.delete(d.ref));
       await del.commit();
-      console.log(`✓ Deleted ${existing.size} existing event(s).`);
+      console.log(`✓ Deleted ${existingSnap.size} existing event(s).`);
     } else {
       console.log("• No existing events to delete.");
     }
@@ -295,10 +463,23 @@ async function main() {
   }
   console.log(`✓ Wrote ${CATEGORIES.length} categories.`);
 
-  // Events — batched, merge so registrationCount is never clobbered.
+  // Events — batched, merge so top-level registrationCount is never clobbered.
+  // Clear the legacy flat venue/date/district/registrationLimit fields so the
+  // `locations` array is the single source of truth (merge alone would leave
+  // stale flat fields behind on events that predate the multi-location model).
   const batch = writeBatch(db);
   for (const { id, data } of events) {
-    batch.set(doc(db, "events", id), data, { merge: true });
+    batch.set(
+      doc(db, "events", id),
+      {
+        ...data,
+        venue: deleteField(),
+        date: deleteField(),
+        district: deleteField(),
+        registrationLimit: deleteField(),
+      },
+      { merge: true },
+    );
   }
   await batch.commit();
   console.log(`✓ Wrote ${events.length} events.`);
