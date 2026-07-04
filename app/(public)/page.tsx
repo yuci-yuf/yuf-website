@@ -98,7 +98,7 @@ export default async function HomePage() {
                   Dr. Tamilisai Soundararajan
                 </h2>
                 <p className="text-sm font-medium text-text-muted">
-                  Lt. Governor of Puducherry &amp; Governor of Telangana
+                  Former Governor of Telangana &amp; Lt. Governor of Puducherry
                 </p>
               </div>
               <p className="text-[16px] leading-relaxed text-body">

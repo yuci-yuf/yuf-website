@@ -40,22 +40,31 @@ export function Navbar() {
       >
         <nav className="mx-auto flex max-w-[96rem] items-center justify-between px-6 py-3 lg:px-10">
           {/* Logo cluster */}
-          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={siteConfig.siteName}>
+          <Link href="/" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label={siteConfig.siteName}>
             <Image
               src="/images/logo.png"
               alt={siteConfig.siteName}
               width={120}
               height={60}
-              className="h-12 w-auto object-contain sm:h-14"
+              className="h-9 w-auto object-contain sm:h-14"
               priority
             />
-            <span className="h-8 w-px bg-border sm:h-10" aria-hidden />
+            <span className="hidden h-8 w-px bg-border sm:inline-block sm:h-10" aria-hidden />
             <Image
               src="/images/yuci-logo.png"
               alt="YUCI"
-              width={48}
-              height={48}
-              className="h-12 w-auto object-contain sm:h-14"
+              width={276}
+              height={100}
+              className="h-8 w-auto object-contain sm:h-14"
+              priority
+            />
+            <span className="hidden h-8 w-px bg-border sm:inline-block sm:h-10" aria-hidden />
+            <Image
+              src="/images/gov-logo.png"
+              alt="Ministry of Skill Development and Entrepreneurship"
+              width={260}
+              height={100}
+              className="h-7 w-auto object-contain sm:h-9 md:h-11"
               priority
             />
           </Link>
