@@ -15,7 +15,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { cn } from "@/lib/utils";
 import { getEventLocations } from "@/lib/event-groups";
 import type { EventInput } from "@/lib/admin-data";
 import type {
@@ -218,11 +217,10 @@ export function EventForm({
     }));
   });
   const [details, setDetails] = useState((event?.details ?? []).join("\n"));
+  const [guidelines, setGuidelines] = useState(
+    (event?.guidelines ?? []).join("\n"),
+  );
   const [rules, setRules] = useState((event?.rules ?? []).join("\n"));
-  // Rules are optional per event: the toggle defaults on when the event
-  // already has rules. Turning it off hides + clears the rules on save.
-  const [hasRules, setHasRules] = useState((event?.rules?.length ?? 0) > 0);
-
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -316,7 +314,8 @@ export function EventForm({
       district: undefined,
       registrationLimit: undefined,
       details: toLines(details).length ? toLines(details) : undefined,
-      rules: hasRules && toLines(rules).length ? toLines(rules) : undefined,
+      guidelines: toLines(guidelines).length ? toLines(guidelines) : undefined,
+      rules: toLines(rules).length ? toLines(rules) : undefined,
     };
 
     setSaving(true);
@@ -599,48 +598,42 @@ export function EventForm({
           </p>
         </div>
 
-        {/* Rules toggle — full width so the two textareas below stay aligned */}
-        <label
-          htmlFor="ev-has-rules"
-          className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface-alt px-4 py-3"
+        <Field
+          label="About — detail paragraphs (one per line)"
+          htmlFor="ev-details"
         >
-          <span className="flex flex-col">
-            <span className="text-sm font-medium text-text">
-              This event has rules
-            </span>
-            <span className="text-xs text-text-muted">
-              Show a rules / guidelines list on the detail page
-            </span>
-          </span>
-          <Switch
-            id="ev-has-rules"
-            checked={hasRules}
-            onCheckedChange={setHasRules}
+          <Textarea
+            id="ev-details"
+            className="min-h-40"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            placeholder="Leave blank to use the description."
           />
-        </label>
+        </Field>
 
-        <div className={cn("grid items-start gap-5", hasRules && "lg:grid-cols-2")}>
-          <Field label="Detail paragraphs (one per line)" htmlFor="ev-details">
+        <div className="grid items-start gap-5 lg:grid-cols-2">
+          <Field
+            label="General Guidelines (one per line)"
+            htmlFor="ev-guidelines"
+          >
             <Textarea
-              id="ev-details"
+              id="ev-guidelines"
               className="min-h-60"
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              placeholder="Leave blank to use the description."
+              value={guidelines}
+              onChange={(e) => setGuidelines(e.target.value)}
+              placeholder="One guideline per line"
             />
           </Field>
 
-          {hasRules && (
-            <Field label="Rules / guidelines (one per line)" htmlFor="ev-rules">
-              <Textarea
-                id="ev-rules"
-                className="min-h-60"
-                value={rules}
-                onChange={(e) => setRules(e.target.value)}
-                placeholder="One rule per line"
-              />
-            </Field>
-          )}
+          <Field label="Rules & Regulations (one per line)" htmlFor="ev-rules">
+            <Textarea
+              id="ev-rules"
+              className="min-h-60"
+              value={rules}
+              onChange={(e) => setRules(e.target.value)}
+              placeholder="One rule per line"
+            />
+          </Field>
         </div>
       </section>
 

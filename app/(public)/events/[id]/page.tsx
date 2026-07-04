@@ -150,10 +150,25 @@ export default async function EventDetailPage({
               </p>
             ))}
 
+            {event.guidelines && event.guidelines.length > 0 && (
+              <div className="mt-4 flex flex-col gap-4">
+                <h3 className="font-heading text-xl font-bold text-heading">
+                  General Guidelines
+                </h3>
+                <ul className="flex list-disc flex-col gap-2 pl-5 text-text-muted">
+                  {event.guidelines.map((item, i) => (
+                    <li key={i} className="leading-relaxed">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {event.rules && event.rules.length > 0 && (
               <div className="mt-4 flex flex-col gap-4">
                 <h3 className="font-heading text-xl font-bold text-heading">
-                  Rules &amp; Guidelines
+                  Rules &amp; Regulations
                 </h3>
                 <ul className="flex list-disc flex-col gap-2 pl-5 text-text-muted">
                   {event.rules.map((rule, i) => (
@@ -167,7 +182,21 @@ export default async function EventDetailPage({
           </div>
 
           {/* Register card */}
-          <aside className="h-fit rounded-2xl border border-border bg-surface p-6 shadow-card lg:sticky lg:top-28">
+          <aside className="h-fit overflow-hidden rounded-2xl border border-border bg-surface shadow-card lg:sticky lg:top-28">
+            {/* Framed event photo at the top of the card */}
+            {event.image && (
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  sizes="(min-width: 1024px) 24rem, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            )}
+
+            <div className="p-6">
             {event.registrationOpen !== false ? (
               <>
                 <h3 className="font-heading text-lg font-bold text-heading">
@@ -244,6 +273,7 @@ export default async function EventDetailPage({
                 </Button>
               </>
             )}
+            </div>
           </aside>
         </div>
       </Section>

@@ -349,8 +349,8 @@ function buildEvents(content) {
         locations: [],
       };
       if (c?.about) data.details = [c.about];
-      const combinedRules = [...(c?.guidelines ?? []), ...(c?.rules ?? [])];
-      if (combinedRules.length) data.rules = combinedRules;
+      if (c?.guidelines?.length) data.guidelines = c.guidelines;
+      if (c?.rules?.length) data.rules = c.rules;
       byKey.set(key, { id, data, matched: !!c });
     }
 

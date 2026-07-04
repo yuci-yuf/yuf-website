@@ -189,7 +189,9 @@ export interface EventItem {
   venue?: string;
   /** Legacy single-location district (e.g. "Ponneri", "Coimbatore"). */
   district?: string;
-  /** Bullet rules/guidelines shown on the detail page. */
+  /** General guidelines bullets shown on the detail page. */
+  guidelines?: string[];
+  /** Rules & regulations bullets shown on the detail page. */
   rules?: string[];
 }
 
