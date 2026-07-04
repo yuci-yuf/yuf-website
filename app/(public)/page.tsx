@@ -9,6 +9,7 @@ import { InitiativesRow } from "@/components/home/InitiativesRow";
 import { StepsTimeline } from "@/components/home/StepsTimeline";
 import { GalleryMosaic } from "@/components/home/GalleryMosaic";
 import { Testimonials } from "@/components/home/Testimonials";
+import { RajBhavanCarousel } from "@/components/home/RajBhavanCarousel";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
 import { FestiveEyebrow, ConfettiDots, FestiveGlows } from "@/components/home/FestiveAccents";
@@ -59,7 +60,7 @@ export default async function HomePage() {
       />
 
       <MissionSection
-        label="Prime Minister of India"
+        label="From the Prime Minister of India"
         title="A Message to India's Youth"
         primaryImage={homeContent.about.image!}
       />
@@ -70,10 +71,11 @@ export default async function HomePage() {
         subtitle={homeContent.recognition.subtitle}
         details={homeContent.recognition.details}
         images={homeContent.recognition.images}
+        highlight="Dr. Mansukh L. Mandaviya"
       />
 
       {/* ── Dignitary Spotlight ── */}
-      <section className="section-aqua relative overflow-hidden py-16 lg:py-24">
+      <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
         <FestiveGlows />
         <Container className="relative">
           <div className="grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
@@ -94,7 +96,7 @@ export default async function HomePage() {
             <FadeUp className="flex flex-col gap-7">
               <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
               <div className="flex flex-col gap-2">
-                <h2 className="font-display text-4xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-5xl lg:text-6xl">
+                <h2 className="font-display text-2xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-3xl xl:text-4xl lg:whitespace-nowrap">
                   Dr. Tamilisai Soundararajan
                 </h2>
                 <p className="text-base font-medium text-text-muted lg:text-lg">
@@ -103,7 +105,10 @@ export default async function HomePage() {
               </div>
               <p className="text-lg leading-relaxed text-body lg:text-xl">
                 The Youth United Council of India extends its sincere gratitude to{" "}
-                <span className="text-primary-600">Dr. Tamilisai Soundararajan</span>,
+                <span className="whitespace-nowrap font-semibold text-highlight-600">
+                  Dr. Tamilisai Soundararajan
+                </span>
+                ,
                 former Governor of Telangana and Pondicherry, for honoring our Youth United
                 Festival award ceremony with her esteemed presence. Her encouraging words
                 celebrating the talents and accomplishments of our winners were truly inspiring.
@@ -115,7 +120,7 @@ export default async function HomePage() {
 
       {/* ── Event Categories — horizontal strips per category ── */}
       {categoryGroups.length > 0 && (
-        <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24">
+        <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-16">
           <ConfettiDots />
           <Container className="relative">
             <FadeUp className="mb-14 flex items-end justify-between">
@@ -149,8 +154,61 @@ export default async function HomePage() {
 
 <GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
 
+      {/* ── Nobel Appreciation From Raj Bhavan ── */}
+      <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
+        <FestiveGlows />
+        <Container className="relative">
+          <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+            {/* Left — image carousel */}
+            <ScaleIn>
+              <RajBhavanCarousel />
+            </ScaleIn>
+
+            {/* Right — content */}
+            <FadeUp className="flex flex-col gap-6">
+              {/* <div className="flex items-center gap-2.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-highlight-500" aria-hidden />
+                <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">YUCI</span>
+              </div> */}
+
+              <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-heading sm:text-4xl xl:text-5xl">
+                Nobel Appreciation From{" "}
+                <span className="text-highlight-600">Raj Bhavan</span>
+              </h2>
+
+              <p className="text-base leading-relaxed text-body sm:text-lg">
+                The Youth United Council of India (YUCI) to has received prestigious
+                recognition for its commendable contributions. Awards of appreciation
+                were presented by esteemed dignitaries:
+              </p>
+
+              <ul className="flex flex-col gap-3">
+                <li className="flex items-start gap-3 text-body">
+                  <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-highlight-500" aria-hidden />
+                  <span className="text-base leading-relaxed sm:text-lg">
+                    <span className="font-semibold text-heading">Sri Jishnu Dev Varma</span>,
+                    Governor of Telangana, at Raj Bhavan, Hyderabad.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-body">
+                  <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-highlight-500" aria-hidden />
+                  <span className="text-base leading-relaxed sm:text-lg">
+                    <span className="font-semibold text-heading">Shri K. Kailashnathan</span>,
+                    Lieutenant Governor of Puducherry, at Raj Bhavan, Puducherry.
+                  </span>
+                </li>
+              </ul>
+
+              {/* <p className="text-base leading-relaxed text-body sm:text-lg">
+                <span className="font-semibold text-heading">Shri. Embalam R. Selvam</span>{" "}
+                presents an award to a recipient recognized by the Asia Book of Records.
+              </p> */}
+            </FadeUp>
+          </div>
+        </Container>
+      </section>
+
       <Testimonials
-        label={homeContent.testimonials.label}
         title={homeContent.testimonials.title}
         subtitle={homeContent.testimonials.subtitle}
         items={homeContent.testimonials.items}

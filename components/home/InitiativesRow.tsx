@@ -18,7 +18,7 @@ export function InitiativesRow({
   cards,
 }: InitiativesRowProps) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/50 to-white py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/50 to-white py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
       <Container className="relative">
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">

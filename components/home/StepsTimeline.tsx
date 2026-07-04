@@ -3,15 +3,14 @@ import { ArrowRight } from "lucide-react";
 import type { RegistrationStep } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
-import { FestiveEyebrow, ConfettiDots } from "./FestiveAccents";
+import { ConfettiDots } from "./FestiveAccents";
 
 export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
   return (
-    <section className="relative overflow-hidden bg-slate-50/60 py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-slate-50/60 py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
       <Container className="relative">
         <FadeUp className="mb-16 flex flex-col items-center gap-4 text-center">
-          <FestiveEyebrow>How It Works</FestiveEyebrow>
           <h2 className="max-w-md font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
             Steps to Register
           </h2>
@@ -21,9 +20,10 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
         </FadeUp>
 
         <StaggerContainer stagger={0.12} className="relative">
-          {/* Connecting line (desktop) */}
+          {/* Connecting line (desktop) — spans only from the first step circle
+             to the last, not edge to edge. */}
           <div
-            className="absolute left-0 right-0 top-7 z-0 hidden h-0.5 bg-primary-200 lg:block"
+            className="absolute left-[16.666%] right-[16.666%] top-7 z-0 hidden h-0.5 bg-primary-200 lg:block"
             aria-hidden
           />
 
