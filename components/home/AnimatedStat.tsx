@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /**
@@ -23,12 +23,20 @@ export function AnimatedStat({
 
   const reduced = useReducedMotion();
   const [n, setN] = useState(reduced ? target : 0);
-  const started = useRef(false);
 
   useEffect(() => {
-    if (reduced || started.current || !match) return;
-    started.current = true;
+    if (!match) return;
     let raf = 0;
+
+    // Reduced motion (or a flip to it after mount) → jump straight to target.
+    if (reduced) {
+      raf = requestAnimationFrame(() => setN(target));
+      return () => cancelAnimationFrame(raf);
+    }
+
+    // Count up from 0. Starting each run fresh (state updates live in the rAF
+    // callback) keeps React Strict Mode's mount→cleanup→mount cycle from
+    // leaving the counter stuck.
     let start: number | null = null;
     const step = (ts: number) => {
       if (start === null) start = ts;
@@ -39,7 +47,9 @@ export function AnimatedStat({
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, target, duration, match]);
+    // `value` (a stable string) stands in for `match`, which is a fresh object
+    // every render and would otherwise restart the animation on each frame.
+  }, [reduced, target, duration, value]);
 
   return (
     <span className={className}>

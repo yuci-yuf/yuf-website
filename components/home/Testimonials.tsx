@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import type { Testimonial } from "@/types";
 import { SectionHeading } from "@/components/ui/Section";
+import { ConfettiDots } from "./FestiveAccents";
 
 function initials(name: string) {
   return name
@@ -64,6 +65,7 @@ export function Testimonials({
         aria-hidden
         className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-festival-cyan/25 blur-3xl"
       />
+      <ConfettiDots />
 
       <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
         <SectionHeading label={label} title={title} subtitle={subtitle} className="mb-14" invert />

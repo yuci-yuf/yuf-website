@@ -62,7 +62,7 @@ export const siteConfig: SiteConfig = {
   },
   copyrightText: "© 2026 Youth United Council of India | All Rights Reserved",
   stats: [
-    { number: 5000, suffix: "K+", label: "Participation" },
+    { number: 5, suffix: "K+", label: "Participants" },
     { number: 28, suffix: "+", label: "States" },
     { number: 100, suffix: "+", label: "Districts" },
     { number: 10, suffix: "+", label: "Locations" },
@@ -187,6 +187,7 @@ export const partners: Partner[] = [
   { name: "University of Salford", logoUrl: "/images/partners/university-of-salford.png" },
   { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
   { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
+  { name: "Easwari Engineering College", logoUrl: "/images/partners/srm-easwari.png" },
 ];
 
 // ── Study Abroad page content ──
@@ -292,10 +293,7 @@ export const homeContent = {
     title: "Appreciation From Ministry of Youth Affairs and Sports",
     subtitle:
       "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",
-    details: [
-      "Dr. Mansukh L. Mandaviya, Ministry of Youth Affairs and Sports, Government of India.",
-      "Dr. Mansukh L. Mandaviya, Ministry of Labour and Employment, Government of India.",
-    ],
+    details: [],
     images: [
       "/images/recognition/award_5.jpeg",
       "/images/recognition/award_1.jpg",
@@ -438,7 +436,7 @@ export const aboutContent = {
       "We believe that when youth come together, great things happen. YUF is about building a future where creativity, knowledge, and unity drive positive change for all.",
     ],
     stats: [
-      { number: 5000, suffix: "K+", label: "Youth Participants" },
+      { number: 5, suffix: "K+", label: "Youth Participants" },
       { number: 28, suffix: "+", label: "States Covered" },
       { number: 100, suffix: "+", label: "Districts" },
       { number: 50, suffix: "+", label: "Events Held" },

@@ -144,10 +144,20 @@ export function HeroSection({
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden pt-20 sm:pt-24">
-      {/* ── Gradient base: blue → cyan → purple ── */}
+      {/* ── Background photo (YUF 2025 participants) ── */}
+      <Image
+        src="/images/hero/group-2025.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="absolute inset-0 z-0 object-cover"
+      />
+
+      {/* ── Gradient wash over the photo: blue → cyan → purple ── */}
       <div
         aria-hidden
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 opacity-75"
         style={{
           background:
             "radial-gradient(110% 90% at 18% 22%, rgba(89,31,172,0.6) 0%, transparent 50%), radial-gradient(100% 90% at 88% 78%, rgba(89,31,172,0.5) 0%, transparent 48%), linear-gradient(125deg, #133a8c 0%, #155fa6 38%, #15938f 58%, #1d5fbf 100%)",
@@ -224,7 +234,7 @@ export function HeroSection({
             transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
           >
-            Youth United<br />Festival <span className="text-highlight-400">{highlight}</span>
+            Youth United Festival<br /><span className="text-highlight-400">{highlight}</span>
           </motion.h1>
 
           <motion.p

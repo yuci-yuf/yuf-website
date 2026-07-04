@@ -26,14 +26,14 @@ export function RecognitionBanner({
   const titleTail = words.length > 3 ? words.slice(mid).join(" ") : "";
 
   return (
-    <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">
+    <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-14 lg:py-16">
       <ConfettiDots />
       <Container className="relative">
-        <div className="grid items-center gap-14 lg:grid-cols-2">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.12fr_0.88fr]">
           {/* Left — content */}
-          <FadeUp className="flex flex-col gap-7">
+          <FadeUp className="flex flex-col gap-6">
             <FestiveEyebrow className="w-fit text-highlight-400">{label}</FestiveEyebrow>
-            <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.5rem] lg:text-[2.5rem]">
+            <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.4rem] lg:text-[2.75rem]">
               {titleHead}
               {titleTail && (
                 <>
@@ -44,17 +44,19 @@ export function RecognitionBanner({
                 </>
               )}
             </h2>
-            <p className="text-lg leading-relaxed text-white/85">
+            <p className="text-xl leading-relaxed text-white/85 sm:text-2xl sm:leading-relaxed">
               {subtitle}
             </p>
-            <ul className="flex flex-col gap-4">
-              {details.map((d) => (
-                <li key={d} className="flex items-start gap-3 text-white/85">
-                  <span className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-highlight-500" aria-hidden />
-                  <span className="text-base leading-relaxed sm:text-[17px]">{d}</span>
-                </li>
-              ))}
-            </ul>
+            {details.length > 0 && (
+              <ul className="flex flex-col gap-4">
+                {details.map((d) => (
+                  <li key={d} className="flex items-start gap-3 text-white/85">
+                    <span className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-highlight-500" aria-hidden />
+                    <span className="text-base leading-relaxed sm:text-[17px]">{d}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </FadeUp>
 
           {/* Right — auto-sliding carousel */}
