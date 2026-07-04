@@ -91,17 +91,17 @@ export default async function HomePage() {
             </ScaleIn>
 
             {/* Right — content */}
-            <FadeUp className="flex flex-col gap-6">
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
-              <div className="flex flex-col gap-1">
-                <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.5rem]">
+            <FadeUp className="flex flex-col gap-7">
+              <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
+              <div className="flex flex-col gap-2">
+                <h2 className="font-display text-4xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-5xl lg:text-6xl">
                   Dr. Tamilisai Soundararajan
                 </h2>
-                <p className="text-sm font-medium text-text-muted">
+                <p className="text-base font-medium text-text-muted lg:text-lg">
                   Former Governor of Telangana &amp; Lt. Governor of Puducherry
                 </p>
               </div>
-              <p className="text-[16px] leading-relaxed text-body">
+              <p className="text-lg leading-relaxed text-body lg:text-xl">
                 The Youth United Council of India extends its sincere gratitude to{" "}
                 <span className="text-primary-600">Dr. Tamilisai Soundararajan</span>,
                 former Governor of Telangana and Pondicherry, for honoring our Youth United
@@ -167,7 +167,8 @@ export default async function HomePage() {
         partners={partners.filter(
           (p) =>
             p.name === "Falmouth University" ||
-            p.name === "World Youth Book of Records",
+            p.name === "World Youth Book of Records" ||
+            p.name === "Easwari Engineering College",
         )}
       />
     </>
