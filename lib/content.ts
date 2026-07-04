@@ -181,15 +181,12 @@ export const eventStatusOrder: { status: EventStatus; label: string }[] = [
 
 // ── Partners & supporting institutions ──
 export const partners: Partner[] = [
-  { name: "De Montfort University, Leicester", logoUrl: "/images/partners/de_montfort.png" },
   { name: "Falmouth University", logoUrl: "/images/partners/falmouth_university.png" },
-  { name: "StudyIn", logoUrl: "/images/partners/studyin.png" },
-  { name: "University of Salford", logoUrl: "/images/partners/university-of-salford.png" },
-  { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
   { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
   { name: "Easwari Engineering College", logoUrl: "/images/partners/srm-easwari.png" },
   { name: "Velammal Engineering College", logoUrl: "/images/partners/velammal.png" },
   { name: "Jain (JGI)", logoUrl: "/images/partners/jain.png" },
+  { name: "V Vision", logoUrl: "/images/partners/v-vision-Logo.png" },
 ];
 
 // ── Study Abroad page content ──

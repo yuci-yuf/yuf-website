@@ -228,7 +228,8 @@ export default async function HomePage() {
             p.name === "World Youth Book of Records" ||
             p.name === "Easwari Engineering College" ||
             p.name === "Velammal Engineering College" ||
-            p.name === "Jain (JGI)",
+            p.name === "Jain (JGI)" ||
+            p.name === "V Vision",
         )}
       />
     </>
