@@ -45,8 +45,8 @@ export function Footer() {
                 </span>
               </span>
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-white/85">
-              {siteConfig.footerBlurb.slice(0, 180)}...
+            <p className="max-w-sm text-sm leading-relaxed text-white/85">
+              {siteConfig.footerBlurb}
             </p>
             <div className="flex gap-2.5">
               {siteConfig.socialLinks.map((s) => (
@@ -72,7 +72,7 @@ export function Footer() {
               { label: "All Events", path: "/events" },
               { label: "Youth Parliament", path: "/events/youth-parliament" },
               { label: "Young Scientist", path: "/events/young-scientist" },
-              { label: "Talent Icon", path: "/events/talent-icon" },
+              { label: "Youth Talent Icon", path: "/events/talent-icon" },
             ]}
           />
 
