@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, ArrowRight } from "lucide-react";
 import type { EventItem } from "@/types";
-import { EventCard } from "@/components/public/EventCard";
-import { CATEGORY_STYLE } from "@/lib/category-style";
+import { CATEGORY_STYLE, categoryStyle } from "@/lib/category-style";
+import { getEventLocations } from "@/lib/event-groups";
 
 export interface CategoryGroup {
   /** The real category key used for filtering/links (e.g. "Arts & Culturals"). */
@@ -22,6 +23,99 @@ export function CategoryEventRows({ groups }: { groups: CategoryGroup[] }) {
         <CategoryRow key={group.key} group={group} />
       ))}
     </div>
+  );
+}
+
+/* ── Fixture card ──
+   Image-forward "match ticket": a date tab clipped to the photo, a frosted
+   info strip with the venue + title, on the festival gradient. Home-only. */
+function splitDate(date?: string) {
+  if (!date) return null;
+  const m = /(\d{1,2})[a-z]*\s+([A-Za-z]+)/.exec(date);
+  return m ? { day: m[1], month: m[2].slice(0, 3).toUpperCase() } : null;
+}
+
+function FixtureCard({ event }: { event: EventItem }) {
+  const st = categoryStyle(event.category);
+
+  const locations = getEventLocations(event);
+  const multi = locations.length > 1;
+  const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
+  const metaPlace = uniq(
+    locations.map((l) => (l.district || l.venue || "").trim()),
+  ).join(", ");
+  const tab = splitDate(locations[0]?.date ?? event.date);
+
+  return (
+    <Link
+      href={`/events/${event.id}`}
+      className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-3xl shadow-xl shadow-primary-950/40 ring-1 ring-white/15 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+    >
+      {/* Photo */}
+      {event.image ? (
+        <Image
+          src={event.image}
+          alt={event.title}
+          fill
+          sizes="20rem"
+          className="object-cover transition-transform duration-[600ms] group-hover:scale-105"
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: `linear-gradient(135deg, ${st.from}, ${st.to})` }}
+        />
+      )}
+
+      {/* Scrim */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-primary-950/90 via-primary-950/15 to-primary-950/10"
+      />
+
+      {/* Date tab — the fixture "stub" */}
+      {tab && (
+        <span className="absolute left-4 top-4 z-10 flex flex-col items-center rounded-xl bg-white px-2.5 py-1.5 leading-none shadow-lg">
+          <span className="font-display text-lg font-extrabold text-primary-700">
+            {tab.day}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary-500">
+            {tab.month}
+          </span>
+        </span>
+      )}
+
+      {/* Multi-location badge */}
+      {multi && (
+        <span className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-800 shadow-sm backdrop-blur-sm">
+          <MapPin size={12} style={{ color: st.accent }} />
+          {locations.length} locations
+        </span>
+      )}
+
+      {/* Frosted info strip */}
+      <div className="relative z-10 m-3 flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/12 p-4 backdrop-blur-md">
+        {/* Category-colored hairline ties the card to its discipline */}
+        <span
+          aria-hidden
+          className="h-0.5 w-8 rounded-full"
+          style={{ backgroundColor: st.accent }}
+        />
+        <h3 className="font-heading text-lg font-bold leading-tight text-white">
+          {event.title}
+        </h3>
+        {metaPlace && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-white/80">
+            <MapPin size={13} className="shrink-0 text-highlight-300" />
+            <span className="line-clamp-1">{metaPlace}</span>
+          </span>
+        )}
+        <span className="mt-0.5 inline-flex items-center gap-1.5 text-sm font-semibold text-white transition-colors group-hover:text-highlight-300">
+          View details
+          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+        </span>
+      </div>
+    </Link>
   );
 }
 
@@ -60,7 +154,7 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
     if (!el) return;
 
     let raf = 0;
-    const SPEED = 0.40; // px per frame (~15px/s at 60fps)
+    const SPEED = 0.4; // px per frame (~15px/s at 60fps)
     // Accumulate as a float — writing sub-pixel values to scrollLeft rounds
     // down each frame and would otherwise never advance.
     let pos = el.scrollLeft;
@@ -104,9 +198,21 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
               <Icon size={20} style={{ color: st.accent }} />
             </span>
           )}
-          <h3 className="font-heading text-xl font-bold text-white transition-colors group-hover:text-highlight-300 sm:text-2xl">
-            {group.label}
-          </h3>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-2.5">
+              <h3 className="font-heading text-xl font-bold text-white transition-colors group-hover:text-highlight-300 sm:text-2xl">
+                {group.label}
+              </h3>
+              <span className="text-sm font-medium text-white/55">
+                {group.events.length} event{group.events.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <span
+              aria-hidden
+              className="h-0.5 w-10 rounded-full"
+              style={{ backgroundColor: st?.accent }}
+            />
+          </div>
         </Link>
 
         {/* Scroll controls — hidden on touch where native swipe is better. */}
@@ -144,10 +250,10 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         {loopEvents.map((event, i) => (
           <div
             key={`${event.id}-${i}`}
-            className="flex w-70 shrink-0 *:h-full sm:w-80"
+            className="w-64 shrink-0 sm:w-72"
             aria-hidden={i >= group.events.length}
           >
-            <EventCard event={event} />
+            <FixtureCard event={event} />
           </div>
         ))}
       </div>
