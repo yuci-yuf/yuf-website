@@ -1,13 +1,15 @@
 import type { Partner } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { FadeIn } from "./MotionWrapper";
+import { FestiveGlows } from "./FestiveAccents";
 
 export function LogoStrip({ partners }: { partners: Partner[] }) {
   return (
     <FadeIn>
-      <section className="border-y border-gray-100 bg-white py-12 sm:py-14">
-        <Container>
-          <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+      <section className="relative overflow-hidden border-y border-gray-100 bg-white py-12 sm:py-14">
+        <FestiveGlows />
+        <Container className="relative">
+          <p className="mb-8 flex items-center justify-center gap-2 text-center text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
             Trusted by Leading Partners
           </p>
 
