@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, MapPin, ArrowRight } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 import { siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { SocialIcon } from "./SocialIcon";
@@ -24,41 +24,27 @@ export function Footer() {
       />
 
       <Container className="relative pb-8 pt-14 lg:pb-10 lg:pt-16">
-        {/* Top row: brand + register CTA */}
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 border-b border-white/15 pb-10 md:flex-row md:items-center">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg">
-              <Image
-                src={siteConfig.logo}
-                alt={siteConfig.siteName}
-                width={44}
-                height={44}
-                className="h-full w-auto object-contain"
-              />
-            </span>
-            <span className="font-heading text-lg font-bold leading-tight text-white">
-              Youth United Festival
-              <span className="block text-xs font-medium text-white/75">
-                Youth United Council of India
-              </span>
-            </span>
-          </Link>
-          <Link
-            href="/register"
-            className="group inline-flex h-12 items-center gap-2 rounded-full bg-white px-7 text-sm font-bold text-festival-blue shadow-lg transition-all hover:bg-primary-50"
-          >
-            Register Now
-            <ArrowRight
-              size={16}
-              className="transition-transform group-hover:translate-x-0.5"
-            />
-          </Link>
-        </div>
-
         {/* Link columns */}
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.4fr]">
-          {/* Brand blurb + socials */}
+          {/* Brand + blurb + socials */}
           <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
+            <Link href="/" className="flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg">
+                <Image
+                  src={siteConfig.logo}
+                  alt={siteConfig.siteName}
+                  width={44}
+                  height={44}
+                  className="h-full w-auto object-contain"
+                />
+              </span>
+              <span className="font-heading text-lg font-bold leading-tight text-white">
+                Youth United Festival
+                <span className="block text-xs font-medium text-white/75">
+                  Youth United Council of India
+                </span>
+              </span>
+            </Link>
             <p className="max-w-xs text-sm leading-relaxed text-white/85">
               {siteConfig.footerBlurb.slice(0, 180)}...
             </p>

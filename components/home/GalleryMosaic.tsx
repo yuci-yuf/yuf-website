@@ -34,7 +34,7 @@ export function GalleryMosaic({
   }));
 
   return (
-    <section className="relative overflow-hidden bg-slate-50/60 py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-slate-50/60 py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
       <Container className="relative">
         <FadeUp className="mb-14 flex items-end justify-between">

@@ -59,7 +59,7 @@ export default async function HomePage() {
       />
 
       <MissionSection
-        label="Prime Minister of India"
+        label="From the Prime Minister of India"
         title="A Message to India's Youth"
         primaryImage={homeContent.about.image!}
       />
@@ -70,10 +70,11 @@ export default async function HomePage() {
         subtitle={homeContent.recognition.subtitle}
         details={homeContent.recognition.details}
         images={homeContent.recognition.images}
+        highlight="Dr. Mansukh L. Mandaviya"
       />
 
       {/* ── Dignitary Spotlight ── */}
-      <section className="section-aqua relative overflow-hidden py-16 lg:py-24">
+      <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
         <FestiveGlows />
         <Container className="relative">
           <div className="grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
@@ -94,7 +95,7 @@ export default async function HomePage() {
             <FadeUp className="flex flex-col gap-7">
               <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
               <div className="flex flex-col gap-2">
-                <h2 className="font-display text-4xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-5xl lg:text-6xl">
+                <h2 className="font-display text-2xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-3xl xl:text-4xl lg:whitespace-nowrap">
                   Dr. Tamilisai Soundararajan
                 </h2>
                 <p className="text-base font-medium text-text-muted lg:text-lg">
@@ -103,7 +104,10 @@ export default async function HomePage() {
               </div>
               <p className="text-lg leading-relaxed text-body lg:text-xl">
                 The Youth United Council of India extends its sincere gratitude to{" "}
-                <span className="text-primary-600">Dr. Tamilisai Soundararajan</span>,
+                <span className="whitespace-nowrap font-semibold text-highlight-600">
+                  Dr. Tamilisai Soundararajan
+                </span>
+                ,
                 former Governor of Telangana and Pondicherry, for honoring our Youth United
                 Festival award ceremony with her esteemed presence. Her encouraging words
                 celebrating the talents and accomplishments of our winners were truly inspiring.
@@ -115,7 +119,7 @@ export default async function HomePage() {
 
       {/* ── Event Categories — horizontal strips per category ── */}
       {categoryGroups.length > 0 && (
-        <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24">
+        <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-16">
           <ConfettiDots />
           <Container className="relative">
             <FadeUp className="mb-14 flex items-end justify-between">
@@ -150,7 +154,6 @@ export default async function HomePage() {
 <GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
 
       <Testimonials
-        label={homeContent.testimonials.label}
         title={homeContent.testimonials.title}
         subtitle={homeContent.testimonials.subtitle}
         items={homeContent.testimonials.items}

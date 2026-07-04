@@ -19,7 +19,7 @@ interface HeroSectionProps {
 const DIAMONDS_LEFT = [
   { src: "/images/hero/pondicherry-event.jpg", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
   { src: "/images/about/youth-yoga.jpg", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
-  { src: "/images/gallery/pondicherry-juniors.jpg", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
+  { src: "/images/hero/IMG-20250924-WA0003.jpg", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
 ];
 const DIAMONDS_RIGHT = [
   { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
