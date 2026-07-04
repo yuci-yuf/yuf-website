@@ -69,11 +69,11 @@ export function Testimonials({
         <SectionHeading title={title} subtitle={subtitle} className="mb-14" invert />
 
         <div className="mx-auto max-w-none">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/80 p-8 shadow-card backdrop-blur-sm sm:p-14">
+          <div className="relative flex overflow-hidden rounded-3xl border border-border bg-surface/80 shadow-card backdrop-blur-sm min-h-[340px] sm:min-h-[400px]">
             {/* Oversized quotation watermark */}
             <Quote
               aria-hidden
-              className="absolute right-6 top-6 h-20 w-20 -scale-x-100 text-primary-100"
+              className="absolute right-6 top-6 h-20 w-20 -scale-x-100 text-primary-100 z-10"
               strokeWidth={1.5}
             />
 
@@ -84,34 +84,34 @@ export function Testimonials({
                 animate={{ opacity: 1 }}
                 exit={reduced ? undefined : { opacity: 0 }}
                 transition={{ duration: 0.35 }}
-                className="grid items-center gap-8 sm:grid-cols-[auto_1fr] sm:gap-12"
+                className="grid w-full sm:grid-cols-[30%_1fr]"
               >
-                {/* Portrait — fixed circle on the left */}
+                {/* Portrait — 30% width strip, full card height */}
                 <motion.div
-                  initial={reduced ? false : { opacity: 0, scale: 0.9 }}
+                  initial={reduced ? false : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.05 }}
-                  className="mx-auto w-48 sm:mx-0 sm:w-60"
+                  className="relative min-h-[220px] sm:min-h-[400px]"
                 >
-                  <div className="rounded-full bg-gradient-to-br from-festival-blue via-festival-cyan to-festival-purple p-1 shadow-lg">
-                    <div className="relative aspect-square w-full overflow-hidden rounded-full bg-primary-100 ring-4 ring-surface">
-                      {active.image && !failed[index] ? (
-                        <Image
-                          src={active.image}
-                          alt={active.name}
-                          fill
-                          sizes="(min-width: 640px) 240px, 192px"
-                          className="object-cover"
-                          onError={() =>
-                            setFailed((f) => ({ ...f, [index]: true }))
-                          }
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center font-display text-5xl font-extrabold text-primary-600 sm:text-7xl">
-                          {initials(active.name)}
-                        </span>
-                      )}
-                    </div>
+                  <div className="absolute inset-0 overflow-hidden bg-primary-100">
+                    {active.image && !failed[index] ? (
+                      <Image
+                        src={active.image}
+                        alt={active.name}
+                        fill
+                        sizes="(min-width: 640px) 30vw, 100vw"
+                        className="object-cover"
+                        onError={() =>
+                          setFailed((f) => ({ ...f, [index]: true }))
+                        }
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center font-display text-6xl font-extrabold text-primary-600 sm:text-8xl">
+                        {initials(active.name)}
+                      </span>
+                    )}
+                    {/* Subtle gradient overlay for readability on mobile stacked layout */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/5 hidden sm:block" />
                   </div>
                 </motion.div>
 
@@ -120,15 +120,15 @@ export function Testimonials({
                   initial={reduced ? false : { opacity: 0, x: dir >= 0 ? 24 : -24 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-                  className="flex flex-col gap-4 text-center sm:text-left"
+                  className="flex flex-col justify-center gap-5 p-8 sm:p-12 lg:p-16 text-center sm:text-left"
                 >
-                  <figcaption className="text-xs font-bold uppercase tracking-[0.18em] text-highlight-600">
+                  <figcaption className="text-sm font-bold uppercase tracking-[0.18em] text-highlight-600 sm:text-base lg:text-lg">
                     {active.role}
                   </figcaption>
-                  <blockquote className="text-lg leading-relaxed text-body sm:text-xl">
-                    “{active.quote}”
+                  <blockquote className="text-lg leading-relaxed text-body sm:text-xl lg:text-2xl">
+                    &ldquo;{active.quote}&rdquo;
                   </blockquote>
-                  <p className="font-heading text-lg font-bold text-heading">
+                  <p className="font-heading text-xl font-bold text-heading sm:text-2xl lg:text-3xl">
                     {active.name}
                   </p>
                 </motion.figure>
