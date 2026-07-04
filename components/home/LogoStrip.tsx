@@ -3,9 +3,6 @@ import { Container } from "@/components/ui/Container";
 import { FadeIn } from "./MotionWrapper";
 
 export function LogoStrip({ partners }: { partners: Partner[] }) {
-  // Duplicate the set so the -50% translate loop is seamless.
-  const loop = [...partners, ...partners];
-
   return (
     <FadeIn>
       <section className="border-y border-gray-100 bg-white py-12 sm:py-14">
@@ -13,16 +10,10 @@ export function LogoStrip({ partners }: { partners: Partner[] }) {
           <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
             Trusted by Leading Partners
           </p>
-        </Container>
 
-        <div className="group relative overflow-hidden">
-          {/* Edge fade masks */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent sm:w-28" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white to-transparent sm:w-28" />
-
-          <div className="flex w-max animate-[marquee_45s_linear_infinite] items-center gap-x-20 pr-20 group-hover:[animation-play-state:paused] sm:gap-x-28 sm:pr-28">
-            {loop.map((partner, i) => (
-              <div key={`${partner.name}-${i}`} className="flex shrink-0 items-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-8 sm:gap-x-24">
+            {partners.map((partner) => (
+              <div key={partner.name} className="flex items-center">
                 {partner.logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -38,7 +29,7 @@ export function LogoStrip({ partners }: { partners: Partner[] }) {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
     </FadeIn>
   );
