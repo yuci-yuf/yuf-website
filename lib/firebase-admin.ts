@@ -16,7 +16,12 @@ import {
   type App,
   type ServiceAccount,
 } from "firebase-admin/app";
-import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import {
+  FieldValue,
+  getFirestore,
+  type DocumentReference,
+  type Firestore,
+} from "firebase-admin/firestore";
 
 function loadServiceAccount(): ServiceAccount {
   const raw = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT;
@@ -45,4 +50,50 @@ export function getAdminDb(): Firestore {
     getApps()[0] ?? initializeApp({ credential: cert(loadServiceAccount()) });
   db = getFirestore(app);
   return db;
+}
+
+/**
+ * Release a previously reserved slot (e.g. a failed/abandoned payment) by
+ * decrementing the right counter: the chosen location's count inside the
+ * `locations` array, plus the whole-doc `registrationCount`. Legacy events (no
+ * locations array) just decrement the doc count. Runs inside a transaction so
+ * the array re-write is atomic. Never drops a count below 0.
+ *
+ * Pass an existing `tx` to fold this into a caller's transaction; otherwise it
+ * opens its own.
+ */
+export async function releaseLocationSlot(
+  adminDb: Firestore,
+  eventRef: DocumentReference,
+  locationId: string | undefined,
+): Promise<void> {
+  await adminDb.runTransaction(async (tx) => {
+    const snap = await tx.get(eventRef);
+    if (!snap.exists) return;
+    const ev = snap.data()!;
+    const locations = Array.isArray(ev.locations)
+      ? (ev.locations as Record<string, unknown>[])
+      : null;
+
+    if (locations && locations.length > 0) {
+      const idx = locationId
+        ? locations.findIndex((l) => l.id === locationId)
+        : 0;
+      if (idx >= 0) {
+        const current =
+          typeof locations[idx].registrationCount === "number"
+            ? (locations[idx].registrationCount as number)
+            : 0;
+        const nextLocations = locations.map((l, i) =>
+          i === idx ? { ...l, registrationCount: Math.max(0, current - 1) } : l,
+        );
+        tx.update(eventRef, {
+          locations: nextLocations,
+          registrationCount: FieldValue.increment(-1),
+        });
+      }
+    } else {
+      tx.update(eventRef, { registrationCount: FieldValue.increment(-1) });
+    }
+  });
 }

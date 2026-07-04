@@ -116,6 +116,32 @@ export type EventCategory =
 
 export type EventStatus = "upcoming" | "ongoing" | "past";
 
+/** Who an event is open to. Defaults to "both" when unset (legacy events). */
+export type EventAudience = "school" | "college" | "both";
+
+/**
+ * One place/date an event is held. An event can run in several locations that
+ * share all other details (fee, description, image, rules) but each have their
+ * own venue, date, and capacity. Registrations are tagged with `id` so they can
+ * be counted and exported per location.
+ */
+export interface EventLocation {
+  /** Stable key within the event, used to tag registrations. */
+  id: string;
+  /** District/city label, e.g. "Ponneri" (the clean disambiguator). */
+  district?: string;
+  /** Full venue, e.g. "Velammal Bodhi Campus, Ponneri". */
+  venue?: string;
+  /** Human-readable schedule label, e.g. "2nd Sept 2026". */
+  date?: string;
+  /**
+   * Max registrations for THIS location. Omitted/undefined = unlimited.
+   */
+  registrationLimit?: number;
+  /** Running count of registrations for this location. Defaults to 0. */
+  registrationCount?: number;
+}
+
 export interface EventItem {
   id: string;
   title: string;
@@ -145,15 +171,27 @@ export interface EventItem {
   order: number;
   /** Scheduling state used to group events on the Events page. Defaults to "upcoming". */
   status?: EventStatus;
+  /** Who can register — school, college, or both. Defaults to "both". */
+  audience?: EventAudience;
   /** Longer write-up shown on the event detail page (falls back to `description`). */
   details?: string[];
-  /** Human-readable schedule label, e.g. "15 Feb 2026". */
+  /**
+   * The places/dates this event runs. When present, this is the source of
+   * truth for venue/date/capacity (each entry has its own). When absent (legacy
+   * events), the flat `date`/`venue`/`district`/`registrationLimit`/
+   * `registrationCount` fields below describe the single location. Use
+   * `getEventLocations()` to read either shape uniformly.
+   */
+  locations?: EventLocation[];
+  /** Legacy single-location schedule label, e.g. "15 Feb 2026". */
   date?: string;
-  /** Venue / city for this event. */
+  /** Legacy single-location venue / city. */
   venue?: string;
-  /** District the event belongs to (e.g. "Ponneri", "Coimbatore"). */
+  /** Legacy single-location district (e.g. "Ponneri", "Coimbatore"). */
   district?: string;
-  /** Bullet rules/guidelines shown on the detail page. */
+  /** General guidelines bullets shown on the detail page. */
+  guidelines?: string[];
+  /** Rules & regulations bullets shown on the detail page. */
   rules?: string[];
 }
 
@@ -211,6 +249,12 @@ export interface Registration {
   eventCategory: string;
   eventId: string;
   eventTitle: string;
+  /** Which location of the event this registration is for (EventLocation.id). */
+  locationId?: string;
+  /** Snapshot of the chosen location's venue/district, for admin display/export. */
+  locationVenue?: string;
+  /** Snapshot of the chosen location's date. */
+  locationDate?: string;
   ageCategory: string;
   message?: string;
   amountPaid: number;

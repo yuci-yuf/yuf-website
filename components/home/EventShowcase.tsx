@@ -13,7 +13,7 @@ export function EventShowcase({ events }: { events: EventItem[] }) {
   if (events.length === 0) return null;
 
   return (
-    <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">
+    <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-16 lg:py-20">
       {/* ── Animated background blobs ── */}
       <motion.div
         aria-hidden

@@ -17,9 +17,12 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
+  writeBatch,
   type Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { normalizeLocations } from "@/lib/cms-data";
 import type {
   ContactMessage,
   EventCategoryDoc,
@@ -51,6 +54,9 @@ export async function getRegistrations(): Promise<Registration[]> {
       eventCategory: data.eventCategory ?? "",
       eventId: data.eventId ?? "",
       eventTitle: data.eventTitle ?? "",
+      locationId: data.locationId ?? "",
+      locationVenue: data.locationVenue ?? "",
+      locationDate: data.locationDate ?? "",
       ageCategory: data.ageCategory ?? "",
       message: data.message ?? "",
       amountPaid: data.amountPaid ?? 0,
@@ -120,13 +126,40 @@ export async function getAdminEvents(): Promise<EventItem[]> {
   return snap.docs.map((d) => normalizeEvent(d.id, d.data()));
 }
 
+/**
+ * Prepare a `locations` array for Firestore: drop undefined per-location fields
+ * (Firestore rejects them) and ensure each has a numeric `registrationCount`.
+ * `preserveCounts` keeps whatever count the location already carries (used on
+ * update so an edit never wipes live counts); create seeds them to 0.
+ */
+function prepareLocationsForWrite(
+  locations: EventItem["locations"] | undefined,
+  preserveCounts: boolean,
+): Record<string, unknown>[] | undefined {
+  if (!locations) return undefined;
+  return locations.map((loc) => {
+    const out: Record<string, unknown> = {
+      id: loc.id,
+      registrationCount: preserveCounts ? loc.registrationCount ?? 0 : 0,
+    };
+    if (loc.district) out.district = loc.district;
+    if (loc.venue) out.venue = loc.venue;
+    if (loc.date) out.date = loc.date;
+    if (typeof loc.registrationLimit === "number")
+      out.registrationLimit = loc.registrationLimit;
+    return out;
+  });
+}
+
 export async function createEvent(
   id: string,
   data: EventInput,
 ): Promise<void> {
+  const locations = prepareLocationsForWrite(data.locations, false);
   // Seed registrationCount so the public capacity check has a number to read.
   await setDoc(doc(db, "events", id), {
     ...stripUndefined(data),
+    ...(locations ? { locations } : {}),
     registrationCount: 0,
   });
 }
@@ -135,10 +168,31 @@ export async function updateEvent(
   id: string,
   data: Partial<EventInput>,
 ): Promise<void> {
-  await updateDoc(doc(db, "events", id), { ...stripUndefined(data) });
+  const hasLocations = "locations" in data;
+  const locations = prepareLocationsForWrite(data.locations, true);
+  await updateDoc(doc(db, "events", id), {
+    ...stripUndefined(data),
+    ...(hasLocations ? { locations: locations ?? [] } : {}),
+  });
 }
 
+/**
+ * Delete an event and cascade-delete its registrations, so no orphaned
+ * registrations linger (which previously reattached to a new event that
+ * reclaimed the same slug id). Registrations are removed in batches of 500 to
+ * stay within Firestore's per-batch write limit.
+ */
 export async function deleteEvent(id: string): Promise<void> {
+  const q = query(collection(db, "registrations"), where("eventId", "==", id));
+  const snap = await getDocs(q);
+
+  const regDocs = snap.docs;
+  for (let i = 0; i < regDocs.length; i += 500) {
+    const batch = writeBatch(db);
+    for (const d of regDocs.slice(i, i + 500)) batch.delete(d.ref);
+    await batch.commit();
+  }
+
   await deleteDoc(doc(db, "events", id));
 }
 
@@ -165,10 +219,15 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,
     status: (data.status as EventItem["status"]) ?? "upcoming",
+    audience: (data.audience as EventItem["audience"]) ?? "both",
     details: Array.isArray(data.details) ? (data.details as string[]) : undefined,
+    locations: normalizeLocations(data.locations),
     date: (data.date as string) ?? undefined,
     venue: (data.venue as string) ?? undefined,
     district: (data.district as string) ?? undefined,
+    guidelines: Array.isArray(data.guidelines)
+      ? (data.guidelines as string[])
+      : undefined,
     rules: Array.isArray(data.rules) ? (data.rules as string[]) : undefined,
   };
 }
