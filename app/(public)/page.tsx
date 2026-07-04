@@ -154,7 +154,7 @@ export default async function HomePage() {
 
 <GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
 
-      {/* ── Nobel Appreciation From Raj Bhavan ── */}
+      {/* ── Noble Appreciation From Raj Bhavan ── */}
       <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
         <FestiveGlows />
         <Container className="relative">
@@ -172,7 +172,7 @@ export default async function HomePage() {
               </div> */}
 
               <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-heading sm:text-4xl xl:text-5xl">
-                Nobel Appreciation From{" "}
+                Noble Appreciation From{" "}
                 <span className="text-highlight-600">Raj Bhavan</span>
               </h2>
 
