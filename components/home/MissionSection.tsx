@@ -21,7 +21,7 @@ export function MissionSection({
         {/* Centered heading */}
         <FadeUp className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
           <FestiveEyebrow>{label}</FestiveEyebrow>
-          <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
             {title}
           </h2>
         </FadeUp>

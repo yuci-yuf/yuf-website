@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, GraduationCap, Globe2, Award, Compass } from "lucide-react";
+
+const BENEFIT_ICONS = [GraduationCap, Globe2, Award, Compass];
 import { studyAbroadContent, partners } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { HeroBackdrop } from "@/components/public/HeroBackdrop";
@@ -50,7 +52,7 @@ export default function StudyAbroadPage() {
       <section className="bg-white py-16 lg:py-24">
         <Container>
           <FadeUp className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               {intro.title}
             </h2>
             {intro.body.map((p, i) => (
@@ -109,7 +111,7 @@ export default function StudyAbroadPage() {
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               {benefits.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="max-w-lg font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               {benefits.title}
             </h2>
             <p className="max-w-xl text-[16px] leading-relaxed text-white/85">
@@ -121,18 +123,24 @@ export default function StudyAbroadPage() {
             stagger={0.08}
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
-            {benefits.cards.map((card) => (
-              <StaggerItem key={card.title} className="h-full">
-                <div className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
-                  <h3 className="font-heading text-base font-bold text-heading">
-                    {card.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-body">
-                    {card.description}
-                  </p>
-                </div>
-              </StaggerItem>
-            ))}
+            {benefits.cards.map((card, i) => {
+              const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
+              return (
+                <StaggerItem key={card.title} className="h-full">
+                  <div className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-500 transition-colors group-hover:bg-primary-100">
+                      <Icon size={20} />
+                    </div>
+                    <h3 className="font-heading text-base font-bold text-heading">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-body">
+                      {card.description}
+                    </p>
+                  </div>
+                </StaggerItem>
+              );
+            })}
           </StaggerContainer>
         </Container>
       </section>
@@ -146,7 +154,7 @@ export default function StudyAbroadPage() {
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               {partnersCopy.label}
             </span>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               {partnersCopy.title}
             </h2>
             <p className="text-[16px] leading-relaxed text-body">
@@ -178,7 +186,7 @@ export default function StudyAbroadPage() {
                   <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/70">
                     {cta.label}
                   </p>
-                  <h2 className="font-heading text-3xl font-bold text-white sm:text-4xl">
+                  <h2 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
                     {cta.title}
                   </h2>
                   <p className="mt-4 text-[16px] leading-relaxed text-white/80">

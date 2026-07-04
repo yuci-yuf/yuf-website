@@ -36,7 +36,7 @@ function StatCell({ stat, run, index }: { stat: Stat; run: boolean; index: numbe
         <Icon size={22} />
       </div>
       <div>
-        <span className="font-heading text-3xl font-bold text-gray-900">
+        <span className="font-display text-3xl font-extrabold text-gray-900">
           {value.toLocaleString("en-IN")}
           <span className="text-primary-500">{stat.suffix}</span>
         </span>

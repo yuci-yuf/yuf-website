@@ -40,7 +40,7 @@ export function GalleryMosaic({
         <FadeUp className="mb-14 flex items-end justify-between">
           <div className="flex flex-col gap-4">
             <FestiveEyebrow className="w-fit">Gallery</FestiveEyebrow>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               Moments Worth Capturing
             </h2>
           </div>
@@ -61,7 +61,7 @@ export function GalleryMosaic({
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`group relative overflow-hidden rounded-2xl ${img.span}`}
+              className={`group relative overflow-hidden rounded-2xl shadow-card ring-1 ring-white/70 ${img.span}`}
             >
               <div className="relative aspect-[4/3] h-full w-full">
                 <Image

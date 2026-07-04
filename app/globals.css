@@ -9,20 +9,22 @@
    ────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* ── Primary brand (YUCI ocean blue) ──
+  /* ── Primary brand (YUCI ocean blue → bright sky cyan) ──
      Anchored on the logo: Light Cyan #9DE0EF (200), Sky Blue #64D1EC (300),
-     Primary Blue #1FA8D7 (500), Deep Ocean #146B94 (700). */
-  --color-primary-50: #e3f0f7;
-  --color-primary-100: #bfdcec;
-  --color-primary-200: #8ac1da;
-  --color-primary-300: #4ea2c2;
-  --color-primary-400: #2a83a6;
-  --color-primary-500: #166787;
-  --color-primary-600: #11536e;
-  --color-primary-700: #0e4258;
-  --color-primary-800: #0c3547;
-  --color-primary-900: #0a2b3a;
-  --color-primary-950: #051824;
+     Primary Blue #1FA8D7 (500), Deep Ocean #146B94 (700). The mid shades are
+     the vivid cyan the brand is built on; 600 stays deep enough to keep white
+     button text at AA contrast, and 800–950 stay dark for hero/footer bands. */
+  --color-primary-50: #ecfbff;
+  --color-primary-100: #d2f4fc;
+  --color-primary-200: #9de0ef;
+  --color-primary-300: #64d1ec;
+  --color-primary-400: #33bce1;
+  --color-primary-500: #1fa8d7;
+  --color-primary-600: #167ea6;
+  --color-primary-700: #146b94;
+  --color-primary-800: #155874;
+  --color-primary-900: #123f56;
+  --color-primary-950: #0a2836;
 
   /* ── Accent (luminous sky cyan) ──
      The logo's bright Sky Blue #64D1EC, used for glows & highlights. */
@@ -119,9 +121,9 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
 
-  /* ── Shadow ── */
-  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.04), 0 1px 2px rgb(0 0 0 / 0.03);
-  --shadow-hover: 0 20px 44px -12px rgb(0 0 0 / 0.1);
+  /* ── Shadow (tinted with brand ink #102330 for depth, not flat black) ── */
+  --shadow-card: 0 2px 8px -1px rgb(16 35 48 / 0.1), 0 1px 3px rgb(16 35 48 / 0.07);
+  --shadow-hover: 0 24px 50px -12px rgb(16 35 48 / 0.24);
 
   /* ── Motion ── */
   --animate-marquee: marquee 30s linear infinite;

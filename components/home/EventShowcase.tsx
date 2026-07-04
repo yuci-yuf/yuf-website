@@ -39,7 +39,7 @@ export function EventShowcase({ events }: { events: EventItem[] }) {
         <FadeUp className="mb-14 flex items-end justify-between">
           <div className="flex flex-col gap-4">
             <FestiveEyebrow className="w-fit text-highlight-400">Popular Events</FestiveEyebrow>
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Explore Upcoming Events
             </h2>
           </div>

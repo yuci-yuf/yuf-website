@@ -1,13 +1,17 @@
 import Image from "next/image";
+import type { LucideIcon } from "lucide-react";
 import type { FeatureCard } from "@/types";
 import { cn } from "@/lib/utils";
 
 export function FeatureGrid({
   cards,
   columns = 3,
+  icons,
 }: {
   cards: FeatureCard[];
   columns?: 2 | 3 | 4;
+  /** Optional lucide icons rendered per card (by index) when a card has no image. */
+  icons?: LucideIcon[];
 }) {
   return (
     <div
@@ -18,10 +22,12 @@ export function FeatureGrid({
         columns === 4 && "sm:grid-cols-2 lg:grid-cols-4",
       )}
     >
-      {cards.map((card) => (
+      {cards.map((card, i) => {
+        const Icon = icons?.[i % (icons.length || 1)];
+        return (
         <div
           key={card.title}
-          className="group flex flex-col gap-4 rounded-2xl border border-border bg-surface p-8 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-hover"
+          className="group flex flex-col gap-4 rounded-2xl border border-border bg-white p-8 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-hover"
         >
           {card.image ? (
             <span className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-sm">
@@ -32,6 +38,10 @@ export function FeatureGrid({
                 height={104}
                 className="h-full w-full object-contain"
               />
+            </span>
+          ) : Icon ? (
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-primary-500 transition-colors group-hover:bg-primary-100">
+              <Icon size={24} />
             </span>
           ) : (
             card.icon && (
@@ -47,7 +57,8 @@ export function FeatureGrid({
             {card.description}
           </p>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

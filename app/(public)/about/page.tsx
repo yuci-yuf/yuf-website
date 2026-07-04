@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Quote, Sparkles, Eye, Heart } from "lucide-react";
+import { ArrowRight, Quote, Sparkles, Eye, Heart, Music, Cpu, Trophy, GraduationCap } from "lucide-react";
 import { aboutContent, siteConfig } from "@/lib/content";
+
+const ACTIVITY_ICONS = [Music, Cpu, Trophy, GraduationCap];
 import { Container } from "@/components/ui/Container";
 import { HeroBackdrop } from "@/components/public/HeroBackdrop";
 import { IndiaMapImage } from "@/components/public/IndiaMapImage";
@@ -123,7 +125,7 @@ export default function AboutPage() {
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.about.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl lg:text-[2.75rem]">
                 {aboutContent.about.title}
               </h2>
               <p className="text-lg font-semibold text-primary-700">
@@ -167,7 +169,7 @@ export default function AboutPage() {
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
                 Our Belief
               </span>
-              <h2 className="font-heading text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
                 Change begins where
                 <br className="hidden sm:block" /> youth find their voice
               </h2>
@@ -214,7 +216,7 @@ export default function AboutPage() {
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.mission.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+              <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
                 {aboutContent.mission.title}
               </h2>
               {aboutContent.mission.body.map((p, i) => (
@@ -253,7 +255,7 @@ export default function AboutPage() {
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               Leadership
             </span>
-            <h2 className="mt-5 font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Meet Our Leaders
             </h2>
           </FadeUp>
@@ -343,7 +345,7 @@ export default function AboutPage() {
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
               {aboutContent.activities.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="max-w-lg font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               {aboutContent.activities.title}
             </h2>
             <p className="max-w-xl text-[16px] leading-relaxed text-body">
@@ -352,10 +354,14 @@ export default function AboutPage() {
           </FadeUp>
 
           <StaggerContainer stagger={0.08} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {aboutContent.activities.cards.map((card) => {
+            {aboutContent.activities.cards.map((card, i) => {
+              const Icon = ACTIVITY_ICONS[i % ACTIVITY_ICONS.length];
               return (
                 <StaggerItem key={card.title} className="h-full">
                   <div className="group flex h-full flex-col gap-4 rounded-3xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary-100 hover:shadow-md">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-500 transition-colors group-hover:bg-primary-100">
+                      <Icon size={20} />
+                    </div>
                     <h3 className="font-heading text-base font-bold text-heading">
                       {card.title}
                     </h3>
@@ -379,7 +385,7 @@ export default function AboutPage() {
             <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-400">
               {aboutContent.whyJoinUs.label}
             </span>
-            <h2 className="max-w-lg font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="max-w-lg font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               {aboutContent.whyJoinUs.title}
             </h2>
             <p className="max-w-xl text-[16px] leading-relaxed text-white/85">
@@ -422,7 +428,7 @@ export default function AboutPage() {
               <span className="w-fit text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
                 {aboutContent.impact.label}
               </span>
-              <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+              <h2 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
                 {aboutContent.impact.title}
               </h2>
               {aboutContent.impact.body.map((p, i) => (
@@ -463,7 +469,7 @@ export default function AboutPage() {
                       key={stat.label}
                       className="flex flex-col gap-3 rounded-3xl border border-border bg-white p-7 shadow-sm"
                     >
-                      <span className="font-heading text-3xl font-bold text-heading">
+                      <span className="font-display text-3xl font-extrabold text-heading">
                         {stat.number}
                         <span className="text-primary-500">{stat.suffix}</span>
                       </span>
@@ -493,7 +499,7 @@ export default function AboutPage() {
                   <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/70">
                     {aboutContent.ctaBanner.label}
                   </p>
-                  <h2 className="font-heading text-3xl font-bold text-white sm:text-4xl">
+                  <h2 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
                     {aboutContent.ctaBanner.title}
                   </h2>
                   <p className="mt-4 text-[16px] leading-relaxed text-white/80">

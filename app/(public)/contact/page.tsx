@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, HelpCircle, Handshake, Users } from "lucide-react";
 import { ContactForm } from "@/components/public/ContactForm";
 import { SocialIcon } from "@/components/public/SocialIcon";
 import { FeatureGrid } from "@/components/public/FeatureGrid";
@@ -92,7 +92,11 @@ export default function ContactPage() {
           subtitle={contactContent.helpCards.subtitle}
           className="mb-12"
         />
-        <FeatureGrid cards={contactContent.helpCards.cards} columns={3} />
+        <FeatureGrid
+          cards={contactContent.helpCards.cards}
+          columns={3}
+          icons={[HelpCircle, Handshake, Users]}
+        />
       </Section>
 
       <CTABanner data={contactContent.ctaBanner} />

@@ -12,7 +12,7 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
       <Container className="relative">
         <FadeUp className="mb-16 flex flex-col items-center gap-4 text-center">
           <FestiveEyebrow>How It Works</FestiveEyebrow>
-          <h2 className="max-w-md font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+          <h2 className="max-w-md font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
             Steps to Register
           </h2>
           <p className="max-w-xl text-[16px] leading-relaxed text-body">

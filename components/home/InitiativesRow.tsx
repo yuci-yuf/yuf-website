@@ -23,7 +23,7 @@ export function InitiativesRow({
       <Container className="relative">
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
           <FestiveEyebrow>{label}</FestiveEyebrow>
-          <h2 className="max-w-xl font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+          <h2 className="max-w-xl font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
             {title}
           </h2>
           <p className="max-w-lg text-[16px] leading-relaxed text-body">
