@@ -18,10 +18,12 @@ export function RecognitionBanner({
   details,
   images,
 }: RecognitionBannerProps) {
-  // Drop the last two words ("Raj Bhavan") onto their own line.
+  // Break the title into two balanced lines at its midpoint, with the second
+  // half in the accent color — keeps long titles to two lines instead of three.
   const words = title.split(" ");
-  const titleHead = words.length > 2 ? words.slice(0, -2).join(" ") : title;
-  const titleTail = words.length > 2 ? words.slice(-2).join(" ") : "";
+  const mid = Math.ceil(words.length / 2);
+  const titleHead = words.length > 3 ? words.slice(0, mid).join(" ") : title;
+  const titleTail = words.length > 3 ? words.slice(mid).join(" ") : "";
 
   return (
     <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">

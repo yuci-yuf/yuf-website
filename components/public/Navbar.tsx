@@ -38,7 +38,7 @@ export function Navbar() {
           scrolled ? "shadow-sm" : "",
         )}
       >
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8">
+        <nav className="mx-auto flex max-w-[96rem] items-center justify-between px-6 py-3 lg:px-10">
           {/* Logo cluster */}
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={siteConfig.siteName}>
             <Image
@@ -46,16 +46,16 @@ export function Navbar() {
               alt={siteConfig.siteName}
               width={120}
               height={60}
-              className="h-9 w-auto object-contain sm:h-10"
+              className="h-12 w-auto object-contain sm:h-14"
               priority
             />
-            <span className="h-6 w-px bg-border sm:h-7" aria-hidden />
+            <span className="h-8 w-px bg-border sm:h-10" aria-hidden />
             <Image
               src="/images/yuci-logo.png"
               alt="YUCI"
               width={48}
               height={48}
-              className="h-8 w-auto object-contain sm:h-9"
+              className="h-12 w-auto object-contain sm:h-14"
               priority
             />
           </Link>

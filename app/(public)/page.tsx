@@ -59,9 +59,8 @@ export default async function HomePage() {
       />
 
       <MissionSection
-        label={homeContent.about.label}
-        title={homeContent.about.title}
-        body={homeContent.about.body}
+        label="Prime Minister of India"
+        title="A Message to India's Youth"
         primaryImage={homeContent.about.image!}
       />
 
@@ -163,7 +162,13 @@ export default async function HomePage() {
         cards={homeContent.govInitiatives.cards}
       />
 
-      <LogoStrip partners={partners} />
+      <LogoStrip
+        partners={partners.filter(
+          (p) =>
+            p.name === "Falmouth University" ||
+            p.name === "World Youth Book of Records",
+        )}
+      />
     </>
   );
 }

@@ -34,24 +34,30 @@ export function InitiativesRow({
         <StaggerContainer stagger={0.1} className="grid gap-6 sm:grid-cols-3">
           {cards.map((card) => (
             <StaggerItem key={card.title}>
-              <div className="group flex flex-col items-center gap-5 rounded-3xl border border-primary-200 bg-gradient-to-br from-primary-100 to-primary-200/80 p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:from-primary-100 hover:to-primary-300/70 hover:shadow-lg hover:shadow-primary-200/60">
+              <div className="group flex h-full items-center gap-6 rounded-3xl border border-border bg-white p-8 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-hover">
                 {card.image && (
-                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-white p-2 shadow-sm ring-1 ring-primary-200">
+                  <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl">
                     <Image
                       src={card.image}
                       alt={card.title}
-                      width={80}
-                      height={80}
-                      className="h-full w-full object-contain"
+                      width={128}
+                      height={128}
+                      // Skill India's artwork sits larger in its frame — scale
+                      // just this logo down so it visually matches the others.
+                      className={`h-full w-full object-contain${
+                        card.image.includes("skill-india") ? " scale-[0.85]" : ""
+                      }`}
                     />
                   </div>
                 )}
-                <h3 className="font-heading text-lg font-bold text-primary-900">
-                  {card.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-gray-600">
-                  {card.description}
-                </p>
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-heading text-xl font-bold text-heading">
+                    {card.title}
+                  </h3>
+                  <p className="text-[15px] leading-relaxed text-body">
+                    {card.description}
+                  </p>
+                </div>
               </div>
             </StaggerItem>
           ))}

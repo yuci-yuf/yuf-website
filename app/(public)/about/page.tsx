@@ -140,7 +140,7 @@ export default function AboutPage() {
             <FadeUp delay={0.15} className="relative">
               <div className="relative aspect-4/3 overflow-hidden rounded-3xl shadow-md">
                 <Image
-                  src="/images/sections/who-we-are.jpg"
+                  src="/images/sections/who-we-are-team.jpg"
                   alt="YUCI Team"
                   fill
                   sizes="(min-width: 1024px) 40vw, 90vw"

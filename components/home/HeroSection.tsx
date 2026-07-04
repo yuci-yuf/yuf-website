@@ -142,7 +142,7 @@ export function HeroSection({
   const loop = [...marqueeItems, ...marqueeItems];
 
   return (
-    <section className="relative flex min-h-[100svh] flex-col overflow-hidden">
+    <section className="relative flex min-h-[100svh] flex-col overflow-hidden pt-20 sm:pt-24">
       {/* ── Gradient base: blue → cyan → purple ── */}
       <div
         aria-hidden

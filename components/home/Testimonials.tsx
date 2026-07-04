@@ -65,10 +65,10 @@ export function Testimonials({
         className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-festival-cyan/25 blur-3xl"
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-6 lg:px-8">
+      <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
         <SectionHeading label={label} title={title} subtitle={subtitle} className="mb-14" invert />
 
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-none">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/80 p-8 shadow-card backdrop-blur-sm sm:p-12">
             {/* Oversized quotation watermark */}
             <Quote

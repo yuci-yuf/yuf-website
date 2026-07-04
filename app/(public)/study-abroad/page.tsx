@@ -25,11 +25,6 @@ export default function StudyAbroadPage() {
         <HeroBackdrop />
         <Container className="relative z-30">
           <div className="flex max-w-3xl flex-col gap-6">
-            <FadeUp>
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-400 backdrop-blur-sm">
-                {hero.kicker}
-              </span>
-            </FadeUp>
             <FadeUp delay={0.08}>
               <h1 className="font-heading text-[2.75rem] font-black uppercase leading-[0.9] tracking-tighter text-white sm:text-[4.5rem] lg:text-[6rem]">
                 {hero.title}
@@ -55,9 +50,6 @@ export default function StudyAbroadPage() {
       <section className="bg-white py-16 lg:py-24">
         <Container>
           <FadeUp className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">
-              {intro.label}
-            </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight text-heading sm:text-4xl">
               {intro.title}
             </h2>

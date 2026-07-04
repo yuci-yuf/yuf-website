@@ -289,7 +289,7 @@ export const homeContent = {
   },
   recognition: {
     label: "Recognition",
-    title: "Appreciation From Ministry of Youth Affairs",
+    title: "Appreciation From Ministry of Youth Affairs and Sports",
     subtitle:
       "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",
     details: [

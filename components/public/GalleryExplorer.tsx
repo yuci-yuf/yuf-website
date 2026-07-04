@@ -1,27 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryPhoto, GalleryVideo } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 type Tab = "photos" | "videos";
-
-/**
- * Widths vary while every tile keeps the same row height. Rather than repeat
- * one span pattern (which parks every wide tile on the same side), we cycle a
- * set of 4-column row layouts that place the wide tile in different positions —
- * left, right, middle, a pair of wides, then an all-equal row — so the wall
- * feels irregular. Every row still sums to 4 columns, so there are no gaps.
- */
-const SPAN_SEQUENCE = [
-  2, 1, 1, // wide left
-  1, 1, 2, // wide right
-  1, 2, 1, // wide middle
-  2, 2, //    two wides
-  1, 1, 1, 1, // all equal
-].map((n) => (n === 2 ? "md:col-span-2" : "md:col-span-1"));
 
 function Lightbox({
   photos,
@@ -129,6 +114,57 @@ export function GalleryExplorer({
   const [tab, setTab] = useState<Tab>("photos");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  // ── Justified-rows (collage) layout ──
+  // Each row is scaled so its images fill the full width at their true aspect
+  // ratio — no cropping and no ragged column gaps.
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const [ratios, setRatios] = useState<number[]>([]);
+  const GAP = 12;
+  const TARGET = width && width < 640 ? 170 : 240; // ideal row height
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width));
+    ro.observe(el);
+    setWidth(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
+
+  const rows = useMemo(() => {
+    if (!width) return [] as { items: number[]; height: number }[];
+    const ratioOf = (i: number) => ratios[i] || 1.4; // default until measured
+    const out: { items: number[]; height: number }[] = [];
+    let items: number[] = [];
+    let sum = 0;
+    photos.forEach((_, i) => {
+      items.push(i);
+      sum += ratioOf(i);
+      const rowWidth = sum * TARGET + (items.length - 1) * GAP;
+      if (rowWidth >= width) {
+        const height = (width - (items.length - 1) * GAP) / sum;
+        out.push({ items, height });
+        items = [];
+        sum = 0;
+      }
+    });
+    if (items.length) out.push({ items, height: TARGET }); // last row, left-aligned
+    return out;
+  }, [photos, width, ratios, TARGET]);
+
+  function onImgLoad(i: number, e: React.SyntheticEvent<HTMLImageElement>) {
+    const img = e.currentTarget;
+    if (!img.naturalHeight) return;
+    const r = img.naturalWidth / img.naturalHeight;
+    setRatios((prev) => {
+      if (prev[i]) return prev;
+      const copy = prev.slice();
+      copy[i] = r;
+      return copy;
+    });
+  }
+
   const tabs: { key: Tab; label: string }[] = [
     { key: "photos", label: "Photos" },
     ...(hasVideos ? [{ key: "videos" as Tab, label: "Videos" }] : []),
@@ -157,27 +193,37 @@ export function GalleryExplorer({
       )}
 
       {tab === "photos" && (
-        <div className="grid grid-cols-2 gap-4 [grid-auto-flow:dense] md:grid-cols-4 md:[grid-auto-rows:14rem]">
-          {photos.map((photo, i) => (
-            <button
-              key={photo.src}
-              type="button"
-              onClick={() => setLightboxIndex(i)}
-              className={cn(
-                "group relative aspect-[4/3] h-full overflow-hidden rounded-2xl border border-border bg-surface-alt shadow-card transition-shadow hover:shadow-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 md:aspect-auto",
-                SPAN_SEQUENCE[i % SPAN_SEQUENCE.length],
-              )}
-              aria-label={`View ${photo.alt || "photo"} fullscreen`}
-            >
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(min-width: 1024px) 24vw, (min-width: 768px) 30vw, 50vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary-950/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            </button>
+        // Justified rows: every row fills the width at true aspect ratio.
+        <div ref={rowRef} className="flex flex-col" style={{ gap: GAP }}>
+          {rows.map((row, ri) => (
+            <div key={ri} className="flex flex-nowrap overflow-hidden" style={{ gap: GAP }}>
+              {row.items.map((i) => {
+                const photo = photos[i];
+                const ratio = ratios[i] || 1.4;
+                return (
+                  <button
+                    key={photo.src}
+                    type="button"
+                    onClick={() => setLightboxIndex(i)}
+                    style={{ width: ratio * row.height, height: row.height }}
+                    className="group relative block shrink-0 overflow-hidden rounded-2xl border border-border bg-surface-alt shadow-card transition-shadow hover:shadow-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    aria-label={`View ${photo.alt || "photo"} fullscreen`}
+                  >
+                    {/* Uploads have arbitrary dimensions; plain img + measured
+                        ratio keeps them uncropped. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading="lazy"
+                      onLoad={(e) => onImgLoad(i, e)}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary-950/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </div>
       )}

@@ -78,40 +78,47 @@ function EventCard({ event }: { event: EventItem }) {
     <motion.article
       whileHover={{ y: -6 }}
       transition={{ duration: 0.25 }}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-highlight-400/50 hover:shadow-xl hover:shadow-festival-purple/10"
+      className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl border border-white/15 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-festival-purple/20"
     >
+      {/* Full-bleed image fills the whole card */}
+      {event.image ? (
+        <Image
+          src={event.image}
+          alt={event.title}
+          fill
+          sizes="(min-width: 1024px) 24rem, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-primary-200" />
+      )}
+
+      {/* Depth veil so the frosted panel reads against any photo */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"
+      />
+
       {/* Festive gradient bar that grows in on hover */}
       <span
         aria-hidden
         className="absolute inset-x-0 top-0 z-20 h-1 origin-left scale-x-0 bg-gradient-to-r from-festival-blue via-festival-cyan to-highlight-500 transition-transform duration-300 group-hover:scale-x-100"
       />
 
-      <div className="relative aspect-[16/10] overflow-hidden">
-        {event.image ? (
-          <Image
-            src={event.image}
-            alt={event.title}
-            fill
-            sizes="(min-width: 1024px) 24rem, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
-            <span className="font-heading text-4xl font-bold text-primary-200">
-              {event.title.charAt(0)}
-            </span>
-          </div>
-        )}
-        {/* Bottom gradient veil for depth, deepens on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-festival-purple/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      </div>
+      {/* Full-card click target */}
+      <Link
+        href={`/events/${event.id}`}
+        className="absolute inset-0 z-10"
+        aria-label={event.title}
+      />
 
-      <div className="flex flex-1 flex-col gap-3 p-6">
+      {/* Translucent frosted panel — the image shows through beneath it */}
+      <div className="relative z-20 m-3 flex flex-col gap-3 rounded-2xl border border-white/50 bg-white/65 p-5 shadow-lg backdrop-blur-md">
         <h3 className="font-heading text-lg font-bold text-heading transition-colors group-hover:text-festival-blue">
           {event.title}
         </h3>
 
-        <div className="flex flex-col gap-1.5 text-xs text-body/70">
+        <div className="flex flex-col gap-1.5 text-xs text-body/80">
           {event.date && (
             <span className="inline-flex items-center gap-1.5">
               <Calendar size={13} className="text-highlight-500" /> {event.date}
@@ -119,23 +126,19 @@ function EventCard({ event }: { event: EventItem }) {
           )}
           {event.venue && (
             <span className="inline-flex items-center gap-1.5">
-              <MapPin size={13} className="text-festival-cyan" /> {event.venue}
+              <MapPin size={13} className="shrink-0 text-festival-cyan" />
+              <span className="truncate">{event.venue}</span>
             </span>
           )}
         </div>
 
-        <div className="mt-auto pt-3">
-          <Link
-            href={`/events/${event.id}`}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-festival-blue transition-colors hover:text-festival-blue-dark"
-          >
-            View Details
-            <ArrowRight
-              size={14}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-        </div>
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-festival-blue">
+          View Details
+          <ArrowRight
+            size={14}
+            className="transition-transform group-hover:translate-x-1"
+          />
+        </span>
       </div>
     </motion.article>
   );

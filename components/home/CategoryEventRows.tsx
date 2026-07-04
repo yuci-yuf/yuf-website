@@ -139,7 +139,7 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         }}
         onTouchStart={() => pauseAuto()}
         onTouchEnd={() => pauseAuto(2000)}
-        className="no-scrollbar -mx-3 flex gap-5 overflow-x-auto px-3 py-3"
+        className="no-scrollbar -mx-3 flex gap-5 overflow-x-auto px-3 py-3 [mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)]"
       >
         {loopEvents.map((event, i) => (
           <div
