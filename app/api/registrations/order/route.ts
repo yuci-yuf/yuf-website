@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { getAdminDb, releaseLocationSlot } from "@/lib/firebase-admin";
 import { getRazorpay } from "@/lib/razorpay";
 import { computeInvoice } from "@/lib/pricing";
 import { generateRegistrationCode } from "@/lib/registration-code";
@@ -17,6 +17,8 @@ interface OrderBody {
   institution: string;
   ageCategory: string;
   eventId: string;
+  /** Which event location the participant is registering for. */
+  locationId?: string;
   idempotencyKey: string;
 }
 
@@ -82,16 +84,60 @@ export async function POST(req: Request) {
       const ev = snap.data()!;
       if (ev.registrationOpen === false) throw new Error("CLOSED");
 
-      const limit =
-        typeof ev.registrationLimit === "number" ? ev.registrationLimit : null;
-      const count =
-        typeof ev.registrationCount === "number" ? ev.registrationCount : 0;
-      if (limit !== null && count >= limit) throw new Error("FULL");
-
       base = typeof ev.registrationFee === "number" ? ev.registrationFee : 0;
       category = (ev.category as string) ?? "";
       title = (ev.title as string) ?? "";
       const total = computeInvoice(base).total;
+
+      // Per-location capacity. When the event has a `locations` array we reserve
+      // against the chosen location's count/limit and write the array back
+      // (Firestore can't increment an array element, so we re-write the array —
+      // atomic inside the transaction). Legacy events (no array) fall back to
+      // the whole-doc registrationCount.
+      const locations = Array.isArray(ev.locations)
+        ? (ev.locations as Record<string, unknown>[])
+        : null;
+
+      let locationSnapshot: { venue: string; date: string } = {
+        venue: "",
+        date: "",
+      };
+
+      if (locations && locations.length > 0) {
+        const idx = body.locationId
+          ? locations.findIndex((l) => l.id === body.locationId)
+          : 0;
+        if (idx < 0) throw new Error("LOCATION_NOT_FOUND");
+        const loc = locations[idx];
+        const limit =
+          typeof loc.registrationLimit === "number" ? loc.registrationLimit : null;
+        const count =
+          typeof loc.registrationCount === "number" ? loc.registrationCount : 0;
+        if (limit !== null && count >= limit) throw new Error("FULL");
+
+        const nextLocations = locations.map((l, i) =>
+          i === idx ? { ...l, registrationCount: count + 1 } : l,
+        );
+        tx.update(eventRef, {
+          locations: nextLocations,
+          registrationCount: FieldValue.increment(1),
+        });
+        locationSnapshot = {
+          venue: (loc.venue as string) || (loc.district as string) || "",
+          date: (loc.date as string) || "",
+        };
+      } else {
+        const limit =
+          typeof ev.registrationLimit === "number" ? ev.registrationLimit : null;
+        const count =
+          typeof ev.registrationCount === "number" ? ev.registrationCount : 0;
+        if (limit !== null && count >= limit) throw new Error("FULL");
+        tx.update(eventRef, { registrationCount: FieldValue.increment(1) });
+        locationSnapshot = {
+          venue: (ev.venue as string) || (ev.district as string) || "",
+          date: (ev.date as string) || "",
+        };
+      }
 
       tx.set(regRef, {
         firstName: body.firstName,
@@ -104,6 +150,9 @@ export async function POST(req: Request) {
         eventCategory: category,
         eventId: body.eventId,
         eventTitle: title,
+        locationId: body.locationId ?? "",
+        locationVenue: locationSnapshot.venue,
+        locationDate: locationSnapshot.date,
         registrationCode: code,
         idempotencyKey: body.idempotencyKey,
         amountPaid: total,
@@ -111,7 +160,6 @@ export async function POST(req: Request) {
         status: "pending",
         createdAt: FieldValue.serverTimestamp(),
       });
-      tx.update(eventRef, { registrationCount: FieldValue.increment(1) });
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "ERROR";
@@ -121,6 +169,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Registration is closed." }, { status: 409 });
     if (msg === "EVENT_NOT_FOUND")
       return NextResponse.json({ error: "Event not found." }, { status: 404 });
+    if (msg === "LOCATION_NOT_FOUND")
+      return NextResponse.json(
+        { error: "Selected location not found." },
+        { status: 404 },
+      );
     console.error("order: reservation failed", err);
     return NextResponse.json({ error: "Could not reserve a spot." }, { status: 500 });
   }
@@ -152,11 +205,9 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error("order: razorpay create failed", err);
-    // Release the slot we reserved so it isn't stuck.
-    await adminDb.runTransaction(async (tx) => {
-      tx.update(eventRef, { registrationCount: FieldValue.increment(-1) });
-      tx.delete(regRef);
-    });
+    // Release the slot we reserved so it isn't stuck, then drop the pending reg.
+    await releaseLocationSlot(adminDb, eventRef, body.locationId);
+    await regRef.delete();
     return NextResponse.json(
       { error: "Could not start payment. Please try again." },
       { status: 502 },

@@ -9,6 +9,22 @@ interface RecognitionBannerProps {
   subtitle: string;
   details: string[];
   images: string[];
+  /** Substring of `subtitle` to emphasize in the accent color. */
+  highlight?: string;
+}
+
+/** Wrap the first occurrence of `term` in the subtitle with an accent style. */
+function emphasize(text: string, term?: string) {
+  if (!term) return text;
+  const i = text.indexOf(term);
+  if (i === -1) return text;
+  return (
+    <>
+      {text.slice(0, i)}
+      <span className="font-semibold text-highlight-400">{term}</span>
+      {text.slice(i + term.length)}
+    </>
+  );
 }
 
 export function RecognitionBanner({
@@ -17,6 +33,7 @@ export function RecognitionBanner({
   subtitle,
   details,
   images,
+  highlight,
 }: RecognitionBannerProps) {
   // Break the title into two balanced lines at its midpoint, with the second
   // half in the accent color — keeps long titles to two lines instead of three.
@@ -45,7 +62,7 @@ export function RecognitionBanner({
               )}
             </h2>
             <p className="text-xl leading-relaxed text-white/85 sm:text-2xl sm:leading-relaxed">
-              {subtitle}
+              {emphasize(subtitle, highlight)}
             </p>
             {details.length > 0 && (
               <ul className="flex flex-col gap-4">

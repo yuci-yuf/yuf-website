@@ -15,7 +15,7 @@ export function MissionSection({
   primaryImage,
 }: MissionSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-white py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-white py-12 sm:py-16 lg:py-20">
       <FestiveGlows />
       <Container className="relative">
         {/* Centered heading */}

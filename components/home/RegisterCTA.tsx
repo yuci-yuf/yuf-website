@@ -6,7 +6,7 @@ import { FadeUp } from "./MotionWrapper";
 
 export function RegisterCTA({ data }: { data: CTABanner }) {
   return (
-    <section className="bg-white py-16 sm:py-24 lg:py-32">
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
       <Container>
         <FadeUp>
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 px-8 py-16 sm:px-14 lg:px-20">
