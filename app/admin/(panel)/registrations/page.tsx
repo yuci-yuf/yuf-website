@@ -64,13 +64,15 @@ export default function RegistrationsPage() {
 
   function exportCsv() {
     const headers = [
-      "Name", "Email", "Phone", "Location", "Institution",
-      "Category", "Event", "Age", "Amount", "Payment", "Status", "Date",
+      "Name", "Email", "Phone", "City", "Institution",
+      "Category", "Event", "Loc. Venue", "Loc. Date",
+      "Age", "Amount", "Payment", "Status", "Date",
     ];
     const lines = filtered.map((r) =>
       [
         `${r.firstName} ${r.lastName}`, r.email, r.phone, r.location, r.institution,
-        r.eventCategory, r.eventTitle, r.ageCategory, r.amountPaid, r.paymentStatus,
+        r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
+        r.ageCategory, r.amountPaid, r.paymentStatus,
         r.status, formatDate(r.createdAt),
       ]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
@@ -161,6 +163,13 @@ export default function RegistrationsPage() {
                     <td className="px-4 py-3 text-text-muted">
                       {r.eventTitle}
                       <div className="text-xs">{r.eventCategory}</div>
+                      {(r.locationVenue || r.locationDate) && (
+                        <div className="text-xs text-primary-700">
+                          {[r.locationVenue, r.locationDate]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-text">₹ {r.amountPaid.toLocaleString("en-IN")}</td>
                     <td className="px-4 py-3"><StatusBadge status={r.paymentStatus} /></td>

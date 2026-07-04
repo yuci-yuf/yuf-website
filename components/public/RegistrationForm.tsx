@@ -4,7 +4,12 @@ import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
-import type { EventItem } from "@/types";
+import type { EventItem, EventLocation } from "@/types";
+import {
+  getEventLocations,
+  locationParts,
+  locationSpotsLeft,
+} from "@/lib/event-groups";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/content";
 import { computeInvoice, formatINR, GST_RATE } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -59,22 +63,13 @@ function loadRazorpay(): Promise<void> {
   });
 }
 
-/**
- * Remaining capacity for an event. Returns null when the event has no limit
- * (unlimited), otherwise the number of spots left (clamped at 0).
- */
-function spotsLeft(ev: EventItem | undefined): number | null {
-  if (!ev || typeof ev.registrationLimit !== "number") return null;
-  return Math.max(0, ev.registrationLimit - (ev.registrationCount ?? 0));
-}
-
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
 /** Cities where the festival runs. */
 const LOCATIONS = ["Chennai", "Coimbatore"];
 /**
- * Where each location's events are actually held. A participant's chosen
- * location filters the event list to events whose venue is in that place.
+ * Where each city's events are actually held. A participant's chosen city
+ * filters to event locations whose district/venue is in that place.
  * (Chennai's events run in Ponneri; Coimbatore's in Coimbatore.)
  */
 const LOCATION_VENUES: Record<string, string[]> = {
@@ -82,12 +77,33 @@ const LOCATION_VENUES: Record<string, string[]> = {
   Coimbatore: ["Coimbatore"],
 };
 
-/** True if the event's venue belongs to the given location. */
-function eventInLocation(ev: EventItem, location: string): boolean {
-  const venues = LOCATION_VENUES[location] ?? [];
-  if (venues.length === 0) return false;
-  const venue = (ev.venue ?? "").toLowerCase();
-  return venues.some((name) => venue.includes(name.toLowerCase()));
+/** True if an event location (district/venue) belongs to the given city. */
+function locationInCity(loc: EventLocation, city: string): boolean {
+  const names = LOCATION_VENUES[city] ?? [];
+  if (names.length === 0) return false;
+  const haystack = `${loc.district ?? ""} ${loc.venue ?? ""}`.toLowerCase();
+  return names.some((name) => haystack.includes(name.toLowerCase()));
+}
+
+/** The event's locations that belong to the given city. */
+function eventLocationsInCity(ev: EventItem, city: string): EventLocation[] {
+  return getEventLocations(ev).filter((loc) => locationInCity(loc, city));
+}
+
+/** True if the event has any location in the given city. */
+function eventInLocation(ev: EventItem, city: string): boolean {
+  return eventLocationsInCity(ev, city).length > 0;
+}
+
+/**
+ * True if the event is open to the given student type. An event with audience
+ * "both" (or unset) accepts anyone; otherwise it must match. Before the student
+ * picks school/college (`type === ""`), everything is allowed.
+ */
+function eventForStudentType(ev: EventItem, type: InstitutionType): boolean {
+  if (!type) return true;
+  const audience = ev.audience ?? "both";
+  return audience === "both" || audience === type;
 }
 
 /** School class levels (6th–12th). */
@@ -117,7 +133,7 @@ const EMPTY: FormValues = {
   level: "",
 };
 
-type ErrorKey = keyof FormValues | "category" | "event";
+type ErrorKey = keyof FormValues | "category" | "event" | "eventLocation";
 type Errors = Partial<Record<ErrorKey, string>>;
 
 export function RegistrationForm({
@@ -129,20 +145,34 @@ export function RegistrationForm({
 }) {
   const searchParams = useSearchParams();
   const preselectedId = searchParams.get("event");
+  const preselectedLoc = searchParams.get("loc");
   const preselected = events.find((e) => e.id === preselectedId);
 
-  // Deep-link (?event=): pre-fill location from the event's venue so the
-  // location-filtered dropdowns still include the preselected event.
-  const preselectedLocation = preselected
-    ? (LOCATIONS.find((loc) => eventInLocation(preselected, loc)) ?? "")
-    : "";
+  // Deep-link (?event=&loc=): the explicitly chosen location, if any. Only an
+  // explicit ?loc pre-selects a location — otherwise a multi-location event
+  // starts with none chosen so the user must consciously pick the date/place.
+  const explicitLocation = preselected
+    ? getEventLocations(preselected).find((l) => l.id === preselectedLoc)
+    : undefined;
+  // For pre-filling the city, fall back to the event's first location so the
+  // city-filtered dropdowns include the event even without an explicit ?loc.
+  const cityHintLocation =
+    explicitLocation ??
+    (preselected ? getEventLocations(preselected)[0] : undefined);
+  const preselectedCity =
+    preselected && cityHintLocation
+      ? (LOCATIONS.find((c) => locationInCity(cityHintLocation, c)) ?? "")
+      : "";
 
   const [values, setValues] = useState<FormValues>({
     ...EMPTY,
-    location: preselectedLocation,
+    location: preselectedCity,
   });
   const [category, setCategory] = useState<string>(preselected?.category ?? "");
   const [eventId, setEventId] = useState<string>(preselected?.id ?? "");
+  const [locationId, setLocationId] = useState<string>(
+    explicitLocation?.id ?? "",
+  );
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error" | "full"
@@ -158,29 +188,61 @@ export function RegistrationForm({
     setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
-  // Categories that actually have events in the chosen location (empty until a
-  // location is picked, so the participant selects location first).
+  // Categories that actually have events in the chosen city AND open to the
+  // student's type (school/college). Empty until a city is picked.
   const availableCategories = useMemo(() => {
     if (!values.location) return [];
     return categories.filter((c) =>
-      events.some((e) => e.category === c && eventInLocation(e, values.location)),
+      events.some(
+        (e) =>
+          e.category === c &&
+          eventInLocation(e, values.location) &&
+          eventForStudentType(e, values.institutionType),
+      ),
     );
-  }, [categories, events, values.location]);
+  }, [categories, events, values.location, values.institutionType]);
 
-  // Events matching BOTH the chosen location and category.
+  // Events matching the chosen city, category, AND the student's type.
   const eventsForSelection = useMemo(() => {
     if (!values.location || !category) return [];
     return events.filter(
-      (e) => e.category === category && eventInLocation(e, values.location),
+      (e) =>
+        e.category === category &&
+        eventInLocation(e, values.location) &&
+        eventForStudentType(e, values.institutionType),
     );
-  }, [events, category, values.location]);
+  }, [events, category, values.location, values.institutionType]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
+
+  // The event list is filtered by BOTH city and school/college, so the user
+  // must pick those before choosing a category/event.
+  const canChooseEvent = !!values.location && !!values.institutionType;
+
+  // Locations of the selected event that are in the chosen city (what the
+  // participant picks between). Fee is shared across locations.
+  const locationsForSelection = useMemo(() => {
+    if (!selectedEvent || !values.location) return [];
+    return eventLocationsInCity(selectedEvent, values.location);
+  }, [selectedEvent, values.location]);
+
+  // When an event has just one location in the city, use it implicitly so the
+  // participant isn't asked to "choose" from a list of one.
+  const effectiveLocationId =
+    locationsForSelection.length === 1
+      ? locationsForSelection[0].id
+      : locationId;
+  const selectedLocation = locationsForSelection.find(
+    (l) => l.id === effectiveLocationId,
+  );
+
   const fee = selectedEvent?.registrationFee;
   const feeLabel = fee != null ? formatINR(fee) : "—";
   const invoice = fee != null ? computeInvoice(fee) : null;
 
-  const selectedSpotsLeft = spotsLeft(selectedEvent);
+  const selectedSpotsLeft = selectedLocation
+    ? locationSpotsLeft(selectedLocation)
+    : null;
   const selectedFull = selectedSpotsLeft === 0;
 
   function validate(): Errors {
@@ -207,6 +269,9 @@ export function RegistrationForm({
     }
     if (!category) e.category = "Please choose a category.";
     if (!eventId) e.event = "Please choose an event.";
+    // A location must be chosen whenever the event offers more than one.
+    if (eventId && locationsForSelection.length > 1 && !selectedLocation)
+      e.eventLocation = "Please choose a location.";
     return e;
   }
 
@@ -231,7 +296,8 @@ export function RegistrationForm({
     }
 
     if (!selectedEvent || selectedEvent.registrationOpen === false) return;
-    if (spotsLeft(selectedEvent) === 0) {
+    if (!selectedLocation) return;
+    if (locationSpotsLeft(selectedLocation) === 0) {
       setStatus("full");
       return;
     }
@@ -264,6 +330,7 @@ export function RegistrationForm({
           institution,
           ageCategory: values.level,
           eventId: selectedEvent.id,
+          locationId: effectiveLocationId,
           idempotencyKey: idempotencyKeyRef.current,
         }),
       });
@@ -388,8 +455,8 @@ export function RegistrationForm({
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-start">
-        {/* Left column: form inputs */}
+      {/* Single card: all sections in one column, full width */}
+      <div className="w-full">
         <div className="flex flex-col gap-8 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
         {/* ── Your details ── */}
         <FormSection title="Your details">
@@ -472,16 +539,18 @@ export function RegistrationForm({
                 <Select
                   value={values.location}
                   onValueChange={(v) => {
-                    // Changing location changes which events are available,
-                    // so clear any category/event chosen for the old location.
+                    // Changing city changes which events are available,
+                    // so clear any category/event/location for the old city.
                     setValues((prev) => ({ ...prev, location: v }));
                     setCategory("");
                     setEventId("");
+                    setLocationId("");
                     setErrors((e) => ({
                       ...e,
                       location: undefined,
                       category: undefined,
                       event: undefined,
+                      eventLocation: undefined,
                     }));
                   }}
                 >
@@ -532,10 +601,18 @@ export function RegistrationForm({
                           institutionType: val,
                           level: "",
                         }));
+                        // Changing school/college changes which events are
+                        // eligible, so clear any category/event/location chosen.
+                        setCategory("");
+                        setEventId("");
+                        setLocationId("");
                         setErrors((e) => ({
                           ...e,
                           institutionType: undefined,
                           level: undefined,
+                          category: undefined,
+                          event: undefined,
+                          eventLocation: undefined,
                         }));
                       }}
                       className="sr-only"
@@ -638,13 +715,15 @@ export function RegistrationForm({
                     onValueChange={(v) => {
                       setCategory(v);
                       setEventId("");
+                      setLocationId("");
                       setErrors((e) => ({
                         ...e,
                         category: undefined,
                         event: undefined,
+                        eventLocation: undefined,
                       }));
                     }}
-                    disabled={!values.location}
+                    disabled={!canChooseEvent}
                   >
                     <SelectTrigger
                       id="category"
@@ -653,9 +732,11 @@ export function RegistrationForm({
                     >
                       <SelectValue
                         placeholder={
-                          values.location
-                            ? "Choose a category"
-                            : "Select your location first"
+                          !values.location
+                            ? "Select your city first"
+                            : !values.institutionType
+                              ? "Choose school or college first"
+                              : "Choose a category"
                         }
                       />
                     </SelectTrigger>
@@ -677,7 +758,12 @@ export function RegistrationForm({
                     value={eventId}
                     onValueChange={(v) => {
                       setEventId(v);
-                      setErrors((e) => ({ ...e, event: undefined }));
+                      setLocationId("");
+                      setErrors((e) => ({
+                        ...e,
+                        event: undefined,
+                        eventLocation: undefined,
+                      }));
                     }}
                     disabled={!category}
                   >
@@ -688,8 +774,8 @@ export function RegistrationForm({
                     >
                       <SelectValue
                         placeholder={
-                          !values.location
-                            ? "Select your location first"
+                          !canChooseEvent
+                            ? "Complete your details first"
                             : category
                               ? "Choose an event"
                               : "Choose a category first"
@@ -697,12 +783,46 @@ export function RegistrationForm({
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {eventsForSelection.map((ev) => {
-                        const left = spotsLeft(ev);
+                      {eventsForSelection.map((ev) => (
+                        <SelectItem key={ev.id} value={ev.id}>
+                          {ev.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <ErrorText>{errors.event}</ErrorText>
+                </>
+              </Field>
+            </div>
+
+            {/* Location picker — only when the chosen event runs in more than
+                one place in this city. Capacity is shown per location. */}
+            {locationsForSelection.length > 1 && (
+              <Field label="Location & date" htmlFor="event-location" required>
+                <>
+                  <Select
+                    value={effectiveLocationId}
+                    onValueChange={(v) => {
+                      setLocationId(v);
+                      setErrors((e) => ({ ...e, eventLocation: undefined }));
+                    }}
+                  >
+                    <SelectTrigger
+                      id="event-location"
+                      data-field="eventLocation"
+                      aria-invalid={!!errors.eventLocation}
+                    >
+                      <SelectValue placeholder="Choose a location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locationsForSelection.map((loc) => {
+                        const { place, date } = locationParts(loc);
+                        const left = locationSpotsLeft(loc);
                         const full = left === 0;
+                        const label = [place, date].filter(Boolean).join(" · ");
                         return (
-                          <SelectItem key={ev.id} value={ev.id} disabled={full}>
-                            {ev.title}
+                          <SelectItem key={loc.id} value={loc.id} disabled={full}>
+                            {label || "Location"}
                             {full
                               ? " — Full"
                               : left !== null && left <= 10
@@ -713,10 +833,10 @@ export function RegistrationForm({
                       })}
                     </SelectContent>
                   </Select>
-                  <ErrorText>{errors.event}</ErrorText>
+                  <ErrorText>{errors.eventLocation}</ErrorText>
                 </>
               </Field>
-            </div>
+            )}
 
             {/* Live fee line, once an event is chosen */}
             {selectedEvent && (
@@ -741,16 +861,23 @@ export function RegistrationForm({
               </div>
             )}
         </FormSection>
-        </div>
 
-        {/* Right column: sticky summary + payment */}
-        <div className="lg:sticky lg:top-28">
-        <div className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
+        <div className="h-px bg-border" />
+
         {/* ── Confirm & finish ── */}
         <FormSection title="Confirm & finish">
             <div className="flex flex-col gap-4 rounded-2xl bg-surface-alt p-5">
               <Row label="Event">
                 {selectedEvent ? selectedEvent.title : "Not selected yet"}
+              </Row>
+
+              <Row label="Location">
+                {selectedLocation
+                  ? (() => {
+                      const { place, date } = locationParts(selectedLocation);
+                      return [place, date].filter(Boolean).join(" · ") || "—";
+                    })()
+                  : "Not selected yet"}
               </Row>
 
               {/* Itemized invoice */}
@@ -778,26 +905,6 @@ export function RegistrationForm({
               ) : (
                 <Row label="Fee">{feeLabel}</Row>
               )}
-
-              <div className="border-t border-border pt-4">
-                <p className="mb-2 text-sm font-medium text-text">
-                  What&apos;s included
-                </p>
-                <ul className="flex flex-col gap-1.5">
-                  {siteConfig.registrationPerks.map((perk) => (
-                    <li
-                      key={perk}
-                      className="flex items-start gap-2 text-sm text-text-muted"
-                    >
-                      <CheckCircle2
-                        size={15}
-                        className="mt-0.5 shrink-0 text-success"
-                      />
-                      {perk}
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
 
             <p className="flex items-center gap-2 text-xs text-text-muted">
@@ -849,7 +956,6 @@ export function RegistrationForm({
               .
             </p>
         </FormSection>
-        </div>
         </div>
       </div>
     </form>

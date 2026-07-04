@@ -9,7 +9,25 @@
  */
 import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { EventItem } from "@/types";
+import type { EventItem, EventLocation } from "@/types";
+
+/** Read a stored `locations` array into typed EventLocation[]. */
+export function normalizeLocations(raw: unknown): EventLocation[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const locations = raw
+    .filter((l): l is Record<string, unknown> => !!l && typeof l === "object")
+    .map((l, i) => ({
+      id: typeof l.id === "string" && l.id ? l.id : `loc-${i}`,
+      district: typeof l.district === "string" ? l.district : undefined,
+      venue: typeof l.venue === "string" ? l.venue : undefined,
+      date: typeof l.date === "string" ? l.date : undefined,
+      registrationLimit:
+        typeof l.registrationLimit === "number" ? l.registrationLimit : undefined,
+      registrationCount:
+        typeof l.registrationCount === "number" ? l.registrationCount : 0,
+    }));
+  return locations.length > 0 ? locations : undefined;
+}
 
 function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
   return {
@@ -34,7 +52,9 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,
     status: (data.status as EventItem["status"]) ?? "upcoming",
+    audience: (data.audience as EventItem["audience"]) ?? "both",
     details: Array.isArray(data.details) ? (data.details as string[]) : undefined,
+    locations: normalizeLocations(data.locations),
     date: (data.date as string) ?? undefined,
     venue: (data.venue as string) ?? undefined,
     district: (data.district as string) ?? undefined,

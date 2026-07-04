@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
+import { getEventLocations, audienceLabel } from "@/lib/event-groups";
 
 // Read fresh CMS data on every request so admin edits (including fee changes)
 // show after a reload, and events created post-build resolve without a rebuild.
@@ -29,13 +30,22 @@ export async function generateMetadata({
 
 export default async function EventDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ loc?: string }>;
 }) {
   const { id } = await params;
+  const { loc } = await searchParams;
   const allEvents = await getEvents();
   const event = allEvents.find((e) => e.id === id);
   if (!event) notFound();
+
+  const locations = getEventLocations(event);
+  const multi = locations.length > 1;
+  // The location picked from the listing (?loc=), else the first one.
+  const selectedLocation =
+    locations.find((l) => l.id === loc) ?? locations[0];
 
   const body = event.details ?? [event.description];
   const related = allEvents
@@ -79,20 +89,48 @@ export default async function EventDetailPage({
               <Badge className="bg-white/15 px-4 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
                 {event.category}
               </Badge>
+              {audienceLabel(event.audience) && (
+                <Badge className="bg-highlight-400/20 px-4 py-1.5 text-sm text-white ring-1 ring-highlight-300/40 backdrop-blur-sm">
+                  {audienceLabel(event.audience)}
+                </Badge>
+              )}
             </div>
             <h1 className="font-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
             </h1>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/90">
-              {event.date && (
-                <span className="inline-flex items-center gap-2">
-                  <CalendarDays size={16} className="text-highlight-400" /> {event.date}
-                </span>
-              )}
-              {event.venue && (
-                <span className="inline-flex items-center gap-2">
-                  <MapPin size={16} className="text-highlight-400" /> {event.venue}
-                </span>
+              {/* Single-location: date + venue on one line. Multi-location:
+                  list every location with its own date. */}
+              {!multi ? (
+                <>
+                  {selectedLocation?.date && (
+                    <span className="inline-flex items-center gap-2">
+                      <CalendarDays size={16} className="text-highlight-400" />{" "}
+                      {selectedLocation.date}
+                    </span>
+                  )}
+                  {(selectedLocation?.venue || selectedLocation?.district) && (
+                    <span className="inline-flex items-center gap-2">
+                      <MapPin size={16} className="text-highlight-400" />{" "}
+                      {selectedLocation.venue ?? selectedLocation.district}
+                    </span>
+                  )}
+                </>
+              ) : (
+                locations.map((loc) => (
+                  <span
+                    key={loc.id}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <MapPin size={16} className="text-highlight-400" />
+                    {loc.venue || loc.district}
+                    {loc.date && (
+                      <span className="font-semibold text-highlight-300">
+                        · {loc.date}
+                      </span>
+                    )}
+                  </span>
+                ))
               )}
             </div>
           </div>
@@ -144,8 +182,53 @@ export default async function EventDetailPage({
                     ₹{event.registrationFee}
                   </p>
                 )}
+
+                {multi && (
+                  <div className="mt-5 flex flex-col gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                      Available locations
+                    </p>
+                    <ul className="flex flex-col gap-2">
+                      {locations.map((location) => (
+                        <li
+                          key={location.id}
+                          className="flex items-start gap-2 rounded-xl border border-border bg-surface-alt px-3.5 py-2.5"
+                        >
+                          <MapPin
+                            size={15}
+                            className="mt-0.5 shrink-0 text-primary-600"
+                          />
+                          <span className="flex min-w-0 flex-col">
+                            <span className="text-sm font-medium text-text">
+                              {location.venue ||
+                                location.district ||
+                                "Location"}
+                            </span>
+                            {location.date && (
+                              <span className="text-xs text-text-muted">
+                                {location.date}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-xs text-text-muted">
+                      You&apos;ll choose your location on the next step.
+                    </p>
+                  </div>
+                )}
+
                 <Button asChild size="lg" className="mt-6 w-full">
-                  <Link href={`/register?event=${event.id}`}>Register Now</Link>
+                  <Link
+                    href={`/register?event=${event.id}${
+                      selectedLocation && !multi
+                        ? `&loc=${encodeURIComponent(selectedLocation.id)}`
+                        : ""
+                    }`}
+                  >
+                    Register Now
+                  </Link>
                 </Button>
               </>
             ) : (
