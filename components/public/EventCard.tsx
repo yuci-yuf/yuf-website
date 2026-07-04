@@ -3,10 +3,25 @@ import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle } from "@/lib/category-style";
+import { getEventLocations, audienceLabel } from "@/lib/event-groups";
 
 export function EventCard({ event }: { event: EventItem }) {
   const style = categoryStyle(event.category);
   const Icon = style.icon;
+  const audience = audienceLabel(event.audience);
+
+  // Location-aware meta: keep the card to two lines — one for date(s), one for
+  // place(s) — even when the event runs in multiple places. Multi-location
+  // events also get a "N locations" badge; the detail page lists each fully.
+  const locations = getEventLocations(event);
+  const multi = locations.length > 1;
+
+  // Combine dates and places across locations, de-duplicated, into one line each.
+  const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
+  const metaDate = uniq(locations.map((l) => l.date?.trim() ?? "")).join(", ");
+  const metaPlace = uniq(
+    locations.map((l) => (l.district || l.venue || "").trim()),
+  ).join(", ");
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover">
@@ -60,22 +75,37 @@ export function EventCard({ event }: { event: EventItem }) {
           className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-primary-950/55 to-transparent"
           aria-hidden
         />
+
+        {/* Multi-location hint */}
+        {multi && (
+          <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1 text-xs font-semibold text-text shadow-sm ring-1 ring-border backdrop-blur-sm">
+            <MapPin size={12} style={{ color: style.accent }} />
+            {locations.length} locations
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        {/* Schedule meta — date + venue (when present) */}
-        {(event.date || event.venue) && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-text-muted">
-            {event.date && (
-              <span className="inline-flex items-center gap-1.5">
-                <Calendar size={14} className="text-primary-500" />
-                {event.date}
+        {/* Schedule meta — kept to two lines: all dates on one, all places on
+            the other, even for multi-location events. */}
+        {(metaDate || metaPlace) && (
+          <div className="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
+            {metaDate && (
+              <span className="inline-flex min-w-0 items-start gap-1.5">
+                <Calendar
+                  size={14}
+                  className="mt-0.5 shrink-0 text-primary-500"
+                />
+                <span className="line-clamp-1">{metaDate}</span>
               </span>
             )}
-            {event.venue && (
-              <span className="inline-flex min-w-0 items-center gap-1.5">
-                <MapPin size={14} className="shrink-0 text-primary-500" />
-                <span className="truncate">{event.venue}</span>
+            {metaPlace && (
+              <span className="inline-flex min-w-0 items-start gap-1.5">
+                <MapPin
+                  size={14}
+                  className="mt-0.5 shrink-0 text-primary-500"
+                />
+                <span className="line-clamp-1">{metaPlace}</span>
               </span>
             )}
           </div>
@@ -91,6 +121,12 @@ export function EventCard({ event }: { event: EventItem }) {
             {event.title}
           </Link>
         </h3>
+
+        {audience && (
+          <span className="inline-flex w-fit items-center rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-semibold text-primary-700">
+            {audience}
+          </span>
+        )}
 
         <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-text-muted">
           {event.description}

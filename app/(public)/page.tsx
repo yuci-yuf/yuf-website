@@ -221,14 +221,7 @@ export default async function HomePage() {
         cards={homeContent.govInitiatives.cards}
       />
 
-      <LogoStrip
-        partners={partners.filter(
-          (p) =>
-            p.name === "Falmouth University" ||
-            p.name === "World Youth Book of Records" ||
-            p.name === "Easwari Engineering College",
-        )}
-      />
+      <LogoStrip partners={partners} />
     </>
   );
 }

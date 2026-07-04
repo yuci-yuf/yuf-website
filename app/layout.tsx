@@ -33,6 +33,11 @@ export const metadata: Metadata = {
   },
   description:
     "Youth United Festival (YUF) — organized by Youth United Council of India. A platform celebrating youth talent, innovation, sports, arts, and unity across India.",
+  icons: {
+    icon: "/images/favicon.png",
+    shortcut: "/images/favicon.png",
+    apple: "/images/favicon.png",
+  },
   keywords: [
     "Youth United Festival",
     "YUF",
