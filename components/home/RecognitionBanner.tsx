@@ -46,9 +46,11 @@ export function RecognitionBanner({
     <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-14 lg:py-16">
       <ConfettiDots />
       <Container className="relative">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.12fr_0.88fr]">
-          {/* Left — content */}
-          <FadeUp className="flex flex-col gap-6">
+        {/* Mobile order: title → image → paragraph. Desktop: title + paragraph
+            stacked on the left, carousel on the right spanning both rows. */}
+        <div className="grid items-center gap-x-10 gap-y-8 lg:grid-cols-[1.12fr_0.88fr]">
+          {/* Title — first on mobile, top-left on desktop */}
+          <FadeUp className="order-1 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-1">
             <FestiveEyebrow className="w-fit text-highlight-400">{label}</FestiveEyebrow>
             <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.4rem] lg:text-[2.75rem]">
               {titleHead}
@@ -61,6 +63,20 @@ export function RecognitionBanner({
                 </>
               )}
             </h2>
+          </FadeUp>
+
+          {/* Carousel — between title and paragraph on mobile; right column
+              (spanning both rows) on desktop */}
+          <FadeUp
+            delay={0.15}
+            className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          >
+            <RecognitionCarousel images={images} />
+          </FadeUp>
+
+          {/* Paragraph + details — below the image on mobile; below the title
+              on desktop */}
+          <FadeUp className="order-3 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-2">
             <p className="text-xl leading-relaxed text-white/85 sm:text-2xl sm:leading-relaxed">
               {emphasize(subtitle, highlight)}
             </p>
@@ -74,11 +90,6 @@ export function RecognitionBanner({
                 ))}
               </ul>
             )}
-          </FadeUp>
-
-          {/* Right — auto-sliding carousel */}
-          <FadeUp delay={0.15}>
-            <RecognitionCarousel images={images} />
           </FadeUp>
         </div>
       </Container>

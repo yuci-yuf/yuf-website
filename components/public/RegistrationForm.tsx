@@ -85,16 +85,6 @@ function locationInCity(loc: EventLocation, city: string): boolean {
   return names.some((name) => haystack.includes(name.toLowerCase()));
 }
 
-/** The event's locations that belong to the given city. */
-function eventLocationsInCity(ev: EventItem, city: string): EventLocation[] {
-  return getEventLocations(ev).filter((loc) => locationInCity(loc, city));
-}
-
-/** True if the event has any location in the given city. */
-function eventInLocation(ev: EventItem, city: string): boolean {
-  return eventLocationsInCity(ev, city).length > 0;
-}
-
 /**
  * True if the event is open to the given student type. An event with audience
  * "both" (or unset) accepts anyone; otherwise it must match. Before the student
@@ -188,43 +178,40 @@ export function RegistrationForm({
     setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
-  // Categories that actually have events in the chosen city AND open to the
-  // student's type (school/college). Empty until a city is picked.
+  // Categories that have at least one event open to the student's type
+  // (school/college). Not filtered by city — every event is shown.
   const availableCategories = useMemo(() => {
-    if (!values.location) return [];
     return categories.filter((c) =>
       events.some(
         (e) =>
           e.category === c &&
-          eventInLocation(e, values.location) &&
           eventForStudentType(e, values.institutionType),
       ),
     );
-  }, [categories, events, values.location, values.institutionType]);
+  }, [categories, events, values.institutionType]);
 
-  // Events matching the chosen city, category, AND the student's type.
+  // Events matching the chosen category AND the student's type (no city filter).
   const eventsForSelection = useMemo(() => {
-    if (!values.location || !category) return [];
+    if (!category) return [];
     return events.filter(
       (e) =>
         e.category === category &&
-        eventInLocation(e, values.location) &&
         eventForStudentType(e, values.institutionType),
     );
-  }, [events, category, values.location, values.institutionType]);
+  }, [events, category, values.institutionType]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
 
-  // The event list is filtered by BOTH city and school/college, so the user
-  // must pick those before choosing a category/event.
-  const canChooseEvent = !!values.location && !!values.institutionType;
+  // The event list is filtered only by school/college, so the user must pick
+  // that before choosing a category/event. City no longer gates the list.
+  const canChooseEvent = !!values.institutionType;
 
-  // Locations of the selected event that are in the chosen city (what the
-  // participant picks between). Fee is shared across locations.
+  // All locations of the selected event (what the participant picks between).
+  // Fee is shared across locations.
   const locationsForSelection = useMemo(() => {
-    if (!selectedEvent || !values.location) return [];
-    return eventLocationsInCity(selectedEvent, values.location);
-  }, [selectedEvent, values.location]);
+    if (!selectedEvent) return [];
+    return getEventLocations(selectedEvent);
+  }, [selectedEvent]);
 
   // When an event has just one location in the city, use it implicitly so the
   // participant isn't asked to "choose" from a list of one.
@@ -732,11 +719,9 @@ export function RegistrationForm({
                     >
                       <SelectValue
                         placeholder={
-                          !values.location
-                            ? "Select your city first"
-                            : !values.institutionType
-                              ? "Choose school or college first"
-                              : "Choose a category"
+                          !values.institutionType
+                            ? "Choose school or college first"
+                            : "Choose a category"
                         }
                       />
                     </SelectTrigger>
