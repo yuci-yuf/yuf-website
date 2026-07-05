@@ -281,6 +281,10 @@ export function RegistrationForm({
       // is re-enabled, this write moves behind the payment API routes.
       const code = makeRegistrationCode();
       const { place, date } = locationParts(selectedLocation);
+      const venue =
+        selectedLocation.venue ?? selectedLocation.district ?? place;
+      const eventDate = selectedLocation.date ?? date;
+
       await submitRegistration({
         firstName,
         lastName,
@@ -295,11 +299,24 @@ export function RegistrationForm({
         amountPaid: fee ?? 0,
         registrationCode: code,
         locationId: effectiveLocationId,
-        locationVenue:
-          selectedLocation.venue ?? selectedLocation.district ?? place,
-        locationDate: selectedLocation.date ?? date,
+        locationVenue: venue,
+        locationDate: eventDate,
       });
       finishSuccess(code);
+
+      // Fire-and-forget confirmation email — never block or fail the success UI.
+      void fetch("/api/registrations/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: values.email.trim(),
+          firstName,
+          eventTitle: selectedEvent.title,
+          date: eventDate,
+          venue,
+          registrationCode: code,
+        }),
+      }).catch(() => {});
     } catch (err) {
       if (err instanceof RegistrationFullError) {
         setStatus("full");
