@@ -15,7 +15,10 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -190,14 +193,20 @@ export function RegistrationForm({
     );
   }, [categories, events, values.institutionType]);
 
-  // Events matching the chosen category AND the student's type (no city filter).
-  const eventsForSelection = useMemo(() => {
-    if (!category) return [];
-    return events.filter(
-      (e) =>
-        e.category === category &&
-        eventForStudentType(e, values.institutionType),
+  // Events for the picker (filtered by the student's school/college type): the
+  // chosen category first, then every other event below it — so a participant
+  // can still reach events outside the selected category.
+  const { primaryEvents, otherEvents } = useMemo(() => {
+    if (!category) {
+      return { primaryEvents: [] as EventItem[], otherEvents: [] as EventItem[] };
+    }
+    const ofType = events.filter((e) =>
+      eventForStudentType(e, values.institutionType),
     );
+    return {
+      primaryEvents: ofType.filter((e) => e.category === category),
+      otherEvents: ofType.filter((e) => e.category !== category),
+    };
   }, [events, category, values.institutionType]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
@@ -768,11 +777,27 @@ export function RegistrationForm({
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {eventsForSelection.map((ev) => (
-                        <SelectItem key={ev.id} value={ev.id}>
-                          {ev.title}
-                        </SelectItem>
-                      ))}
+                      {primaryEvents.length > 0 && (
+                        <SelectGroup>
+                          <SelectLabel>{category}</SelectLabel>
+                          {primaryEvents.map((ev) => (
+                            <SelectItem key={ev.id} value={ev.id}>
+                              {ev.title}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
+                      {otherEvents.length > 0 && (
+                        <SelectGroup>
+                          {primaryEvents.length > 0 && <SelectSeparator />}
+                          <SelectLabel>Other events</SelectLabel>
+                          {otherEvents.map((ev) => (
+                            <SelectItem key={ev.id} value={ev.id}>
+                              {ev.title}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
                     </SelectContent>
                   </Select>
                   <ErrorText>{errors.event}</ErrorText>

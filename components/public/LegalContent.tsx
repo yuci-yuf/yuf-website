@@ -4,7 +4,7 @@ import type { LegalPage } from "@/lib/content";
 export function LegalContent({ data }: { data: LegalPage }) {
   return (
     <>
-      <Section className="bg-festival-gradient text-white" containerClassName="max-w-3xl">
+      <Section className="bg-festival-gradient text-white" containerClassName="max-w-6xl">
         <p className="text-sm font-semibold uppercase tracking-widest text-highlight-400">
           {data.updated}
         </p>
@@ -12,16 +12,18 @@ export function LegalContent({ data }: { data: LegalPage }) {
           {data.title}
         </h1>
         {data.intro && (
-          <p className="mt-5 text-base leading-relaxed text-white/85">
+          <p className="mt-5 max-w-3xl text-base leading-relaxed text-white/85">
             {data.intro}
           </p>
         )}
       </Section>
 
-      <Section tone="aqua" containerClassName="max-w-3xl">
-        <div className="flex flex-col gap-10">
+      <Section tone="aqua" containerClassName="max-w-6xl">
+        {/* Two columns on large screens so the sections fill the width instead
+            of leaving big empty margins; each section stays whole. */}
+        <div className="columns-1 gap-12 lg:columns-2">
           {data.sections.map((section) => (
-            <div key={section.heading} className="flex flex-col gap-4">
+            <div key={section.heading} className="mb-10 flex break-inside-avoid flex-col gap-4 last:mb-0">
               <h2 className="font-heading text-2xl font-bold text-heading">
                 {section.heading}
               </h2>
