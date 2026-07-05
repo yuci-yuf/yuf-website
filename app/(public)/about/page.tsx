@@ -61,9 +61,9 @@ export default function AboutPage() {
           ═══════════════════════════════════════════════════════ */}
       <section id="who-we-are" className="scroll-mt-24 bg-surface-alt py-16 lg:py-24">
         <Container>
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-6">
             {/* Title — first on mobile, top-left on desktop */}
-            <FadeUp className="order-1 lg:col-start-1 lg:row-start-1">
+            <FadeUp className="order-1 lg:col-start-1 lg:row-start-1 lg:self-end">
               <h2 className="font-display text-4xl font-extrabold tracking-tight text-heading sm:text-5xl lg:text-[3rem]">
                 {aboutContent.about.title}
               </h2>
@@ -86,7 +86,7 @@ export default function AboutPage() {
             </FadeUp>
 
             {/* Body — below the image on mobile, under the title on desktop */}
-            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-1 lg:row-start-2">
+            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-1 lg:row-start-2 lg:self-start">
               {aboutContent.about.body.map((p, i) => (
                 <p key={i} className="text-lg leading-relaxed text-body sm:text-xl">
                   {p}

@@ -48,9 +48,9 @@ export function RecognitionBanner({
       <Container className="relative">
         {/* Mobile order: title → image → paragraph. Desktop: title + paragraph
             stacked on the left, carousel on the right spanning both rows. */}
-        <div className="grid items-center gap-x-10 gap-y-8 lg:grid-cols-[1.12fr_0.88fr]">
+        <div className="grid items-center gap-x-10 gap-y-6 lg:grid-cols-[1.12fr_0.88fr]">
           {/* Title — first on mobile, top-left on desktop */}
-          <FadeUp className="order-1 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-1">
+          <FadeUp className="order-1 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-1 lg:self-end">
             <FestiveEyebrow className="w-fit text-highlight-400">{label}</FestiveEyebrow>
             <h2 className="font-heading text-[2rem] font-bold leading-[1.12] tracking-tight text-white sm:text-[2.4rem] lg:text-[2.75rem]">
               {titleHead}
@@ -76,7 +76,7 @@ export function RecognitionBanner({
 
           {/* Paragraph + details — below the image on mobile; below the title
               on desktop */}
-          <FadeUp className="order-3 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-2">
+          <FadeUp className="order-3 flex flex-col gap-6 lg:order-none lg:col-start-1 lg:row-start-2 lg:self-start">
             <p className="text-xl leading-relaxed text-white/85 sm:text-2xl sm:leading-relaxed">
               {emphasize(subtitle, highlight)}
             </p>

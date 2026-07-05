@@ -82,7 +82,7 @@ export default async function HomePage() {
               left (spanning both rows), heading + paragraph stacked on the right. */}
           <div className="grid items-center gap-8 md:grid-cols-2 md:gap-x-16 md:gap-y-5">
             {/* Heading — top on mobile, top-right on desktop */}
-            <FadeUp className="order-1 flex flex-col gap-5 md:order-none md:col-start-2 md:row-start-1">
+            <FadeUp className="order-1 flex flex-col gap-5 md:order-none md:col-start-2 md:row-start-1 md:self-end">
               <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
               <div className="flex flex-col gap-2">
                 <h2 className="font-display text-2xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-3xl xl:text-4xl lg:whitespace-nowrap">
@@ -108,7 +108,7 @@ export default async function HomePage() {
             </ScaleIn>
 
             {/* Paragraph — below the image on mobile, below the heading on desktop */}
-            <FadeUp className="order-3 md:order-none md:col-start-2 md:row-start-2">
+            <FadeUp className="order-3 md:order-none md:col-start-2 md:row-start-2 md:self-start">
               <p className="text-lg leading-relaxed text-body lg:text-xl">
                 The Youth United Council of India extends its sincere gratitude to{" "}
                 <span className="whitespace-nowrap font-semibold text-highlight-600">
@@ -166,7 +166,7 @@ export default async function HomePage() {
         <Container className="relative">
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-x-16">
             {/* Title — first on mobile, top-right on desktop */}
-            <FadeUp className="order-1 lg:col-start-2 lg:row-start-1">
+            <FadeUp className="order-1 lg:col-start-2 lg:row-start-1 lg:self-end">
               <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-heading sm:text-4xl xl:text-5xl">
                 Noble Appreciation From{" "}
                 <span className="text-highlight-600">Raj Bhavan</span>
@@ -179,7 +179,7 @@ export default async function HomePage() {
             </ScaleIn>
 
             {/* Paragraph + list — below the image on mobile, bottom-right on desktop */}
-            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-2 lg:row-start-2">
+            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-2 lg:row-start-2 lg:self-start">
               <p className="text-base leading-relaxed text-body sm:text-lg">
                 The Youth United Council of India (YUCI) to has received prestigious
                 recognition for its commendable contributions. Awards of appreciation
