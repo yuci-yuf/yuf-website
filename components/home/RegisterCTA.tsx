@@ -44,12 +44,6 @@ export function RegisterCTA({ data }: { data: CTABanner }) {
                     className="transition-transform group-hover:translate-x-0.5"
                   />
                 </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex h-13 items-center gap-2 rounded-full border border-white/30 px-8 text-[15px] font-semibold text-white transition-all hover:bg-white/10"
-                >
-                  Contact Us
-                </Link>
               </div>
             </div>
           </div>

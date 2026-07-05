@@ -232,7 +232,7 @@ export function HeroSection({
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
+            className="font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
           >
             Youth United Festival<br /><span className="text-highlight-400">{highlight}</span>
           </motion.h1>

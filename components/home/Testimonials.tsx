@@ -73,7 +73,7 @@ export function Testimonials({
             {/* Oversized quotation watermark */}
             <Quote
               aria-hidden
-              className="absolute right-6 top-6 h-20 w-20 -scale-x-100 text-primary-100 z-10"
+              className="absolute right-6 top-6 z-10 hidden h-20 w-20 -scale-x-100 text-primary-100 sm:block"
               strokeWidth={1.5}
             />
 
@@ -91,7 +91,7 @@ export function Testimonials({
                   initial={reduced ? false : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.05 }}
-                  className="relative min-h-[220px] sm:min-h-[400px]"
+                  className="relative min-h-[420px] sm:min-h-[400px]"
                 >
                   <div className="absolute inset-0 overflow-hidden bg-primary-100">
                     {active.image && !failed[index] ? (

@@ -25,7 +25,7 @@ export function Footer() {
 
       <Container className="relative pb-8 pt-14 lg:pb-10 lg:pt-16">
         {/* Link columns */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.4fr]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.4fr]">
           {/* Brand + blurb + socials */}
           <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-3">
@@ -45,8 +45,8 @@ export function Footer() {
                 </span>
               </span>
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-white/85">
-              {siteConfig.footerBlurb.slice(0, 180)}...
+            <p className="max-w-sm text-sm leading-relaxed text-white/85">
+              {siteConfig.footerBlurb}
             </p>
             <div className="flex gap-2.5">
               {siteConfig.socialLinks.map((s) => (
@@ -66,15 +66,6 @@ export function Footer() {
 
           <FooterCol title="Quick Links" links={siteConfig.quickLinks} />
           <FooterCol title="Useful Links" links={siteConfig.usefulLinks} />
-          <FooterCol
-            title="Events"
-            links={[
-              { label: "All Events", path: "/events" },
-              { label: "Youth Parliament", path: "/events/youth-parliament" },
-              { label: "Young Scientist", path: "/events/young-scientist" },
-              { label: "Talent Icon", path: "/events/talent-icon" },
-            ]}
-          />
 
           {/* Contact */}
           <div className="flex flex-col gap-4">
@@ -115,9 +106,6 @@ export function Footer() {
               className="transition-colors hover:text-white"
             >
               Terms
-            </Link>
-            <Link href="/refund-policy" className="transition-colors hover:text-white">
-              Refunds
             </Link>
           </div>
         </Container>

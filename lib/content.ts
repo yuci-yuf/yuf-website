@@ -28,9 +28,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact", path: "/contact" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
@@ -44,21 +42,18 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact Us", path: "/contact" },
   ],
   usefulLinks: [
     { label: "Register Now", path: "/register" },
     { label: "Privacy Policy", path: "/privacy-policy" },
     { label: "Terms & Conditions", path: "/terms-and-conditions" },
-    { label: "Refund Policy", path: "/refund-policy" },
   ],
   contact: {
     phone: "",
     email: "info@youthunitedcouncilofindia.org",
     address:
-      "NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India",
+      "1, 3rd St, Nandanam Extension, Nandanam, Chennai, Tamil Nadu 600035",
   },
   copyrightText: "© 2026 Youth United Council of India | All Rights Reserved",
   stats: [
@@ -238,9 +233,10 @@ export const studyAbroadContent = {
 
 // ── Shared registration steps ──
 export const registrationSteps: RegistrationStep[] = [
-  { step: 1, title: "Select the Competition", description: "Browse the list of available competitions and select the one you're interested in. Ensure it aligns with your interests and skills." },
-  { step: 2, title: "Fill the Form", description: "Complete the registration form with the necessary details, such as participant information, category, and additional required specifics." },
-  { step: 3, title: "Payment", description: "Proceed to payment to confirm your registration. Choose your preferred payment method and ensure the transaction is completed." },
+  { step: 1, title: "Enter Your Details", description: "Add the participant's name, contact number, email, and school or college details, then choose the city where you'll take part." },
+  { step: 2, title: "Choose Your Event", description: "Pick a category and select the competition you want to enter — the events shown are the ones running in your chosen city." },
+  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets." },
+  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass." },
 ];
 
 // ── Page content ──
@@ -367,7 +363,6 @@ export const homeContent = {
     body: "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
     buttons: [
       { label: "Let's Go!", href: "/register", variant: "primary" },
-      { label: "Contact Us", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };
@@ -420,7 +415,7 @@ export const aboutContent = {
     label: "Be Part of Something Bigger",
     title: "Why Join Us",
     subtitle:
-      "By participating in YUF, you are joining a global community of passionate, creative, and driven individuals. YUF is not just an event; it's a movement.",
+      "By participating in YUF, you are joining a global community of passionate, creative, and driven individuals. Youth United Festival is not just an event; it's a movement.",
     cards: [
       { title: "Showcase Your Talents", description: "Whether you're an artist, innovator, athlete, or leader, YUF gives you the platform to shine in front of thousands." },
       { title: "Learn & Grow", description: "Gain valuable insights through workshops, talks, and networking opportunities with experts, peers, and national icons." },
@@ -477,7 +472,6 @@ export const eventsContent = {
     body: "Discover how YUF initiatives are transforming lives and empowering individuals to achieve their full potential. Join the movement today.",
     buttons: [
       { label: "Register for YUF 2026", href: "/register", variant: "primary" },
-      { label: "Get in Touch", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };

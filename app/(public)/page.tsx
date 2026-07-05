@@ -78,9 +78,24 @@ export default async function HomePage() {
       <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
         <FestiveGlows />
         <Container className="relative">
-          <div className="grid items-center gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
-            {/* Left — image */}
-            <ScaleIn>
+          {/* Mobile order: heading → image → paragraph. Desktop: image on the
+              left (spanning both rows), heading + paragraph stacked on the right. */}
+          <div className="grid items-center gap-8 md:grid-cols-2 md:gap-x-16 md:gap-y-5">
+            {/* Heading — top on mobile, top-right on desktop */}
+            <FadeUp className="order-1 flex flex-col gap-5 md:order-none md:col-start-2 md:row-start-1 md:self-end">
+              <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
+              <div className="flex flex-col gap-2">
+                <h2 className="font-display text-2xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-3xl xl:text-4xl lg:whitespace-nowrap">
+                  Dr. Tamilisai Soundararajan
+                </h2>
+                <p className="text-base font-medium text-text-muted lg:text-lg">
+                  Former Governor of Telangana &amp; Lt. Governor of Puducherry
+                </p>
+              </div>
+            </FadeUp>
+
+            {/* Image — middle on mobile, left column (both rows) on desktop */}
+            <ScaleIn className="order-2 md:order-none md:col-start-1 md:row-start-1 md:row-span-2">
               <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl shadow-lg">
                 <Image
                   src="/images/testimonials/tamilisai-soundararajan.png"
@@ -92,17 +107,8 @@ export default async function HomePage() {
               </div>
             </ScaleIn>
 
-            {/* Right — content */}
-            <FadeUp className="flex flex-col gap-7">
-              <span className="text-base font-bold uppercase tracking-[0.2em] text-highlight-600">Distinguished Guest</span>
-              <div className="flex flex-col gap-2">
-                <h2 className="font-display text-2xl font-extrabold uppercase leading-tight tracking-tight text-heading sm:text-3xl xl:text-4xl lg:whitespace-nowrap">
-                  Dr. Tamilisai Soundararajan
-                </h2>
-                <p className="text-base font-medium text-text-muted lg:text-lg">
-                  Former Governor of Telangana &amp; Lt. Governor of Puducherry
-                </p>
-              </div>
+            {/* Paragraph — below the image on mobile, below the heading on desktop */}
+            <FadeUp className="order-3 md:order-none md:col-start-2 md:row-start-2 md:self-start">
               <p className="text-lg leading-relaxed text-body lg:text-xl">
                 The Youth United Council of India extends its sincere gratitude to{" "}
                 <span className="whitespace-nowrap font-semibold text-highlight-600">
@@ -154,28 +160,26 @@ export default async function HomePage() {
 
 <GalleryMosaic photos={galleryPhotos.slice(0, 7)} />
 
-      {/* ── Nobel Appreciation From Raj Bhavan ── */}
+      {/* ── Noble Appreciation From Raj Bhavan ── */}
       <section className="section-aqua relative overflow-hidden py-12 lg:py-16">
         <FestiveGlows />
         <Container className="relative">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
-            {/* Left — image carousel */}
-            <ScaleIn>
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-x-16">
+            {/* Title — first on mobile, top-right on desktop */}
+            <FadeUp className="order-1 lg:col-start-2 lg:row-start-1 lg:self-end">
+              <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-heading sm:text-4xl xl:text-5xl">
+                Noble Appreciation From{" "}
+                <span className="text-highlight-600">Raj Bhavan</span>
+              </h2>
+            </FadeUp>
+
+            {/* Image carousel — second on mobile, left column (spans both rows) on desktop */}
+            <ScaleIn className="order-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-center">
               <RajBhavanCarousel />
             </ScaleIn>
 
-            {/* Right — content */}
-            <FadeUp className="flex flex-col gap-6">
-              {/* <div className="flex items-center gap-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-highlight-500" aria-hidden />
-                <span className="text-sm font-bold uppercase tracking-[0.2em] text-highlight-600">YUCI</span>
-              </div> */}
-
-              <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-heading sm:text-4xl xl:text-5xl">
-                Nobel Appreciation From{" "}
-                <span className="text-highlight-600">Raj Bhavan</span>
-              </h2>
-
+            {/* Paragraph + list — below the image on mobile, bottom-right on desktop */}
+            <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-2 lg:row-start-2 lg:self-start">
               <p className="text-base leading-relaxed text-body sm:text-lg">
                 The Youth United Council of India (YUCI) to has received prestigious
                 recognition for its commendable contributions. Awards of appreciation
@@ -198,11 +202,6 @@ export default async function HomePage() {
                   </span>
                 </li>
               </ul>
-
-              {/* <p className="text-base leading-relaxed text-body sm:text-lg">
-                <span className="font-semibold text-heading">Shri. Embalam R. Selvam</span>{" "}
-                presents an award to a recipient recognized by the Asia Book of Records.
-              </p> */}
             </FadeUp>
           </div>
         </Container>

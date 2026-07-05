@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { GalleryExplorer } from "@/components/public/GalleryExplorer";
-import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { galleryContent, homeContent } from "@/lib/content";
+import { galleryContent } from "@/lib/content";
 import { getGalleryPhotos } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
@@ -33,9 +32,6 @@ export default async function GalleryPage() {
           </p>
         )}
       </Section>
-
-      {/* Reuse the home CTA banner so we don't author a near-duplicate. */}
-      <CTABanner data={homeContent.ctaBanner} />
     </>
   );
 }
