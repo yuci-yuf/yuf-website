@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import type { EventItem, EventLocation } from "@/types";
 import {
   getEventLocations,
@@ -23,47 +23,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { computeInvoice, formatINR, GST_RATE } from "@/lib/pricing";
+import { formatINR } from "@/lib/pricing";
+import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
 
-// ── Razorpay Checkout (loaded on demand) ──
-interface RazorpayHandlerResponse {
-  razorpay_payment_id: string;
-  razorpay_order_id: string;
-  razorpay_signature: string;
-}
-interface RazorpayOptions {
-  key?: string;
-  order_id: string;
-  amount: number;
-  currency: string;
-  name: string;
-  description?: string;
-  prefill?: { name?: string; email?: string; contact?: string };
-  theme?: { color?: string };
-  handler: (r: RazorpayHandlerResponse) => void;
-  modal?: { ondismiss?: () => void };
-}
-interface RazorpayInstance {
-  open: () => void;
-  on: (event: string, cb: () => void) => void;
-}
-declare global {
-  interface Window {
-    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
-  }
-}
-
-function loadRazorpay(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject(new Error("no window"));
-    if (window.Razorpay) return resolve();
-    const s = document.createElement("script");
-    s.src = "https://checkout.razorpay.com/v1/checkout.js";
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("Failed to load Razorpay Checkout."));
-    document.body.appendChild(s);
-  });
+// Human-friendly, non-sequential entry code (Crockford-ish alphabet, no
+// I/L/O/U). Generated in the browser via Web Crypto.
+function makeRegistrationCode(): string {
+  const ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  let code = "";
+  for (let i = 0; i < 6; i++) code += ALPHABET[bytes[i] % ALPHABET.length];
+  return `YUF26-${code}`;
 }
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
@@ -171,9 +143,6 @@ export function RegistrationForm({
     "idle" | "submitting" | "success" | "error" | "full"
   >("idle");
   const formRef = useRef<HTMLFormElement>(null);
-  // One idempotency key per attempt, reused on retry so a re-submit returns the
-  // same reservation/order instead of creating duplicates.
-  const idempotencyKeyRef = useRef<string>("");
   const [regCode, setRegCode] = useState<string>("");
 
   const setField = (key: keyof FormValues, value: string) => {
@@ -234,7 +203,6 @@ export function RegistrationForm({
 
   const fee = selectedEvent?.registrationFee;
   const feeLabel = fee != null ? formatINR(fee) : "—";
-  const invoice = fee != null ? computeInvoice(fee) : null;
 
   const selectedSpotsLeft = selectedLocation
     ? locationSpotsLeft(selectedLocation)
@@ -307,96 +275,42 @@ export function RegistrationForm({
         ? `${values.institutionName.trim()} (School — ${values.level} standard)`
         : `${values.institutionName.trim()} (College — ${values.level})`;
 
-    if (!idempotencyKeyRef.current) {
-      idempotencyKeyRef.current = crypto.randomUUID();
-    }
-
     setStatus("submitting");
     try {
-      // 1) Reserve a slot + create the pending registration + payment order.
-      const res = await fetch("/api/registrations/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email: values.email.trim(),
-          phone: values.phone,
-          location: values.location,
-          institution,
-          ageCategory: values.level,
-          eventId: selectedEvent.id,
-          locationId: effectiveLocationId,
-          idempotencyKey: idempotencyKeyRef.current,
-        }),
+      // Payment is deferred — record the registration directly. When Razorpay
+      // is re-enabled, this write moves behind the payment API routes.
+      const code = makeRegistrationCode();
+      const { place, date } = locationParts(selectedLocation);
+      await submitRegistration({
+        firstName,
+        lastName,
+        email: values.email.trim(),
+        phone: values.phone,
+        location: values.location,
+        institution,
+        eventCategory: selectedEvent.category,
+        eventId: selectedEvent.id,
+        eventTitle: selectedEvent.title,
+        ageCategory: values.level,
+        amountPaid: fee ?? 0,
+        registrationCode: code,
+        locationId: effectiveLocationId,
+        locationVenue:
+          selectedLocation.venue ?? selectedLocation.district ?? place,
+        locationDate: selectedLocation.date ?? date,
       });
-      if (res.status === 409) {
+      finishSuccess(code);
+    } catch (err) {
+      if (err instanceof RegistrationFullError) {
         setStatus("full");
         return;
       }
-      if (!res.ok) {
-        setStatus("error");
-        return;
-      }
-      const order = await res.json();
-
-      // Free event → already confirmed, no payment step.
-      if (order.free) {
-        finishSuccess(order.code);
-        return;
-      }
-
-      // 2) Open Razorpay Checkout.
-      await loadRazorpay();
-      const rzp = new window.Razorpay({
-        key: order.keyId,
-        order_id: order.orderId,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Youth United Festival 2026",
-        description: selectedEvent.title,
-        prefill: {
-          name: values.name.trim(),
-          email: values.email.trim(),
-          contact: values.phone,
-        },
-        theme: { color: "#155fa6" },
-        // 3) On success, verify the signature server-side, then confirm.
-        handler: async (resp) => {
-          try {
-            const v = await fetch("/api/payments/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                ...resp,
-                registrationId: order.registrationId,
-              }),
-            });
-            if (v.ok) {
-              const d = await v.json();
-              finishSuccess(d.code ?? order.code);
-            } else {
-              setStatus("error");
-            }
-          } catch {
-            setStatus("error");
-          }
-        },
-        modal: {
-          // Dismissed without paying — allow a retry (same idempotency key).
-          ondismiss: () => setStatus("idle"),
-        },
-      });
-      rzp.on("payment.failed", () => setStatus("error"));
-      rzp.open();
-    } catch (err) {
       console.error("Registration failed:", err);
       setStatus("error");
     }
   }
 
   function finishSuccess(code?: string) {
-    idempotencyKeyRef.current = "";
     setRegCode(code ?? "");
     setStatus("success");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -890,43 +804,24 @@ export function RegistrationForm({
                   : "Not selected yet"}
               </Row>
 
-              {/* Itemized invoice */}
-              {invoice ? (
-                <div className="flex flex-col gap-2 border-t border-border pt-4 text-sm">
-                  <div className="flex items-center justify-between text-text-muted">
-                    <span>Registration fee</span>
-                    <span>{formatINR(invoice.base)}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-text-muted">
-                    <span>Platform fee</span>
-                    <span>{formatINR(invoice.platformFee)}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-text-muted">
-                    <span>GST ({Math.round(GST_RATE * 100)}%)</span>
-                    <span>{formatINR(invoice.gst)}</span>
-                  </div>
-                  <div className="mt-1 flex items-center justify-between border-t border-border pt-3">
-                    <span className="font-medium text-text">Total payable</span>
-                    <span className="font-heading text-lg font-bold text-heading">
-                      {formatINR(invoice.total)}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <Row label="Fee">{feeLabel}</Row>
-              )}
+              <div className="flex items-center justify-between border-t border-border pt-4">
+                <span className="font-medium text-text">Registration fee</span>
+                <span className="font-heading text-lg font-bold text-heading">
+                  {feeLabel}
+                </span>
+              </div>
             </div>
 
             <p className="flex items-start gap-2 text-xs text-text-muted">
               <ShieldCheck size={16} className="mt-0.5 shrink-0 text-success" />
-              Secure payment via Razorpay — UPI, cards, net banking &amp; wallets.
-              Your details are kept private.
+              No payment required now — your spot is reserved and our team will
+              share fee &amp; payment details later. Your details are kept private.
             </p>
 
             {status === "error" && (
               <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-                Payment couldn&apos;t be completed. If money was deducted it will be
-                auto-refunded; please try again or contact us.
+                Something went wrong saving your registration. Please try again
+                or contact us.
               </p>
             )}
             {status === "full" && (
@@ -941,14 +836,12 @@ export function RegistrationForm({
               className="w-full"
               disabled={status === "submitting" || selectedFull}
             >
-              <Lock size={18} />
+              <CheckCircle2 size={18} />
               {status === "submitting"
-                ? "Starting payment…"
+                ? "Submitting…"
                 : selectedFull
                   ? "Event Full"
-                  : invoice
-                    ? `Pay ${formatINR(invoice.total)} & Register`
-                    : "Complete Registration"}
+                  : "Complete Registration"}
             </Button>
 
             <p className="text-center text-xs text-text-muted">

@@ -46,6 +46,12 @@ export interface RegistrationSubmission {
   ageCategory: string;
   message?: string;
   amountPaid: number;
+  /** Human-friendly entry code shown to the participant. */
+  registrationCode?: string;
+  /** Which event location the participant registered for. */
+  locationId?: string;
+  locationVenue?: string;
+  locationDate?: string;
 }
 
 /**
@@ -61,9 +67,10 @@ export class RegistrationFullError extends Error {
 }
 
 /**
- * Saves a registration with `pending` payment/status. The Razorpay payment
- * flow (Phase 3) will instead create the doc after a verified payment and set
- * paymentStatus/status to "paid"/"confirmed".
+ * Saves a registration directly from the client (no payment step). The record
+ * is marked `confirmed` with `paymentStatus: "pending"` — i.e. registered,
+ * payment not yet collected. When the Razorpay flow is (re)enabled, the payment
+ * API routes will own confirmation instead.
  *
  * Runs inside a Firestore transaction so the capacity check and the count
  * increment are atomic — two people submitting the last spot at once can't both
@@ -106,7 +113,7 @@ export async function submitRegistration(
       ...data,
       amountPaid,
       paymentStatus: "pending",
-      status: "pending",
+      status: "confirmed",
       createdAt: serverTimestamp(),
     });
     // Only bump the counter when the event doc exists (so the public update

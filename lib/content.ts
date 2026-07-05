@@ -28,9 +28,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact", path: "/contact" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
@@ -44,9 +42,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact Us", path: "/contact" },
   ],
   usefulLinks: [
     { label: "Register Now", path: "/register" },
@@ -367,7 +363,6 @@ export const homeContent = {
     body: "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
     buttons: [
       { label: "Let's Go!", href: "/register", variant: "primary" },
-      { label: "Contact Us", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };
@@ -477,7 +472,6 @@ export const eventsContent = {
     body: "Discover how YUF initiatives are transforming lives and empowering individuals to achieve their full potential. Join the movement today.",
     buttons: [
       { label: "Register for YUF 2026", href: "/register", variant: "primary" },
-      { label: "Get in Touch", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };
