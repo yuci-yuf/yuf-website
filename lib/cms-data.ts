@@ -62,6 +62,7 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
       ? (data.guidelines as string[])
       : undefined,
     rules: Array.isArray(data.rules) ? (data.rules as string[]) : undefined,
+    ruleBook: (data.ruleBook as string) ?? undefined,
   };
 }
 

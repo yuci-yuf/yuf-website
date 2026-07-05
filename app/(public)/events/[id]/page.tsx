@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
@@ -277,6 +277,19 @@ export default async function EventDetailPage({
                   <Link href="/events">Browse other events</Link>
                 </Button>
               </>
+            )}
+
+            {event.ruleBook && (
+              <a
+                href={event.ruleBook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary-300 bg-white px-6 text-[15px] font-semibold text-primary-700 transition-colors hover:border-primary-500 hover:bg-primary-50"
+                style={{ height: "3rem" }}
+              >
+                <FileDown size={17} />
+                Download Rule Book (PDF)
+              </a>
             )}
             </div>
           </aside>

@@ -60,6 +60,12 @@ function locationInCity(loc: EventLocation, city: string): boolean {
   return names.some((name) => haystack.includes(name.toLowerCase()));
 }
 
+/** True if any of the event's locations is in the given city. */
+function eventInCity(ev: EventItem, city: string): boolean {
+  if (!city) return false;
+  return getEventLocations(ev).some((l) => locationInCity(l, city));
+}
+
 /**
  * True if the event is open to the given student type. An event with audience
  * "both" (or unset) accepts anyone; otherwise it must match. Before the student
@@ -79,7 +85,8 @@ const COLLEGE_YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 type InstitutionType = "" | "school" | "college";
 
 interface FormValues {
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email: string;
   location: string;
@@ -89,7 +96,8 @@ interface FormValues {
 }
 
 const EMPTY: FormValues = {
-  name: "",
+  firstName: "",
+  lastName: "",
   phone: "",
   email: "",
   location: "",
@@ -151,38 +159,41 @@ export function RegistrationForm({
   };
 
   // Categories that have at least one event open to the student's type
-  // (school/college). Not filtered by city — every event is shown.
+  // (school/college) AND running in the chosen city.
   const availableCategories = useMemo(() => {
     return categories.filter((c) =>
       events.some(
         (e) =>
           e.category === c &&
-          eventForStudentType(e, values.institutionType),
+          eventForStudentType(e, values.institutionType) &&
+          eventInCity(e, values.location),
       ),
     );
-  }, [categories, events, values.institutionType]);
+  }, [categories, events, values.institutionType, values.location]);
 
-  // Events for the picker (filtered by the student's school/college type): the
-  // chosen category first, then every other event below it — so a participant
-  // can still reach events outside the selected category.
+  // Events for the picker (filtered by the student's school/college type AND the
+  // chosen city): the selected category first, then every other eligible event
+  // below it — so a participant can still reach events outside the category.
   const { primaryEvents, otherEvents } = useMemo(() => {
     if (!category) {
       return { primaryEvents: [] as EventItem[], otherEvents: [] as EventItem[] };
     }
-    const ofType = events.filter((e) =>
-      eventForStudentType(e, values.institutionType),
+    const eligible = events.filter(
+      (e) =>
+        eventForStudentType(e, values.institutionType) &&
+        eventInCity(e, values.location),
     );
     return {
-      primaryEvents: ofType.filter((e) => e.category === category),
-      otherEvents: ofType.filter((e) => e.category !== category),
+      primaryEvents: eligible.filter((e) => e.category === category),
+      otherEvents: eligible.filter((e) => e.category !== category),
     };
-  }, [events, category, values.institutionType]);
+  }, [events, category, values.institutionType, values.location]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
 
   // The event list is filtered only by school/college, so the user must pick
   // that before choosing a category/event. City no longer gates the list.
-  const canChooseEvent = !!values.institutionType;
+  const canChooseEvent = !!values.institutionType && !!values.location;
 
   // All locations of the selected event (what the participant picks between).
   // Fee is shared across locations.
@@ -211,7 +222,8 @@ export function RegistrationForm({
 
   function validate(): Errors {
     const e: Errors = {};
-    if (!values.name.trim()) e.name = "Please enter the student's name.";
+    if (!values.firstName.trim()) e.firstName = "Please enter the first name.";
+    if (!values.lastName.trim()) e.lastName = "Please enter the last name.";
     if (!/^[6-9]\d{9}$/.test(values.phone))
       e.phone = "Enter a valid 10-digit mobile number.";
     if (!EMAIL_RE.test(values.email.trim()))
@@ -267,9 +279,8 @@ export function RegistrationForm({
     }
 
     // Map the friendly fields onto the stored schema.
-    const parts = values.name.trim().split(/\s+/);
-    const firstName = parts[0] ?? "";
-    const lastName = parts.slice(1).join(" ");
+    const firstName = values.firstName.trim();
+    const lastName = values.lastName.trim();
     const institution =
       values.institutionType === "school"
         ? `${values.institutionName.trim()} (School — ${values.level} standard)`
@@ -387,21 +398,38 @@ export function RegistrationForm({
         <div className="flex flex-col gap-8 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
         {/* ── Your details ── */}
         <FormSection title="Your details">
-            <Field label="Name" htmlFor="name" required>
-              <>
-                <Input
-                  id="name"
-                  data-field="name"
-                  value={values.name}
-                  onChange={(e) => setField("name", e.target.value)}
-                  onBlur={() => handleBlur("name")}
-                  autoComplete="name"
-                  aria-invalid={!!errors.name}
-                  placeholder="Student's full name"
-                />
-                <ErrorText>{errors.name}</ErrorText>
-              </>
-            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="First name" htmlFor="firstName" required>
+                <>
+                  <Input
+                    id="firstName"
+                    data-field="firstName"
+                    value={values.firstName}
+                    onChange={(e) => setField("firstName", e.target.value)}
+                    onBlur={() => handleBlur("firstName")}
+                    autoComplete="given-name"
+                    aria-invalid={!!errors.firstName}
+                    placeholder="Student's first name"
+                  />
+                  <ErrorText>{errors.firstName}</ErrorText>
+                </>
+              </Field>
+              <Field label="Last name" htmlFor="lastName" required>
+                <>
+                  <Input
+                    id="lastName"
+                    data-field="lastName"
+                    value={values.lastName}
+                    onChange={(e) => setField("lastName", e.target.value)}
+                    onBlur={() => handleBlur("lastName")}
+                    autoComplete="family-name"
+                    aria-invalid={!!errors.lastName}
+                    placeholder="Student's last name"
+                  />
+                  <ErrorText>{errors.lastName}</ErrorText>
+                </>
+              </Field>
+            </div>
 
             <div className="grid gap-5 sm:grid-cols-2">
               <Field
@@ -456,25 +484,30 @@ export function RegistrationForm({
               </Field>
             </div>
 
+            {/* School / College dropdown */}
             <Field
-              label="Your location"
-              htmlFor="location"
+              label="Are you in school or college?"
+              htmlFor="institutionType"
               required
-              description="Select the city where you'll take part."
             >
               <>
                 <Select
-                  value={values.location}
+                  value={values.institutionType}
                   onValueChange={(v) => {
-                    // Changing city changes which events are available,
-                    // so clear any category/event/location for the old city.
-                    setValues((prev) => ({ ...prev, location: v }));
+                    setValues((prev) => ({
+                      ...prev,
+                      institutionType: v as InstitutionType,
+                      level: "",
+                    }));
+                    // Changing school/college changes which events are eligible,
+                    // so clear any category/event/location chosen.
                     setCategory("");
                     setEventId("");
                     setLocationId("");
                     setErrors((e) => ({
                       ...e,
-                      location: undefined,
+                      institutionType: undefined,
+                      level: undefined,
                       category: undefined,
                       event: undefined,
                       eventLocation: undefined,
@@ -482,74 +515,20 @@ export function RegistrationForm({
                   }}
                 >
                   <SelectTrigger
-                    id="location"
-                    data-field="location"
-                    aria-invalid={!!errors.location}
+                    id="institutionType"
+                    data-field="institutionType"
+                    aria-invalid={!!errors.institutionType}
                   >
-                    <SelectValue placeholder="Select location to participate" />
+                    <SelectValue placeholder="Select school or college" />
                   </SelectTrigger>
                   <SelectContent>
-                    {LOCATIONS.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="school">School</SelectItem>
+                    <SelectItem value="college">College</SelectItem>
                   </SelectContent>
                 </Select>
-                <ErrorText>{errors.location}</ErrorText>
+                <ErrorText>{errors.institutionType}</ErrorText>
               </>
             </Field>
-
-            {/* School / College toggle */}
-            <fieldset className="flex flex-col gap-2.5" data-field="institutionType">
-              <span className="text-sm font-medium text-text">
-                Are you in school or college?{" "}
-                <span className="text-error">*</span>
-              </span>
-              <div className="grid grid-cols-2 gap-3">
-                {(
-                  [
-                    ["school", "School"],
-                    ["college", "College"],
-                  ] as const
-                ).map(([val, label]) => (
-                  <label
-                    key={val}
-                    className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-center text-sm font-medium transition-colors hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700"
-                  >
-                    <input
-                      type="radio"
-                      name="institutionType"
-                      value={val}
-                      checked={values.institutionType === val}
-                      onChange={() => {
-                        setValues((v) => ({
-                          ...v,
-                          institutionType: val,
-                          level: "",
-                        }));
-                        // Changing school/college changes which events are
-                        // eligible, so clear any category/event/location chosen.
-                        setCategory("");
-                        setEventId("");
-                        setLocationId("");
-                        setErrors((e) => ({
-                          ...e,
-                          institutionType: undefined,
-                          level: undefined,
-                          category: undefined,
-                          event: undefined,
-                          eventLocation: undefined,
-                        }));
-                      }}
-                      className="sr-only"
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-              <ErrorText>{errors.institutionType}</ErrorText>
-            </fieldset>
 
             {/* Conditional detail: name + standard (school) or year (college) */}
             {values.institutionType && (
@@ -628,6 +607,50 @@ export function RegistrationForm({
                 </Field>
               </div>
             )}
+
+            <Field
+              label="Your location"
+              htmlFor="location"
+              required
+              description="Select the city where you'll take part."
+            >
+              <>
+                <Select
+                  value={values.location}
+                  onValueChange={(v) => {
+                    // Changing city changes which events are available,
+                    // so clear any category/event/location for the old city.
+                    setValues((prev) => ({ ...prev, location: v }));
+                    setCategory("");
+                    setEventId("");
+                    setLocationId("");
+                    setErrors((e) => ({
+                      ...e,
+                      location: undefined,
+                      category: undefined,
+                      event: undefined,
+                      eventLocation: undefined,
+                    }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="location"
+                    data-field="location"
+                    aria-invalid={!!errors.location}
+                  >
+                    <SelectValue placeholder="Select location to participate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LOCATIONS.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <ErrorText>{errors.location}</ErrorText>
+              </>
+            </Field>
         </FormSection>
 
         <div className="h-px bg-border" />
@@ -661,7 +684,9 @@ export function RegistrationForm({
                         placeholder={
                           !values.institutionType
                             ? "Choose school or college first"
-                            : "Choose a category"
+                            : !values.location
+                              ? "Select your location first"
+                              : "Choose a category"
                         }
                       />
                     </SelectTrigger>

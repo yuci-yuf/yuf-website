@@ -55,7 +55,7 @@ export const siteConfig: SiteConfig = {
     address:
       "1, 3rd St, Nandanam Extension, Nandanam, Chennai, Tamil Nadu 600035",
   },
-  copyrightText: "© 2026 Youth United Council of India | All Rights Reserved",
+  copyrightText: "© 2026 Youth United Festival | All Rights Reserved",
   stats: [
     { number: 5, suffix: "K+", label: "Participants" },
     { number: 28, suffix: "+", label: "States" },
@@ -235,8 +235,8 @@ export const studyAbroadContent = {
 export const registrationSteps: RegistrationStep[] = [
   { step: 1, title: "Enter Your Details", description: "Add the participant's name, contact number, email, and school or college details, then choose the city where you'll take part." },
   { step: 2, title: "Choose Your Event", description: "Pick a category and select the competition you want to enter — the events shown are the ones running in your chosen city." },
-  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets." },
-  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass." },
+  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets. It is your responsibility to verify all details before making the payment." },
+  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass. Please note: once paid, the registration fee is non-refundable." },
 ];
 
 // ── Page content ──
@@ -303,9 +303,13 @@ export const homeContent = {
     subtitle:
       "YUF proudly supports and aligns with key national programs promoting youth development.",
     cards: [
-      { title: "Proudly Made in India", description: "Support Local, Buy Indian products.", image: "/images/gov/made_in_india_logo.png" },
-      { title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation.", image: "/images/gov/fit-india.png" },
-      { title: "Skill India", description: "Empowering Youth, Building the Nation.", image: "/images/gov/skill-india.png" },
+      { title: "Proudly Made in India", description: "Support local — build a self-reliant nation.", image: "/images/gov/made_in_india_logo.png" },
+      { title: "Fit India", description: "A healthy nation is a wealthy nation.", image: "/images/gov/fit-india.png" },
+      { title: "Skill India", description: "Empowering youth, building the nation.", image: "/images/gov/skill-india.png" },
+      { title: "Digital India", description: "Transforming India into a digitally empowered society.", image: "/images/gov/digital-india.png" },
+      { title: "Startup India", description: "Fuelling innovation and youth entrepreneurship.", image: "/images/gov/startup-india-logo.png" },
+      { title: "Swachh Bharat", description: "A cleaner India for a healthier, brighter future.", image: "/images/gov/swach-bharat-abhiyan-logo.png" },
+      { title: "MyGov", description: "Citizen engagement for participatory governance.", image: "/images/gov/my-gov-logo.png" },
     ] satisfies FeatureCard[],
   },
   eventsPreview: {
@@ -674,84 +678,57 @@ export const termsAndConditions: LegalPage = {
   updated: "Last updated: January 2026",
   sections: [
     {
-      heading: "Eligibility",
+      heading: "1. Eligibility",
       blocks: [
-        "Participation in the Youth United Festival is open to individuals aged 17 to 25 years. All participants must register through the official YUF website or authorized platforms. For team-based events, it is essential that all team members meet the eligibility requirements.",
+        "Participation is open to students aged 11 to 23 years only.",
       ],
     },
     {
-      heading: "Registration",
+      heading: "2. Student Verification",
       blocks: [
-        "All participants must complete the registration process to take part in the festival and its events. Accurate personal and contact information must be provided during registration. Registration fees and platform fee, if applicable, are non-refundable except in cases where the event is cancelled by the organizers. In such cases, refunds will be Credited within 15 working days. For certain additional events, on-the-spot registration will be available.",
+        "All participants must present their registered email confirmation and a verified QR code during check-in.",
       ],
     },
     {
-      heading: "Code of Conduct",
+      heading: "3. Transportation, Food & Accommodation",
       blocks: [
-        "The festival promotes values of respect, inclusivity, and professionalism, which all participants are expected to uphold throughout the event. Harassment, discrimination, or any form of inappropriate behavior is strictly prohibited. Attendees must comply with the laws of the Republic of India and adhere to the venue's rules.",
-        "All attendees are required to carry a valid government-issued ID for entry into the venue. Participants may bring one additional person if permitted by the authorities.",
-        "Participants must bring their own tools and accessories, as the management will not provide these essentials. Additionally, a printed copy of the email confirmation from the organization is mandatory for entry.",
+        "Transportation, food, and accommodation will not be provided by the organizers. However, food stalls will be available at the venue for participants to purchase refreshments.",
       ],
     },
     {
-      heading: "Event Participation",
+      heading: "4. Approval Requirement",
       blocks: [
-        "Participants must arrive at their designated event locations at the specified time. Late arrivals may forfeit the right to participate. For competitions, decisions made by the jury or organizing committee are final and binding, and no appeals will be entertained. Participants should show their conformation Email before entering into the respective venue.",
+        "No individual or organization may use the YUCI name, logo, event materials, or conduct any related activities without prior approval from YUCI.",
       ],
     },
     {
-      heading: "Intellectual Property",
+      heading: "5. Teacher Accompaniment",
       blocks: [
-        "Participants retain ownership of their original works created for the festival but grant the Youth United Festival permission to use photographs, videos, or content captured during the event for promotional purposes. Any form of plagiarism or misrepresentation will result in immediate disqualification.",
+        "Students must be accompanied by their teacher/faculty coordinator, who must carry a valid institution ID card.",
       ],
     },
     {
-      heading: "Safety and Security",
+      heading: "6. Parents/Guardians",
       blocks: [
-        "Participants are responsible for the safety of their personal belongings during the festival. The organizers will not be held liable for any loss, theft, or damage. Emergency protocols and instructions provided by security personnel must be strictly followed at all times to ensure safety.",
+        "Parents or guardians will not be permitted inside the event venue.",
       ],
     },
     {
-      heading: "Photography and Media",
+      heading: "7. Personal Belongings",
       blocks: [
-        "The festival will be documented through photography, videography, and live streaming. By participating, attendees consent to being recorded. Media captured during the event may be used for promotional or archival purposes without additional permissions or compensation.",
+        "Participants are advised to bring all necessary personal items required for the event. The organizers will not be responsible for providing personal essentials.",
       ],
     },
     {
-      heading: "Workshops and Competitions",
+      heading: "8. Compliance",
       blocks: [
-        "Participation in workshops will be based on a first-come, first-served basis unless otherwise specified. Each competition will have specific rules and guidelines that must be strictly followed by participants.",
+        "All participants are expected to follow the event rules and instructions issued by the organizers. Failure to comply may result in disqualification or removal from the event.",
       ],
     },
     {
-      heading: "Liability",
+      heading: "9. Payment & Refunds",
       blocks: [
-        "Participants attend the festival at their own risk. The organizers are not responsible for any injuries, illnesses, or damages sustained during the event. Willful damage to property or misconduct will lead to immediate disqualification and may result in legal action.",
-      ],
-    },
-    {
-      heading: "Cancellations and Modifications",
-      blocks: [
-        "The organizers reserve the right to cancel, reschedule, or modify any event without prior notice. In the case of unforeseen circumstances, updates or changes will be communicated through official channels to all participants.",
-      ],
-    },
-    {
-      heading: "Partnerships and Sponsorships",
-      blocks: [
-        "All partnerships and sponsorships must align with the core values and objectives of the Youth United Festival. The display of partner logos or branding during the festival requires prior approval from the organizing committee. VVISION proudly serves as our official accounting partner.",
-      ],
-    },
-    {
-      heading: "Dispute Resolution",
-      blocks: [
-        "Any disputes or grievances related to the festival must be submitted in writing to the organizing committee. The committee's decision in resolving disputes will be considered final.",
-      ],
-    },
-    {
-      heading: "Acknowledgments",
-      blocks: [
-        "By registering for or attending the festival, participants confirm that they have read, understood, and agreed to these terms and conditions. These terms and conditions are subject to change. Updates will be posted on the official Youth United Festival website, and participants are encouraged to review the latest version before the event.",
-        "Note: The organizing committee reserves the right to finalize and announce the scoring format on the spot based on time and event conditions.",
+        "All registration and platform fees are non-refundable. Once a payment is completed, the amount paid will not be refunded under any circumstances, except where an event is cancelled by the organizers. It is the participant's responsibility to verify all details before making the payment.",
       ],
     },
   ],

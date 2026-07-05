@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { FadeUp } from "./MotionWrapper";
-import { FestiveEyebrow, FestiveGlows } from "./FestiveAccents";
+import { FestiveEyebrow } from "./FestiveAccents";
 
 interface MissionSectionProps {
   label: string;
@@ -16,7 +16,6 @@ export function MissionSection({
 }: MissionSectionProps) {
   return (
     <section className="relative overflow-hidden bg-white py-12 sm:py-16 lg:py-20">
-      <FestiveGlows />
       <Container className="relative">
         {/* Centered heading */}
         <FadeUp className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">

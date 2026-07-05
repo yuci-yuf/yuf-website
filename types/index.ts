@@ -193,6 +193,8 @@ export interface EventItem {
   guidelines?: string[];
   /** Rules & regulations bullets shown on the detail page. */
   rules?: string[];
+  /** Optional rule-book PDF URL (uploaded in the admin panel). */
+  ruleBook?: string;
 }
 
 /** An admin-managed event category (Firestore `eventCategories` collection). */

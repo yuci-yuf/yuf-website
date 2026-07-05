@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle, type CategoryStyle } from "@/lib/category-style";
+import { getEventLocations } from "@/lib/event-groups";
 
 export interface CategoryGroup {
   /** The real category key used for filtering/links (e.g. "Arts & Culturals"). */
@@ -59,20 +60,30 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         </Link>
       </div>
 
-      {/* ── Featured + supporting cards ── */}
-      <div
-        className={`grid gap-5 ${side.length > 0 ? "lg:grid-cols-[1.55fr_1fr]" : ""}`}
-      >
-        <FeaturedCard event={featured} st={st} />
+      {/* ── Cards ── */}
+      {group.events.length === 1 ? (
+        // A lone event looks like a giant empty banner in the featured layout,
+        // so show it as a wide landscape card (poster left, details right).
+        <SoloCard event={featured} st={st} />
+      ) : (
+        <div className="grid gap-5 lg:grid-cols-[1.55fr_1fr]">
+          <FeaturedCard event={featured} st={st} />
 
-        {side.length > 0 && (
-          <div className="grid grid-rows-3 gap-4 lg:h-full">
+          <div
+            className={`grid gap-4 lg:h-full ${
+              side.length === 1
+                ? "grid-rows-1"
+                : side.length === 2
+                  ? "grid-rows-2"
+                  : "grid-rows-3"
+            }`}
+          >
             {side.map((event) => (
               <CompactCard key={event.id} event={event} st={st} />
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -138,20 +149,29 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
 }
 
 function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
+  const locations = getEventLocations(event);
+  const uniq = (arr: (string | undefined)[]) =>
+    Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
+  const metaDate = uniq(locations.map((l) => l.date)).join(", ");
+  const metaPlace = uniq(
+    locations.map((l) => l.district || l.venue),
+  ).join(", ");
+
   return (
     <motion.article
       whileHover={{ y: -3 }}
       transition={{ duration: 0.2 }}
-      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm transition-colors hover:border-white/25 hover:bg-white/[0.1]"
+      className="group relative flex min-h-[8rem] items-stretch gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm transition-colors hover:border-white/25 hover:bg-white/[0.1]"
     >
-      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">
+      {/* Poster strip — fills the full card height, showing the top of the art */}
+      <div className="relative w-32 shrink-0 self-stretch overflow-hidden rounded-xl sm:w-36">
         {event.image ? (
           <Image
             src={event.image}
             alt={event.title}
             fill
-            sizes="112px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="144px"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div
@@ -161,11 +181,29 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
         )}
       </div>
 
-      <div className="flex min-w-0 flex-col justify-center gap-1.5 py-1 pr-2">
-        <h4 className="line-clamp-2 font-heading text-base font-bold leading-snug text-white">
+      <div className="flex min-w-0 flex-1 flex-col justify-end gap-2 py-1 pr-2">
+        <h4 className="line-clamp-2 font-heading text-base font-bold leading-snug text-white sm:text-lg">
           {event.title}
         </h4>
-        <p className="line-clamp-2 text-xs leading-relaxed text-white/60">
+
+        {(metaDate || metaPlace) && (
+          <div className="flex flex-col gap-1 text-xs font-medium text-white/70">
+            {metaDate && (
+              <span className="inline-flex items-start gap-1.5">
+                <Calendar size={13} className="mt-0.5 shrink-0 text-primary-200" />
+                <span className="line-clamp-1">{metaDate}</span>
+              </span>
+            )}
+            {metaPlace && (
+              <span className="inline-flex items-start gap-1.5">
+                <MapPin size={13} className="mt-0.5 shrink-0 text-primary-200" />
+                <span className="line-clamp-1">{metaPlace}</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        <p className="line-clamp-3 text-xs leading-relaxed text-white/60">
           {event.description}
         </p>
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-200">
@@ -174,6 +212,82 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
             size={13}
             className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
+        </span>
+      </div>
+
+      <Link
+        href={`/events/${event.id}`}
+        className="absolute inset-0 z-10"
+        aria-label={event.title}
+      />
+    </motion.article>
+  );
+}
+
+/** A single-event category: a wide landscape card (poster left, details right). */
+function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
+  const locations = getEventLocations(event);
+  const uniq = (arr: (string | undefined)[]) =>
+    Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
+  const metaDate = uniq(locations.map((l) => l.date)).join(", ");
+  const metaPlace = uniq(locations.map((l) => l.district || l.venue)).join(", ");
+
+  return (
+    <motion.article
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="group relative grid overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] shadow-lg backdrop-blur-sm sm:grid-cols-[minmax(0,18rem)_1fr]"
+    >
+      {/* Poster — matches the content height (no big empty frame) */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-auto sm:h-full sm:min-h-[12rem]">
+        {event.image ? (
+          <Image
+            src={event.image}
+            alt={event.title}
+            fill
+            sizes="(min-width: 640px) 18rem, 100vw"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(135deg, ${st.from}, ${st.to})` }}
+          />
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col justify-center gap-2.5 p-6 lg:p-8">
+        <h4 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+          {event.title}
+        </h4>
+
+        {(metaDate || metaPlace) && (
+          <div className="flex flex-col gap-1.5 text-sm font-medium text-white/70">
+            {metaDate && (
+              <span className="inline-flex items-center gap-2">
+                <Calendar size={15} className="shrink-0 text-primary-200" />
+                {metaDate}
+              </span>
+            )}
+            {metaPlace && (
+              <span className="inline-flex items-center gap-2">
+                <MapPin size={15} className="shrink-0 text-primary-200" />
+                {metaPlace}
+              </span>
+            )}
+          </div>
+        )}
+
+        <p className="line-clamp-3 max-w-2xl text-sm leading-relaxed text-white/70">
+          {event.description}
+        </p>
+        <span
+          className="mt-1 inline-flex items-center gap-2 text-sm font-semibold"
+          style={{ color: st.accent }}
+        >
+          View Details
+          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
         </span>
       </div>
 
