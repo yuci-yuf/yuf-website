@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "@/types";
 import { SectionHeading } from "@/components/ui/Section";
 import { ConfettiDots } from "./FestiveAccents";
@@ -70,13 +70,6 @@ export function Testimonials({
 
         <div className="mx-auto max-w-none">
           <div className="relative flex overflow-hidden rounded-3xl border border-border bg-surface/80 shadow-card backdrop-blur-sm min-h-[230px] sm:min-h-[260px]">
-            {/* Oversized quotation watermark */}
-            <Quote
-              aria-hidden
-              className="absolute right-6 top-6 z-10 hidden h-20 w-20 -scale-x-100 text-primary-100 sm:block"
-              strokeWidth={1.5}
-            />
-
             <AnimatePresence initial={false} mode="wait">
               <motion.div
                 key={index}

@@ -351,6 +351,13 @@ export const homeContent = {
           "This festival is all about celebrating your creativity, energy, and vision for the future. Together, we have the power to inspire change, break barriers, and build a brighter tomorrow. Let's unite, dream big, and make a difference!",
         image: "/images/testimonials/embalam-selvam.png",
       },
+      {
+        name: "Prof. Sukhee Lee",
+        role: "Advisor of International Affairs | Intercultural Communication | Korean Language & Culture",
+        quote:
+          "The Youth United Festival creates meaningful opportunities for young people to connect across cultures, develop leadership skills, and inspire positive change. Together, we can empower the next generation of global changemakers.",
+        image: "/images/testimonials/sukhee-lee.jpg",
+      },
     ] satisfies Testimonial[],
   },
   partners: {
