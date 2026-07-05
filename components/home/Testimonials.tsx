@@ -65,11 +65,11 @@ export function Testimonials({
       />
       <ConfettiDots />
 
-      <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
-        <SectionHeading title={title} subtitle={subtitle} className="mb-14" invert />
+      <div className="relative mx-auto w-full max-w-4xl px-6 lg:px-8">
+        <SectionHeading title={title} subtitle={subtitle} className="mb-10" invert />
 
         <div className="mx-auto max-w-none">
-          <div className="relative flex overflow-hidden rounded-3xl border border-border bg-surface/80 shadow-card backdrop-blur-sm min-h-[340px] sm:min-h-[400px]">
+          <div className="relative flex overflow-hidden rounded-3xl border border-border bg-surface/80 shadow-card backdrop-blur-sm min-h-[230px] sm:min-h-[260px]">
             {/* Oversized quotation watermark */}
             <Quote
               aria-hidden
@@ -91,7 +91,7 @@ export function Testimonials({
                   initial={reduced ? false : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.05 }}
-                  className="relative min-h-[420px] sm:min-h-[400px]"
+                  className="relative min-h-[250px] sm:min-h-[260px]"
                 >
                   <div className="absolute inset-0 overflow-hidden bg-primary-100">
                     {active.image && !failed[index] ? (
@@ -120,15 +120,15 @@ export function Testimonials({
                   initial={reduced ? false : { opacity: 0, x: dir >= 0 ? 24 : -24 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-                  className="flex flex-col justify-center gap-5 p-8 sm:p-12 lg:p-16 text-center sm:text-left"
+                  className="flex flex-col justify-center gap-3 p-5 sm:p-6 lg:p-8 text-center sm:text-left"
                 >
-                  <figcaption className="text-sm font-bold uppercase tracking-[0.18em] text-highlight-600 sm:text-base lg:text-lg">
+                  <figcaption className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-highlight-600 sm:text-xs">
                     {active.role}
                   </figcaption>
-                  <blockquote className="text-lg leading-relaxed text-body sm:text-xl lg:text-2xl">
+                  <blockquote className="text-sm leading-relaxed text-body sm:text-base">
                     &ldquo;{active.quote}&rdquo;
                   </blockquote>
-                  <p className="font-heading text-xl font-bold text-heading sm:text-2xl lg:text-3xl">
+                  <p className="font-heading text-base font-bold text-heading sm:text-lg">
                     {active.name}
                   </p>
                 </motion.figure>

@@ -66,7 +66,7 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         <FeaturedCard event={featured} st={st} />
 
         {side.length > 0 && (
-          <div className="flex h-full flex-col gap-4">
+          <div className="grid grid-rows-3 gap-4 lg:h-full">
             {side.map((event) => (
               <CompactCard key={event.id} event={event} st={st} />
             ))}
@@ -142,7 +142,7 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
     <motion.article
       whileHover={{ y: -3 }}
       transition={{ duration: 0.2 }}
-      className="group relative flex flex-1 items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm transition-colors hover:border-white/25 hover:bg-white/[0.1]"
+      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm transition-colors hover:border-white/25 hover:bg-white/[0.1]"
     >
       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">
         {event.image ? (
