@@ -42,6 +42,14 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
                 </h3>
                 <p className="text-sm leading-relaxed text-body">
                   {step.description}
+                  {step.highlight && (
+                    <>
+                      {" "}
+                      <span className="font-bold text-heading">
+                        {step.highlight}
+                      </span>
+                    </>
+                  )}
                 </p>
               </FadeUp>
             ))}
