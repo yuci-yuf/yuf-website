@@ -138,9 +138,9 @@ export default function AboutPage() {
               <span className="absolute bottom-16 right-6 h-3 w-3 rounded-full bg-primary-300" aria-hidden />
 
               <IndiaMapImage
-                src="/images/about/youth-event.jpg"
+                src="/images/about/map1.jpeg"
                 label="YUF youth across India"
-                className="mx-auto h-[300px] w-full max-w-sm text-white/90 drop-shadow-xl sm:h-[400px] sm:max-w-md lg:h-[500px] lg:max-w-lg"
+                className="mx-auto h-[380px] w-full max-w-md text-white/90 drop-shadow-xl sm:h-[500px] sm:max-w-lg lg:h-[620px] lg:max-w-xl"
               />
             </FadeUp>
 

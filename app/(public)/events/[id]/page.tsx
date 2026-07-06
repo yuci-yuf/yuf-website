@@ -110,10 +110,12 @@ export default async function EventDetailPage({
                       {selectedLocation.date}
                     </span>
                   )}
-                  {(selectedLocation?.venue || selectedLocation?.district) && (
+                  {(selectedLocation?.address || selectedLocation?.city) && (
                     <span className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
                       <MapPin size={16} className="text-highlight-400" />
-                      {selectedLocation.venue ?? selectedLocation.district}
+                      {[selectedLocation.address, selectedLocation.city]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </span>
                   )}
                 </>
@@ -124,7 +126,7 @@ export default async function EventDetailPage({
                     className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm"
                   >
                     <MapPin size={16} className="text-highlight-400" />
-                    {loc.venue || loc.district}
+                    {[loc.address, loc.city].filter(Boolean).join(" · ")}
                     {loc.date && (
                       <span className="font-semibold text-highlight-300">
                         · {loc.date}
@@ -234,13 +236,15 @@ export default async function EventDetailPage({
                           />
                           <span className="flex min-w-0 flex-col">
                             <span className="text-sm font-medium text-text">
-                              {location.venue ||
-                                location.district ||
+                              {location.address ||
+                                location.city ||
                                 "Location"}
                             </span>
-                            {location.date && (
+                            {(location.city || location.date) && (
                               <span className="text-xs text-text-muted">
-                                {location.date}
+                                {[location.city, location.date]
+                                  .filter(Boolean)
+                                  .join(" · ")}
                               </span>
                             )}
                           </span>

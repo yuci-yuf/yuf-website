@@ -39,8 +39,8 @@ export function getEventLocations(event: EventItem): EventLocation[] {
   return [
     {
       id: "default",
-      district: event.district,
-      venue: event.venue,
+      city: event.district,
+      address: event.venue,
       date: event.date,
       registrationLimit: event.registrationLimit,
       registrationCount: event.registrationCount ?? 0,
@@ -48,24 +48,19 @@ export function getEventLocations(event: EventItem): EventLocation[] {
   ];
 }
 
-/** True when the event runs in more than one place. */
-export function isMultiLocation(event: EventItem): boolean {
-  return getEventLocations(event).length > 1;
-}
-
 /**
  * The distinguishing bits of a location split apart, so a UI can render the
  * (possibly long) place with truncation while keeping the short date always
- * visible. `place` prefers the short district, falling back to the venue.
+ * visible. `place` prefers the short city, falling back to the full address.
  */
 export function locationParts(location: EventLocation): {
   place: string;
   date: string;
 } {
-  const district = location.district?.trim() || "";
-  const venue = location.venue?.trim() || "";
+  const city = location.city?.trim() || "";
+  const address = location.address?.trim() || "";
   const date = location.date?.trim() || "";
-  return { place: district || venue, date };
+  return { place: city || address, date };
 }
 
 /** Remaining spots at a location, or null when it has no limit (unlimited). */
