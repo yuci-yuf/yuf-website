@@ -274,12 +274,12 @@ export default function AboutPage() {
                   <h3 className="font-heading text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
                     {siteConfig.advisor.name}
                   </h3>
-                  <p className="mt-1 text-base text-white/70 sm:text-lg">
-                    {siteConfig.advisor.title}
-                  </p>
-                  <span className="mt-3 inline-block text-sm font-bold uppercase tracking-[0.18em] text-highlight-400">
+                  <span className="mt-2 inline-block text-sm font-bold uppercase tracking-[0.18em] text-highlight-400">
                     {siteConfig.advisor.badge}
                   </span>
+                  <p className="mt-2 text-base text-white/70 sm:text-lg">
+                    {siteConfig.advisor.title}
+                  </p>
                 </div>
                 <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-7 shadow-sm">
                   <Quote size={24} className="mb-2 text-primary-400" />
