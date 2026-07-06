@@ -123,7 +123,7 @@ export async function POST(req: Request) {
           registrationCount: FieldValue.increment(1),
         });
         locationSnapshot = {
-          venue: (loc.venue as string) || (loc.district as string) || "",
+          venue: (loc.address as string) || (loc.city as string) || "",
           date: (loc.date as string) || "",
         };
       } else {

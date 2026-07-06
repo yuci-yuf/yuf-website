@@ -300,16 +300,16 @@ function describe(category, title) {
   }
 }
 
-/** The district is the last comma-separated part of the venue (e.g. "Ponneri"). */
-function districtOf(venue) {
-  if (!venue) return "";
-  const parts = venue.split(",");
+/** The city is the last comma-separated part of the address (e.g. "Ponneri"). */
+function cityOf(address) {
+  if (!address) return "";
+  const parts = address.split(",");
   return parts.length > 1 ? parts[parts.length - 1].trim() : "";
 }
 
-/** A stable location id from its district/venue/date (mirrors the admin form). */
-function locationId(district, venue, date, fallbackIndex) {
-  const base = [district, venue, date]
+/** A stable location id from its city/address/date (mirrors the admin form). */
+function locationId(city, address, date, fallbackIndex) {
+  const base = [city, address, date]
     .filter(Boolean)
     .join("-");
   return slugify(base) || `loc-${fallbackIndex + 1}`;
@@ -325,9 +325,9 @@ function buildEvents(content) {
   const byKey = new Map();
   const order = new Map(); // event id → its display order (first-seen index)
 
-  SCHEDULE.forEach(([category, title, venue, date], i) => {
+  SCHEDULE.forEach(([category, title, address, date], i) => {
     const key = `${slugify(title)}::${slugify(category)}`;
-    const district = districtOf(venue);
+    const city = cityOf(address);
 
     if (!byKey.has(key)) {
       const id = slugify(title);
@@ -355,10 +355,10 @@ function buildEvents(content) {
     }
 
     const entry = byKey.get(key);
-    const locId = locationId(district, venue, date, entry.data.locations.length);
+    const locId = locationId(city, address, date, entry.data.locations.length);
     const location = { id: locId, registrationCount: 0 };
-    if (district) location.district = district;
-    if (venue) location.venue = venue;
+    if (city) location.city = city;
+    if (address) location.address = address;
     if (date) location.date = date;
     entry.data.locations.push(location);
   });
@@ -392,7 +392,7 @@ async function main() {
   if (DRY_RUN) {
     for (const { id, data, matched: m } of events) {
       const locs = data.locations
-        .map((l) => `${l.district || l.venue || "?"}${l.date ? ` (${l.date})` : ""}`)
+        .map((l) => `${l.city || l.address || "?"}${l.date ? ` (${l.date})` : ""}`)
         .join(", ");
       const tag = m
         ? `content ✓ (${data.rules?.length ?? 0} rules)`
