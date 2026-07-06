@@ -15,16 +15,16 @@ interface HeroSectionProps {
   marqueeItems: string[];
 }
 
-/* Real youth-event photos used for the diamond tiles flanking the headline. */
+/* Award-winning YUF 2025 photos for the diamond tiles flanking the headline. */
 const DIAMONDS_LEFT = [
-  { src: "/images/hero/pondicherry-event.jpg", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
-  { src: "/images/about/youth-yoga.jpg", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
-  { src: "/images/hero/IMG-20250924-WA0003.jpg", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
+  { src: "/images/hero/award/championship-trophy.webp", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
+  { src: "/images/hero/award/trophy-raised.webp", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
+  { src: "/images/hero/award/medalists-marigold.webp", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
 ];
 const DIAMONDS_RIGHT = [
-  { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
-  { src: "/images/about/youth-event.jpg", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
-  { src: "/images/hero/events.jpg", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
+  { src: "/images/hero/award/trophy-handover.webp", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
+  { src: "/images/hero/award/medalists-lawn.webp", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
+  { src: "/images/hero/award/stage-certificate.webp", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
 ];
 
 /* Icon + supporting line for each stat card (matched to the reference). */

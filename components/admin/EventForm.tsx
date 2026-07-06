@@ -15,6 +15,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { PdfUploader } from "@/components/admin/PdfUploader";
 import { getEventLocations } from "@/lib/event-groups";
 import type { EventInput } from "@/lib/admin-data";
 import type {
@@ -221,6 +222,7 @@ export function EventForm({
     (event?.guidelines ?? []).join("\n"),
   );
   const [rules, setRules] = useState((event?.rules ?? []).join("\n"));
+  const [ruleBook, setRuleBook] = useState(event?.ruleBook ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -316,6 +318,7 @@ export function EventForm({
       details: toLines(details).length ? toLines(details) : undefined,
       guidelines: toLines(guidelines).length ? toLines(guidelines) : undefined,
       rules: toLines(rules).length ? toLines(rules) : undefined,
+      ruleBook: ruleBook.trim() || undefined,
     };
 
     setSaving(true);
@@ -633,6 +636,16 @@ export function EventForm({
               onChange={(e) => setRules(e.target.value)}
               placeholder="One rule per line"
             />
+          </Field>
+        </div>
+
+        <div className="mt-5">
+          <Field
+            label="Rule book (PDF, optional)"
+            htmlFor="ev-rulebook"
+            description="Attach a downloadable rule book. PDF only, up to 10 MB."
+          >
+            <PdfUploader value={ruleBook} onChange={setRuleBook} />
           </Field>
         </div>
       </section>

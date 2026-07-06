@@ -20,30 +20,46 @@ import {
   registrationSteps,
   tickerItems,
 } from "@/lib/content";
-import { getEvents, getGalleryPhotos } from "@/lib/cms-data";
+import { getEvents, getGalleryPhotos, getCategoryOrder } from "@/lib/cms-data";
 
 export const dynamic = "force-dynamic";
 
-// Categories to surface on the home page, each shown as a horizontal event
-// strip. `key` matches the real event category; `label` is the display name.
-const EVENT_CATEGORIES = [
-  { key: "Sports & Games",   label: "Sports & Games" },
-  { key: "Technical",        label: "Technical" },
-  { key: "Arts & Culturals", label: "Non Technical" },
-] as const;
-
 export default async function HomePage() {
-  const [events, galleryPhotos] = await Promise.all([
+  const [events, galleryPhotos, categoryOrder] = await Promise.all([
     getEvents(),
     getGalleryPhotos(),
+    getCategoryOrder(),
   ]);
 
   const activeEvents = events.filter((e) => e.isActive);
-  const categoryGroups: CategoryGroup[] = EVENT_CATEGORIES.map(({ key, label }) => ({
-    key,
-    label,
-    events: activeEvents.filter((e) => e.category === key),
-  })).filter((g) => g.events.length > 0);
+
+  // Surface every event category the CMS defines (each as a horizontal strip),
+  // in the admin-managed order, appending any extras the events introduce.
+  // Empty categories are dropped so we never render a bare heading.
+  const presentCategories = Array.from(
+    new Set(activeEvents.map((e) => e.category)),
+  );
+  const orderedCategories = [
+    ...categoryOrder.filter((c) => presentCategories.includes(c)),
+    ...presentCategories.filter((c) => !categoryOrder.includes(c)),
+  ];
+  // Within each category, honor the admin-managed home order (index 0 becomes
+  // the featured card). Events without a homeOrder sort after ordered ones,
+  // preserving their existing order (getEvents() already sorts by `order`, and
+  // Array.sort is stable). This ordering applies to the home page only.
+  const categoryGroups: CategoryGroup[] = orderedCategories
+    .map((key) => ({
+      key,
+      label: key,
+      events: activeEvents
+        .filter((e) => e.category === key)
+        .sort(
+          (a, b) =>
+            (a.homeOrder ?? Number.MAX_SAFE_INTEGER) -
+            (b.homeOrder ?? Number.MAX_SAFE_INTEGER),
+        ),
+    }))
+    .filter((g) => g.events.length > 0);
 
   return (
     <>

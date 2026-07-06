@@ -169,6 +169,13 @@ export interface EventItem {
    */
   registrationOpen?: boolean;
   order: number;
+  /**
+   * Position of this event within its category on the HOME page's "Browse By
+   * Category" strips only (lower = earlier; index 0 becomes the featured card).
+   * Admin-managed via the "Arrange Home Order" screen. Does not affect the
+   * /events page. Unset events sort after ordered ones, keeping their prior order.
+   */
+  homeOrder?: number;
   /** Scheduling state used to group events on the Events page. Defaults to "upcoming". */
   status?: EventStatus;
   /** Who can register — school, college, or both. Defaults to "both". */
@@ -193,6 +200,8 @@ export interface EventItem {
   guidelines?: string[];
   /** Rules & regulations bullets shown on the detail page. */
   rules?: string[];
+  /** Optional rule-book PDF URL (uploaded in the admin panel). */
+  ruleBook?: string;
 }
 
 /** An admin-managed event category (Firestore `eventCategories` collection). */

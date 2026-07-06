@@ -314,9 +314,6 @@ export default function AboutPage() {
                   <p className="mt-1 text-base text-white/70 sm:text-lg">
                     National General Secretary, Youth United Council of India
                   </p>
-                  <span className="mt-3 inline-block text-sm font-bold uppercase tracking-[0.18em] text-highlight-400">
-                    Founder · Since 2017 &nbsp;·&nbsp; UN Representation · 28+ States
-                  </span>
                 </div>
                 <blockquote className="rounded-2xl border-l-4 border-primary-500 bg-white p-7 shadow-sm">
                   <Quote size={24} className="mb-2 text-primary-400" />

@@ -5,7 +5,7 @@ export function RecognitionCarousel({ images }: { images: string[] }) {
   if (!src) return null;
 
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5 sm:aspect-5/4">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-none bg-white shadow-md ring-1 ring-black/5 sm:aspect-5/4 lg:rounded-2xl">
       <Image
         src={src}
         alt="Recognition award"

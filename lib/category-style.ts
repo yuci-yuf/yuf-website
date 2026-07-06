@@ -30,6 +30,7 @@ export const CATEGORY_STYLE: Record<string, CategoryStyle> = {
   Athletics: { icon: Timer, from: "#15938f", to: "#0c4f4d", accent: "#129c97", soft: "rgba(18,156,151,0.12)" },
   "Arts & Culturals": { icon: Palette, from: "#7b34e2", to: "#2e0f59", accent: "#7b34e2", soft: "rgba(123,52,226,0.12)" },
   Technical: { icon: Lightbulb, from: "#1787b3", to: "#0a2b3a", accent: "#1787b3", soft: "rgba(23,135,179,0.12)" },
+  Innovation: { icon: Lightbulb, from: "#1787b3", to: "#0a2b3a", accent: "#1787b3", soft: "rgba(23,135,179,0.12)" },
   "Fun Events": { icon: PartyPopper, from: "#e07414", to: "#7a3f08", accent: "#e07414", soft: "rgba(224,116,20,0.12)" },
 };
 

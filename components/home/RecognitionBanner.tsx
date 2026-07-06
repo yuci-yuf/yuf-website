@@ -69,7 +69,7 @@ export function RecognitionBanner({
               (spanning both rows) on desktop */}
           <FadeUp
             delay={0.15}
-            className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-2"
+            className="order-2 -mx-6 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:mx-0"
           >
             <RecognitionCarousel images={images} />
           </FadeUp>
