@@ -142,8 +142,8 @@ function prepareLocationsForWrite(
       id: loc.id,
       registrationCount: preserveCounts ? loc.registrationCount ?? 0 : 0,
     };
-    if (loc.district) out.district = loc.district;
-    if (loc.venue) out.venue = loc.venue;
+    if (loc.city) out.city = loc.city;
+    if (loc.address) out.address = loc.address;
     if (loc.date) out.date = loc.date;
     if (typeof loc.registrationLimit === "number")
       out.registrationLimit = loc.registrationLimit;

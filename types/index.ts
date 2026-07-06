@@ -128,10 +128,10 @@ export type EventAudience = "school" | "college" | "both";
 export interface EventLocation {
   /** Stable key within the event, used to tag registrations. */
   id: string;
-  /** District/city label, e.g. "Ponneri" (the clean disambiguator). */
-  district?: string;
-  /** Full venue, e.g. "Velammal Bodhi Campus, Ponneri". */
-  venue?: string;
+  /** City the event runs in, e.g. "Chennai". Drives the register-page filter. */
+  city?: string;
+  /** Full street address, e.g. "Velammal Bodhi Campus, Ponneri". */
+  address?: string;
   /** Human-readable schedule label, e.g. "2nd Sept 2026". */
   date?: string;
   /**
@@ -260,7 +260,7 @@ export interface Registration {
   eventTitle: string;
   /** Which location of the event this registration is for (EventLocation.id). */
   locationId?: string;
-  /** Snapshot of the chosen location's venue/district, for admin display/export. */
+  /** Snapshot of the chosen location's address/city, for admin display/export. */
   locationVenue?: string;
   /** Snapshot of the chosen location's date. */
   locationDate?: string;
@@ -292,11 +292,4 @@ export interface ContactMessage {
   message: string;
   isRead: boolean;
   createdAt: string | null;
-}
-
-export interface AdminUser {
-  uid: string;
-  email: string;
-  name?: string;
-  role?: string;
 }

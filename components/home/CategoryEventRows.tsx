@@ -158,7 +158,7 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
     Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
   const metaDate = uniq(locations.map((l) => l.date)).join(", ");
   const metaPlace = uniq(
-    locations.map((l) => l.district || l.venue),
+    locations.map((l) => l.city || l.address),
   ).join(", ");
 
   return (
@@ -234,7 +234,7 @@ function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
   const uniq = (arr: (string | undefined)[]) =>
     Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
   const metaDate = uniq(locations.map((l) => l.date)).join(", ");
-  const metaPlace = uniq(locations.map((l) => l.district || l.venue)).join(", ");
+  const metaPlace = uniq(locations.map((l) => l.city || l.address)).join(", ");
 
   return (
     <motion.article
