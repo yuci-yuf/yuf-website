@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { formatINR } from "@/lib/pricing";
+import { computeInvoice, formatINR, GST_RATE, PLATFORM_FEE_RATE } from "@/lib/pricing";
 import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
 
@@ -241,6 +241,9 @@ export function RegistrationForm({
 
   const fee = selectedEvent?.registrationFee;
   const feeLabel = fee != null ? formatINR(fee) : "—";
+  // Itemized breakdown: base fee + platform fee (2%) + GST (18%). Single source
+  // of truth in lib/pricing.ts, so the form and payment order always agree.
+  const invoice = fee != null && fee > 0 ? computeInvoice(fee) : null;
 
   const selectedSpotsLeft = selectedLocation
     ? locationSpotsLeft(selectedLocation)
@@ -334,7 +337,7 @@ export function RegistrationForm({
         eventId: selectedEvent.id,
         eventTitle: selectedEvent.title,
         ageCategory: values.level,
-        amountPaid: fee ?? 0,
+        amountPaid: invoice?.total ?? fee ?? 0,
         registrationCode: code,
         locationId: effectiveLocationId,
         locationVenue: venue,
@@ -869,12 +872,41 @@ export function RegistrationForm({
                   : "Not selected yet"}
               </Row>
 
-              <div className="flex items-center justify-between border-t border-border pt-4">
-                <span className="font-medium text-text">Registration fee</span>
-                <span className="font-heading text-lg font-bold text-heading">
-                  {feeLabel}
-                </span>
-              </div>
+              {invoice ? (
+                <div className="flex flex-col gap-2.5 border-t border-border pt-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">Registration fee</span>
+                    <span className="text-text">{formatINR(invoice.base)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">
+                      Platform fee ({Math.round(PLATFORM_FEE_RATE * 100)}%)
+                    </span>
+                    <span className="text-text">
+                      {formatINR(invoice.platformFee)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">
+                      GST ({Math.round(GST_RATE * 100)}%)
+                    </span>
+                    <span className="text-text">{formatINR(invoice.gst)}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-border pt-3">
+                    <span className="font-medium text-text">Total payable</span>
+                    <span className="font-heading text-lg font-bold text-heading">
+                      {formatINR(invoice.total)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between border-t border-border pt-4">
+                  <span className="font-medium text-text">Registration fee</span>
+                  <span className="font-heading text-lg font-bold text-heading">
+                    {fee === 0 ? "Free" : feeLabel}
+                  </span>
+                </div>
+              )}
             </div>
 
             <p className="flex items-start gap-2 text-xs text-text-muted">

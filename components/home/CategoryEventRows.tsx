@@ -33,31 +33,20 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
   const Icon = st.icon;
   const featured = group.events[0];
   const side = group.events.slice(1, 4);
-  const catHref = `/events?category=${encodeURIComponent(group.key)}`;
 
   return (
     <div className="flex flex-col gap-6">
       {/* ── Category header ── */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-md"
-            style={{ color: st.accent }}
-          >
-            <Icon size={22} />
-          </span>
-          <h3 className="font-heading text-xl font-bold text-white sm:text-2xl">
-            {group.label}
-          </h3>
-        </div>
-
-        <Link
-          href={catHref}
-          className="group inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 transition-colors hover:text-white"
+      <div className="flex items-center gap-3">
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-md"
+          style={{ color: st.accent }}
         >
-          View All
-          <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-        </Link>
+          <Icon size={22} />
+        </span>
+        <h3 className="font-heading text-xl font-bold text-white sm:text-2xl">
+          {group.label}
+        </h3>
       </div>
 
       {/* ── Cards ── layout adapts to how many events the category has ── */}
@@ -141,11 +130,11 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
           {event.description}
         </p>
         <span
-          className="mt-1 inline-flex items-center gap-2 text-sm font-semibold"
-          style={{ color: st.accent }}
+          className="mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
+          style={{ borderColor: st.accent }}
         >
           View Details
-          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
         </span>
       </div>
     </motion.article>
@@ -207,13 +196,16 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
           </div>
         )}
 
-        <p className="line-clamp-3 text-xs leading-relaxed text-white/60">
+        <p className="line-clamp-2 text-xs leading-relaxed text-white/60">
           {event.description}
         </p>
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-200">
+        <span
+          className="mt-1.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white py-2.5 text-sm font-bold shadow-sm transition-transform group-hover:scale-[1.015]"
+          style={{ color: st.accent }}
+        >
           View
           <ArrowUpRight
-            size={13}
+            size={15}
             className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
         </span>
@@ -287,11 +279,11 @@ function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
           {event.description}
         </p>
         <span
-          className="mt-1 inline-flex items-center gap-2 text-sm font-semibold"
-          style={{ color: st.accent }}
+          className="mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
+          style={{ borderColor: st.accent }}
         >
           View Details
-          <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
         </span>
       </div>
 
