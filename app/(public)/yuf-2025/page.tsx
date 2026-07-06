@@ -1,355 +1,354 @@
 import type { Metadata } from "next";
+import { Instrument_Serif } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Trophy, Star } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Star, Trophy, Quote } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import {
-  FadeUp,
-  FadeIn,
-  ScaleIn,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/home/MotionWrapper";
-import {
-  FestiveEyebrow,
-  ConfettiDots,
-  FestiveGlows,
-} from "@/components/home/FestiveAccents";
-import { PhotoGallery, type GalleryImage } from "@/components/yuf2025/PhotoGallery";
-import { VideoGrid, type VideoItem } from "@/components/yuf2025/VideoGrid";
+import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
+import { ConfettiDots } from "@/components/home/FestiveAccents";
+import { ScrollVideo } from "@/components/yuf2025/ScrollVideo";
+import { FilmReel } from "@/components/yuf2025/FilmReel";
+import type { GalleryImage } from "@/components/yuf2025/Lightbox";
+import { cn } from "@/lib/utils";
+
+// Elegant italic serif for the accents, scoped to this route.
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+const SERIF = "font-[family-name:var(--font-instrument)] italic";
 
 export const metadata: Metadata = {
-  title: "YUF 2025 — Highlights",
+  title: "YUF 2025 — Event Highlights",
   description:
-    "Relive the Youth United Festival 2025 — event highlights, award ceremonies, distinguished chief guests, and unforgettable moments of youth talent and celebration.",
+    "Relive the Youth United Festival 2025 — event highlights, the festival film, distinguished chief guests, and the crowning of champions. Every unforgettable moment in one place.",
 };
 
 const P = "/images/yuf2025";
-
-const HIGHLIGHTS: GalleryImage[] = Array.from({ length: 18 }, (_, i) => {
-  const n = String(i + 1).padStart(2, "0");
-  const ext = n === "13" ? "png" : "jpg";
-  return { src: `${P}/h-${n}.${ext}`, alt: `Youth United Festival 2025 moment ${i + 1}` };
+const G = `${P}/gallery`;
+const img = (n: number): GalleryImage => ({
+  src: `${G}/g-${String(n).padStart(2, "0")}.jpg`,
+  alt: `Youth United Festival 2025 — moment ${n}`,
 });
+const range = (a: number, b: number) =>
+  Array.from({ length: b - a + 1 }, (_, i) => img(a + i));
 
-const AWARDS: GalleryImage[] = [1, 2, 3, 4].map((n) => ({
-  src: `${P}/award-${n}.jpg`,
-  alt: `YUF 2025 award ceremony ${n}`,
-}));
+/* Photos for the staggered highlights grid + focal / award selections drawn
+   from the 71-frame gallery. */
+const HIGHLIGHTS = range(1, 16);
+const FOCAL = img(7);
+const AWARDS = [49, 52, 55, 58, 61, 64].map(img);
 
-const EVENT_VIDEOS: VideoItem[] = [
-  { poster: `${P}/h-05.jpg`, title: "Grand Opening Ceremony", tag: "Ceremony" },
-  { poster: `${P}/h-11.jpg`, title: "Sports & Games Finals", tag: "Sports" },
-  { poster: `${P}/h-14.jpg`, title: "Cultural Performances", tag: "Arts" },
-  { poster: `${P}/h-09.jpg`, title: "Innovation Showcase", tag: "Technical" },
-  { poster: `${P}/h-06.jpg`, title: "Youth Parliament", tag: "Debate" },
-  { poster: `${P}/h-08.jpg`, title: "Closing & Prize Distribution", tag: "Finale" },
-];
-
-const FEEDBACK_VIDEOS: VideoItem[] = [
-  { poster: `${P}/h-01.jpg`, title: "In Their Own Words", tag: "Participants" },
-  { poster: `${P}/h-03.jpg`, title: "Voices of the Winners", tag: "Champions" },
-  { poster: `${P}/h-17.jpg`, title: "Mentors & Faculty Reflect", tag: "Educators" },
-];
-
-const GUESTS = [
-  {
-    img: `${P}/guest-tamilisai.png`,
-    name: "Dr. Tamilisai Soundararajan",
-    title: "Former Governor of Telangana & Lt. Governor of Puducherry",
-  },
-  {
-    img: `${P}/guest-sundaramurthy.jpg`,
-    name: "Dr. T K Sundaramurthy",
-    title: "Ex-Mission Director, ISRO · Principal Advisor, YUCI",
-  },
-  {
-    img: `${P}/guest-embalam.png`,
-    name: "Shri Embalam R. Selvam",
-    title: "Speaker, Puducherry Legislative Assembly",
-  },
-  {
-    img: `${P}/guest-modi.jpg`,
-    name: "Shri Narendra Modi",
-    title: "Hon'ble Prime Minister of India — Guiding Vision",
-  },
-];
-
-const STATS = [
-  { number: "5,000+", label: "Participants" },
-  { number: "28+", label: "States" },
-  { number: "50+", label: "Events" },
-  { number: "100+", label: "Districts" },
-];
+/* Highlighted chief guest — carries her own spotlight video. */
+const SUKHEE = {
+  name: "Prof. Sukhee Lee",
+  role: "Advisor, International Affairs · Republic of Korea",
+  quote:
+    "The Youth United Festival creates meaningful opportunities for young people to connect across cultures and inspire positive change.",
+  poster: "/images/testimonials/sukhee-lee.jpg",
+  video: "/videos/sukhee-lee.mp4",
+};
 
 export default function Yuf2025Page() {
   return (
-    <>
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="bg-festival-gradient relative flex min-h-[85svh] items-center overflow-hidden text-white">
-        {/* Photo montage backdrop */}
-        <div aria-hidden className="absolute inset-0 z-0 opacity-25">
-          <div className="grid h-full w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-6">
-            {HIGHLIGHTS.slice(0, 12).map((img) => (
-              <div key={img.src} className="relative">
-                <Image
-                  src={img.src}
-                  alt=""
-                  fill
-                  sizes="20vw"
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className={instrumentSerif.variable}>
+      {/* ═══════════ HERO — text left · logo right ═══════════ */}
+      <section className="relative overflow-hidden bg-surface pt-28 pb-16 lg:pt-32 lg:pb-24">
+        {/* Light brand wash */}
         <div
           aria-hidden
-          className="absolute inset-0 z-10"
+          className="absolute inset-0"
           style={{
-            background:
-              "radial-gradient(120% 90% at 50% 20%, rgba(28,79,198,0.55) 0%, transparent 55%), linear-gradient(180deg, rgba(10,20,45,0.72) 0%, rgba(10,20,45,0.55) 45%, rgba(10,20,45,0.9) 100%)",
+            backgroundImage:
+              "radial-gradient(60% 60% at 82% 22%, rgba(255,165,82,0.14) 0%, transparent 55%), radial-gradient(65% 65% at 14% 34%, rgba(100,209,236,0.30) 0%, transparent 60%), linear-gradient(180deg,#f5fbfd 0%,#e3f0f8 100%)",
           }}
         />
         <ConfettiDots />
 
-        <Container className="relative z-30 py-28 text-center lg:py-32">
+        <Container className="relative z-10">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+            {/* LEFT — hero text */}
+            <div className="order-2 text-center lg:order-1 lg:text-left">
+              <FadeUp>
+                <h1 className="font-display font-black uppercase leading-[0.85] tracking-tight text-heading">
+                  <span className="block text-5xl sm:text-6xl lg:text-7xl">
+                    Youth United Festival
+                  </span>
+                  <span className="mt-2 block bg-gradient-to-r from-primary-500 via-festival-cyan to-highlight-500 bg-clip-text text-7xl text-transparent sm:text-8xl lg:text-[8.5rem]">
+                    2025
+                  </span>
+                </h1>
+              </FadeUp>
+
+              <FadeUp delay={0.16}>
+                <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-body lg:mx-0">
+                  A year of extraordinary talent, unity and celebration — every
+                  unforgettable moment of the festival, gathered in one place.
+                </p>
+              </FadeUp>
+            </div>
+
+            {/* RIGHT — background-less YUF logo */}
+            <FadeUp delay={0.12} className="order-1 lg:order-2">
+              <div className="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-lg">
+                {/* Soft halo + offset colour blobs for atmosphere */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[130%] w-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
+                  style={{
+                    background:
+                      "radial-gradient(circle, rgba(255,255,255,0.75) 0%, rgba(157,224,239,0.35) 45%, transparent 70%)",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -left-6 -top-8 h-40 w-40 rounded-full bg-primary-300/40 blur-3xl"
+                />
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -bottom-10 -right-4 h-44 w-44 rounded-full bg-highlight-400/30 blur-3xl"
+                />
+                <Image
+                  src="/images/logo.png"
+                  alt="Youth United Festival 2025"
+                  width={1080}
+                  height={540}
+                  priority
+                  className="animate-float relative w-full drop-shadow-[0_24px_50px_rgba(16,35,48,0.20)]"
+                />
+              </div>
+            </FadeUp>
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══════════ EVENT HIGHLIGHTS — two-part band + staggered grid ═══════════ */}
+      <section
+        id="highlights"
+        className="relative overflow-hidden scroll-mt-24 bg-white py-20 lg:py-28"
+      >
+        <Container>
+          {/* Two-part feature band (left text · center image · right video) */}
           <FadeUp>
-            <FestiveEyebrow className="mx-auto w-fit text-highlight-400">
-              Youth United Festival · The 2025 Chapter
-            </FestiveEyebrow>
+            <div className="relative overflow-hidden rounded-[2rem] bg-hero-gradient p-6 text-white shadow-2xl shadow-primary-950/30 sm:p-10 lg:p-12">
+              <div
+                aria-hidden
+                className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-highlight-500/25 blur-3xl"
+              />
+              <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
+                {/* LEFT */}
+                <div>
+                  <span className={`${SERIF} text-xl text-highlight-400`}>
+                    The 2025 reel
+                  </span>
+                  <h2 className="mt-2 font-display text-4xl font-extrabold leading-[1.0] tracking-tight sm:text-5xl">
+                    Event
+                    <br />
+                    Highlights
+                  </h2>
+                  <p className="mt-4 max-w-sm leading-relaxed text-white/80">
+                    From the roar of the arena to the spotlight of the stage —
+                    the moments that defined YUF 2025.
+                  </p>
+                  <Link
+                    href="/gallery"
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white underline decoration-highlight-400 decoration-2 underline-offset-4 transition-opacity hover:opacity-80"
+                  >
+                    Explore the full gallery
+                    <ArrowUpRight size={16} className="text-highlight-400" />
+                  </Link>
+                </div>
+
+                {/* CENTER image */}
+                <ScaleIn className="order-first lg:order-none">
+                  <div className="relative mx-auto">
+                    <div
+                      aria-hidden
+                      className="absolute -inset-4 rounded-full bg-highlight-500/30 blur-2xl"
+                    />
+                    <div className="relative aspect-square w-[min(64vw,17rem)] overflow-hidden rounded-full shadow-2xl ring-4 ring-white/20">
+                      <Image
+                        src={FOCAL.src}
+                        alt={FOCAL.alt}
+                        fill
+                        sizes="17rem"
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </ScaleIn>
+
+                {/* RIGHT — scroll-play video */}
+                <div>
+                  <ScrollVideo
+                    src="/videos/event-highlights.mp4"
+                    poster={img(11).src}
+                    label="YUF 2025 event film"
+                    className="aspect-video w-full rounded-2xl shadow-xl ring-1 ring-white/20"
+                  />
+                  <p className="mt-3 text-center text-xs text-white/60">
+                    The festival in motion — plays as you scroll.
+                  </p>
+                </div>
+              </div>
+            </div>
           </FadeUp>
 
-          <FadeUp delay={0.1}>
-            <h1 className="mt-6 font-display text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-8xl lg:text-[9.5rem]">
-              YUF{" "}
-              <span className="bg-gradient-to-r from-[#FF9933] via-white to-[#4ade80] bg-clip-text text-transparent">
-                2025
-              </span>
-            </h1>
-          </FadeUp>
+        </Container>
+      </section>
 
-          <FadeUp delay={0.2}>
-            <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/90 sm:text-xl">
-              A year of extraordinary talent, unity and celebration — relive the
-              moments that made the Youth United Festival 2025 unforgettable.
+      {/* ═══════════ THE FESTIVAL IN FRAMES — horizontal film reel ═══════════ */}
+      <section className="relative bg-white pt-6 pb-16 lg:pb-24">
+        <Container>
+          <FadeUp className="flex flex-col items-center gap-3 text-center">
+            <h3 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
+              The Festival in Frames
+            </h3>
+            <p className="max-w-2xl text-body">
+              Every cheer, every performance, every proud smile — scroll the reel,
+              tap any frame to relive it full-size.
+            </p>
+          </FadeUp>
+        </Container>
+        <FilmReel images={HIGHLIGHTS} />
+      </section>
+
+      {/* ═══════════ CHIEF GUEST — highlighted spotlight ═══════════ */}
+      <section className="relative overflow-hidden bg-hero-gradient py-20 text-white lg:py-28">
+        <ConfettiDots />
+        <Container className="relative">
+          <FadeUp className="mb-12 flex flex-col items-center gap-3 text-center">
+            <span className={`${SERIF} text-xl text-highlight-400`}>
+              Guest of Honour
+            </span>
+            <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Graced by a Visionary
+            </h2>
+            <p className="max-w-2xl text-white/80">
+              A distinguished leader whose words inspired our young changemakers.
             </p>
           </FadeUp>
 
-          {/* Stats */}
-          <FadeUp delay={0.32}>
-            <div className="mx-auto mt-12 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
-              {STATS.map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-2xl border border-white/15 bg-white/5 px-4 py-5 backdrop-blur-sm"
-                >
-                  <div className="font-display text-3xl font-black text-highlight-400 sm:text-4xl">
-                    {s.number}
-                  </div>
-                  <div className="mt-1 text-xs font-semibold uppercase tracking-wider text-white/70">
-                    {s.label}
-                  </div>
+          {/* Highlighted guest — Prof. Sukhee Lee, with her spotlight video */}
+          <FadeUp>
+            <div className="mx-auto grid max-w-5xl items-center gap-8 rounded-[2rem] border border-white/12 bg-white/[0.05] p-5 backdrop-blur sm:p-7 lg:grid-cols-2 lg:gap-10">
+              <ScrollVideo
+                src={SUKHEE.video}
+                poster={SUKHEE.poster}
+                label={SUKHEE.name}
+                className="aspect-[5/4] w-full rounded-3xl ring-1 ring-white/20 lg:aspect-[4/5]"
+              />
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-highlight-400">
+                  Highlighted Guest
+                </span>
+                <Quote size={30} className="mt-4 text-highlight-400" />
+                <p className={`${SERIF} mt-3 text-2xl leading-snug text-white sm:text-3xl`}>
+                  &ldquo;{SUKHEE.quote}&rdquo;
+                </p>
+                <div className="mt-5">
+                  <h3 className="font-display text-2xl font-bold">{SUKHEE.name}</h3>
+                  <p className="mt-0.5 text-white/70">{SUKHEE.role}</p>
                 </div>
-              ))}
+              </div>
             </div>
           </FadeUp>
         </Container>
       </section>
 
-      {/* ═══════════ HIGHLIGHTS GALLERY ═══════════ */}
-      <section className="section-glow relative overflow-hidden py-16 lg:py-24">
-        <FestiveGlows />
-        <Container className="relative">
-          <FadeUp className="mb-12 flex flex-col items-center gap-4 text-center">
-            <FestiveEyebrow>Event Highlights</FestiveEyebrow>
-            <h2 className="font-display text-4xl font-extrabold tracking-tight text-heading sm:text-5xl">
-              Moments Worth Reliving
-            </h2>
-            <p className="max-w-2xl text-lg leading-relaxed text-body">
-              From the roar of the sports arena to the spotlight of the cultural
-              stage — a glimpse into the energy of YUF 2025. Tap any photo to
-              view it full-size.
-            </p>
-          </FadeUp>
-          <FadeIn>
-            <PhotoGallery images={HIGHLIGHTS} />
-          </FadeIn>
-        </Container>
-      </section>
-
-      {/* ═══════════ EVENT VIDEOS ═══════════ */}
-      <section className="bg-hero-gradient relative overflow-hidden py-16 lg:py-24">
-        <ConfettiDots />
-        <Container className="relative">
-          <FadeUp className="mb-12 flex flex-col items-center gap-4 text-center">
-            <FestiveEyebrow className="text-highlight-400">
-              Watch the Action
-            </FestiveEyebrow>
-            <h2 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-              Event Videos
-            </h2>
-            <p className="max-w-2xl text-lg leading-relaxed text-white/85">
-              Ceremonies, finals and showcases — the festival in motion.
-            </p>
-          </FadeUp>
-          <FadeIn>
-            <VideoGrid videos={EVENT_VIDEOS} />
-          </FadeIn>
-        </Container>
-      </section>
-
-      {/* ═══════════ AWARD CEREMONY ═══════════ */}
-      <section className="section-aqua relative overflow-hidden py-16 lg:py-24">
-        <FestiveGlows />
-        <Container className="relative">
-          <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <FadeUp className="flex flex-col gap-6">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-highlight-500/15 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.14em] text-highlight-600">
-                <Trophy size={16} /> Honouring Excellence
+      {/* ═══════════ AWARD CEREMONY — curated collage ═══════════ */}
+      <section className="section-tint relative overflow-hidden py-20 lg:py-28">
+        <Container>
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <FadeUp>
+              <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/12 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-highlight-600">
+                <Trophy size={16} /> Moment of Glory
               </span>
-              <h2 className="font-display text-4xl font-extrabold leading-tight tracking-tight text-heading sm:text-5xl">
-                The Award Ceremony
+              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-heading sm:text-5xl lg:text-6xl">
+                Champions
+                <br />
+                Crowned
               </h2>
-              <p className="text-lg leading-relaxed text-body">
-                YUF 2025 celebrated its brightest talents on stage — recognised
-                for their creativity, skill and sportsmanship. The festival was
-                also honoured with prestigious appreciation at{" "}
-                <span className="font-semibold text-primary-700">Raj Bhavan</span>,
-                a proud milestone for the Youth United Council of India.
+              <p className="mt-5 text-lg leading-relaxed text-body">
+                The brightest talents of YUF 2025 were felicitated on stage —
+                honoured for creativity, skill and sportsmanship. The festival
+                also earned prestigious appreciation at{" "}
+                <span className="font-semibold text-highlight-600">Raj Bhavan</span>
+                , a proud milestone for the Youth United Council of India.
               </p>
-              <ul className="flex flex-col gap-3">
+              <ul className="mt-6 flex flex-col gap-3">
                 {[
                   "State & national-level winners felicitated",
-                  "Recognition from esteemed dignitaries",
+                  "Trophies, medals & merit certificates awarded",
                   "Appreciation received at Raj Bhavan",
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-body">
+                  <li key={t} className="flex items-start gap-3 text-heading/85">
                     <Star
                       size={16}
                       className="mt-1 shrink-0 fill-highlight-500 text-highlight-500"
                     />
-                    <span className="text-[15px] leading-relaxed sm:text-base">
-                      {t}
-                    </span>
+                    <span className="text-[15px] leading-relaxed">{t}</span>
                   </li>
                 ))}
               </ul>
             </FadeUp>
 
             <FadeUp delay={0.15}>
-              <PhotoGallery images={AWARDS} />
+              <div className="grid grid-cols-2 gap-4">
+                {AWARDS.map((a, i) => (
+                  <div
+                    key={a.src}
+                    className={cn(
+                      "relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-primary-900/10",
+                      i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]",
+                      i === 1 ? "mt-8" : "",
+                      i === 4 ? "-mt-8" : "",
+                    )}
+                  >
+                    <Image
+                      src={a.src}
+                      alt={a.alt}
+                      fill
+                      sizes="(min-width: 1024px) 22vw, 45vw"
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                  </div>
+                ))}
+              </div>
             </FadeUp>
           </div>
         </Container>
       </section>
 
-      {/* ═══════════ FEEDBACK VIDEOS ═══════════ */}
-      <section className="section-glow relative overflow-hidden py-16 lg:py-24">
-        <FestiveGlows />
-        <Container className="relative">
-          <FadeUp className="mb-12 flex flex-col items-center gap-4 text-center">
-            <FestiveEyebrow>Straight From the Heart</FestiveEyebrow>
-            <h2 className="font-display text-4xl font-extrabold tracking-tight text-heading sm:text-5xl">
-              Feedback & Reflections
-            </h2>
-            <p className="max-w-2xl text-lg leading-relaxed text-body">
-              What participants, winners and mentors had to say about their YUF
-              2025 experience.
-            </p>
-          </FadeUp>
-          <FadeIn>
-            <VideoGrid videos={FEEDBACK_VIDEOS} />
-          </FadeIn>
-        </Container>
-      </section>
-
-      {/* ═══════════ CHIEF GUESTS ═══════════ */}
-      <section className="bg-festival-gradient relative overflow-hidden py-16 text-white lg:py-24">
-        <ConfettiDots />
-        <Container className="relative">
-          <FadeUp className="mb-12 flex flex-col items-center gap-4 text-center">
-            <FestiveEyebrow className="text-highlight-400">
-              Distinguished Presence
-            </FestiveEyebrow>
-            <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Chief Guests &amp; Dignitaries
-            </h2>
-            <p className="max-w-2xl text-lg leading-relaxed text-white/85">
-              We were honoured by the presence and guidance of eminent leaders
-              who inspired our young changemakers.
-            </p>
-          </FadeUp>
-
-          <StaggerContainer
-            stagger={0.1}
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {GUESTS.map((g) => (
-              <StaggerItem key={g.name}>
-                <div className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/12 bg-white/5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-highlight-400/50">
-                  <div className="relative aspect-[3/4] overflow-hidden">
-                    <Image
-                      src={g.img}
-                      alt={g.name}
-                      fill
-                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
-                      className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-t from-primary-950/80 via-transparent to-transparent"
-                    />
-                  </div>
-                  <div className="flex flex-1 flex-col gap-1.5 p-5">
-                    <h3 className="font-display text-lg font-bold leading-tight">
-                      {g.name}
-                    </h3>
-                    <p className="text-sm leading-snug text-white/70">
-                      {g.title}
-                    </p>
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </Container>
-      </section>
-
       {/* ═══════════ CTA ═══════════ */}
-      <section className="relative overflow-hidden bg-white py-16 lg:py-24">
+      <section className="bg-festival-gradient relative overflow-hidden py-20 text-white lg:py-28">
         <Container>
           <ScaleIn>
-            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary-600 via-primary-500 to-festival-cyan px-8 py-16 text-center sm:px-14 lg:py-20">
-              <div className="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-highlight-400/25 blur-3xl" aria-hidden />
-              <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" aria-hidden />
-              <div className="relative flex flex-col items-center gap-6">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
-                  <Sparkles size={16} /> The story continues
-                </span>
-                <h2 className="max-w-2xl font-display text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">
-                  Loved YUF 2025? Be part of{" "}
-                  <span className="text-highlight-300">YUF 2026.</span>
-                </h2>
-                <p className="max-w-xl text-lg leading-relaxed text-white/85">
-                  Registrations are open. Bring your talent to India&apos;s
-                  biggest celebration of youth.
-                </p>
-                <Link
-                  href="/register"
-                  className="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-xl transition-all hover:bg-primary-50"
-                >
-                  Register for YUF 2026
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-0.5"
-                  />
-                </Link>
-              </div>
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 className="font-display text-4xl font-black leading-tight sm:text-5xl">
+                You just relived 2025.
+                <br />
+                Now be the story of{" "}
+                <span className="text-highlight-400">2026.</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-lg text-white/90">
+                Registrations for Youth United Festival 2026 are open. Your
+                spotlight is waiting.
+              </p>
+              <Link
+                href="/register"
+                className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-white px-9 text-base font-semibold text-primary-700 shadow-xl transition hover:bg-white/90"
+              >
+                Register for YUF 2026
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </ScaleIn>
         </Container>
       </section>
-    </>
+    </div>
   );
 }
