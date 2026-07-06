@@ -35,14 +35,6 @@ export function IndiaMapImage({
 }) {
   return (
     <div className={`relative aspect-[932/1000] ${className ?? ""}`}>
-      {/* Faint India-shaped halo behind — a slightly larger silhouette filled
-          with the current colour peeks out as a subtle outline. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 scale-[1.035] bg-current opacity-20"
-        style={MASK_STYLE}
-      />
-
       {/* Image filled into the India silhouette via CSS mask */}
       <div className="absolute inset-0" style={MASK_STYLE}>
         <Image

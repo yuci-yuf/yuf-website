@@ -140,7 +140,7 @@ export default function AboutPage() {
               <IndiaMapImage
                 src="/images/about/map1.jpeg"
                 label="YUF youth across India"
-                className="mx-auto h-[380px] w-full max-w-md text-white/90 drop-shadow-xl sm:h-[500px] sm:max-w-lg lg:h-[620px] lg:max-w-xl"
+                className="mx-auto h-[380px] w-full max-w-md sm:h-[500px] sm:max-w-lg lg:h-[620px] lg:max-w-xl"
               />
             </FadeUp>
 
