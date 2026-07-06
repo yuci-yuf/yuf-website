@@ -70,7 +70,7 @@ export default async function HomePage() {
         marqueeItems={tickerItems}
         stats={[
           { number: "5K+", label: "Participants" },
-          { number: "28+", label: "States" },
+          { number: "5+", label: "States" },
           { number: "100+", label: "Districts" },
         ]}
       />
