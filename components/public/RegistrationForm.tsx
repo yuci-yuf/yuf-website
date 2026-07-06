@@ -40,30 +40,36 @@ function makeRegistrationCode(): string {
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
-/** Cities where the festival runs. */
-const LOCATIONS = ["Chennai", "Coimbatore"];
 /**
- * Where each city's events are actually held. A participant's chosen city
- * filters to event locations whose district/venue is in that place.
- * (Chennai's events run in Ponneri; Coimbatore's in Coimbatore.)
+ * The city an event location belongs to (the admin form's "City" field).
+ * Returns "" when no city is set.
  */
-const LOCATION_VENUES: Record<string, string[]> = {
-  Chennai: ["Ponneri"],
-  Coimbatore: ["Coimbatore"],
-};
+function cityOf(loc: EventLocation): string {
+  return (loc.city ?? "").trim();
+}
 
-/** True if an event location (district/venue) belongs to the given city. */
+/** True if an event location is in the given city (case-insensitive match). */
 function locationInCity(loc: EventLocation, city: string): boolean {
-  const names = LOCATION_VENUES[city] ?? [];
-  if (names.length === 0) return false;
-  const haystack = `${loc.district ?? ""} ${loc.venue ?? ""}`.toLowerCase();
-  return names.some((name) => haystack.includes(name.toLowerCase()));
+  if (!city) return false;
+  return cityOf(loc).toLowerCase() === city.trim().toLowerCase();
 }
 
 /** True if any of the event's locations is in the given city. */
 function eventInCity(ev: EventItem, city: string): boolean {
   if (!city) return false;
   return getEventLocations(ev).some((l) => locationInCity(l, city));
+}
+
+/**
+ * Participant-facing label for a location: full address, then city, then date
+ * (e.g. "Velammal Bodhi Campus, Ponneri · Chennai · 2nd Sept 2026"). Any empty
+ * part is dropped so short data still reads cleanly.
+ */
+function locationLabel(loc: EventLocation): string {
+  const address = (loc.address ?? "").trim(); // full street address
+  const city = cityOf(loc);
+  const date = (loc.date ?? "").trim();
+  return [address, city, date].filter(Boolean).join(" · ");
 }
 
 /**
@@ -121,6 +127,24 @@ export function RegistrationForm({
   const preselectedLoc = searchParams.get("loc");
   const preselected = events.find((e) => e.id === preselectedId);
 
+  // Cities offered in the "Your location" dropdown, derived from the events'
+  // data (each location's City field) — no hardcoded list, so adding an
+  // event in a new city automatically surfaces it here. De-duplicated
+  // case-insensitively, keeping the first spelling an admin used, in first-seen
+  // order.
+  const cities = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const ev of events) {
+      for (const loc of getEventLocations(ev)) {
+        const city = cityOf(loc);
+        if (city && !seen.has(city.toLowerCase())) {
+          seen.set(city.toLowerCase(), city);
+        }
+      }
+    }
+    return Array.from(seen.values());
+  }, [events]);
+
   // Deep-link (?event=&loc=): the explicitly chosen location, if any. Only an
   // explicit ?loc pre-selects a location — otherwise a multi-location event
   // starts with none chosen so the user must consciously pick the date/place.
@@ -133,9 +157,7 @@ export function RegistrationForm({
     explicitLocation ??
     (preselected ? getEventLocations(preselected)[0] : undefined);
   const preselectedCity =
-    preselected && cityHintLocation
-      ? (LOCATIONS.find((c) => locationInCity(cityHintLocation, c)) ?? "")
-      : "";
+    preselected && cityHintLocation ? cityOf(cityHintLocation) : "";
 
   const [values, setValues] = useState<FormValues>({
     ...EMPTY,
@@ -191,16 +213,21 @@ export function RegistrationForm({
 
   const selectedEvent = events.find((e) => e.id === eventId);
 
-  // The event list is filtered only by school/college, so the user must pick
-  // that before choosing a category/event. City no longer gates the list.
+  // The category/event lists are filtered by BOTH school/college and city, so
+  // the user must pick both before choosing a category/event.
   const canChooseEvent = !!values.institutionType && !!values.location;
 
   // All locations of the selected event (what the participant picks between).
   // Fee is shared across locations.
   const locationsForSelection = useMemo(() => {
     if (!selectedEvent) return [];
-    return getEventLocations(selectedEvent);
-  }, [selectedEvent]);
+    const all = getEventLocations(selectedEvent);
+    // Only offer the locations that are in the city the participant picked, so
+    // choosing "Chennai" never shows a Coimbatore date and vice-versa.
+    return values.location
+      ? all.filter((l) => locationInCity(l, values.location))
+      : all;
+  }, [selectedEvent, values.location]);
 
   // When an event has just one location in the city, use it implicitly so the
   // participant isn't asked to "choose" from a list of one.
@@ -296,7 +323,7 @@ export function RegistrationForm({
       const code = makeRegistrationCode();
       const { place, date } = locationParts(selectedLocation);
       const venue =
-        selectedLocation.venue ?? selectedLocation.district ?? place;
+        selectedLocation.address ?? selectedLocation.city ?? place;
       const eventDate = selectedLocation.date ?? date;
 
       await submitRegistration({
@@ -644,7 +671,7 @@ export function RegistrationForm({
                     <SelectValue placeholder="Select location to participate" />
                   </SelectTrigger>
                   <SelectContent>
-                    {LOCATIONS.map((city) => (
+                    {cities.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}
                       </SelectItem>
@@ -785,10 +812,9 @@ export function RegistrationForm({
                     </SelectTrigger>
                     <SelectContent>
                       {locationsForSelection.map((loc) => {
-                        const { place, date } = locationParts(loc);
                         const left = locationSpotsLeft(loc);
                         const full = left === 0;
-                        const label = [place, date].filter(Boolean).join(" · ");
+                        const label = locationLabel(loc);
                         return (
                           <SelectItem key={loc.id} value={loc.id} disabled={full}>
                             {label || "Location"}
@@ -842,10 +868,7 @@ export function RegistrationForm({
 
               <Row label="Location">
                 {selectedLocation
-                  ? (() => {
-                      const { place, date } = locationParts(selectedLocation);
-                      return [place, date].filter(Boolean).join(" · ") || "—";
-                    })()
+                  ? locationLabel(selectedLocation) || "—"
                   : "Not selected yet"}
               </Row>
 

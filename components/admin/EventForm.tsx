@@ -45,8 +45,8 @@ interface LocationDraft {
    * Preserved for existing locations so their registrations stay linked.
    */
   id: string;
-  district: string;
-  venue: string;
+  city: string;
+  address: string;
   dateIso: string;
   /**
    * The date label as originally loaded. Preserved so a label the picker can't
@@ -68,8 +68,8 @@ function emptyLocation(): LocationDraft {
   return {
     key: nextLocationKey(),
     id: "",
-    district: "",
-    venue: "",
+    city: "",
+    address: "",
     dateIso: "",
     originalDateLabel: "",
     limit: "",
@@ -79,7 +79,7 @@ function emptyLocation(): LocationDraft {
 
 /** Slug used as a fallback location id when a row has no persisted id yet. */
 function slugifyLocation(l: LocationDraft, index: number): string {
-  const base = [l.district, l.venue, l.dateIso]
+  const base = [l.city, l.address, l.dateIso]
     .map((s) => s.trim())
     .filter(Boolean)
     .join("-")
@@ -209,8 +209,8 @@ export function EventForm({
     return existing.map((loc) => ({
       key: nextLocationKey(),
       id: loc.id,
-      district: loc.district ?? "",
-      venue: loc.venue ?? "",
+      city: loc.city ?? "",
+      address: loc.address ?? "",
       dateIso: labelToIso(loc.date ?? ""),
       originalDateLabel: loc.date ?? "",
       limit: loc.registrationLimit != null ? String(loc.registrationLimit) : "",
@@ -263,11 +263,11 @@ export function EventForm({
     }
 
     // Build the locations array. A location counts as "filled in" if it has any
-    // of district/venue/date; blank rows are dropped. Existing rows keep their
+    // of city/address/date; blank rows are dropped. Existing rows keep their
     // id (so registrations stay linked); new rows get a slug, de-duplicated.
     const usedIds = new Set<string>();
     const builtLocations: EventLocation[] = locations
-      .filter((l) => l.district.trim() || l.venue.trim() || l.dateIso)
+      .filter((l) => l.city.trim() || l.address.trim() || l.dateIso)
       .map((l, i) => {
         let id = l.id || slugifyLocation(l, i);
         while (usedIds.has(id)) id = `${id}-${i + 1}`;
@@ -284,8 +284,8 @@ export function EventForm({
             : undefined;
         return {
           id,
-          district: l.district.trim() || undefined,
-          venue: l.venue.trim() || undefined,
+          city: l.city.trim() || undefined,
+          address: l.address.trim() || undefined,
           date,
           registrationLimit: l.limit.trim() ? Number(l.limit) : undefined,
           registrationCount: l.count,
@@ -293,7 +293,14 @@ export function EventForm({
       });
 
     if (builtLocations.length === 0) {
-      setError("Add at least one location (a district, venue, or date).");
+      setError("Add at least one location (a city, address, or date).");
+      return;
+    }
+
+    // City is required on every location: the public register page filters
+    // events by city, so a location without one would never be selectable.
+    if (builtLocations.some((l) => !l.city)) {
+      setError("Every location needs a City (used to filter events on the register page).");
       return;
     }
 
@@ -535,24 +542,24 @@ export function EventForm({
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Field label="District" htmlFor={`loc-district-${loc.key}`}>
+                <Field label="City" htmlFor={`loc-city-${loc.key}`} required>
                   <Input
-                    id={`loc-district-${loc.key}`}
-                    value={loc.district}
+                    id={`loc-city-${loc.key}`}
+                    value={loc.city}
                     onChange={(e) =>
-                      updateLocation(loc.key, { district: e.target.value })
+                      updateLocation(loc.key, { city: e.target.value })
                     }
-                    placeholder="e.g. Ponneri"
+                    placeholder="e.g. Chennai"
                   />
                 </Field>
-                <Field label="Venue" htmlFor={`loc-venue-${loc.key}`}>
+                <Field label="Address" htmlFor={`loc-address-${loc.key}`}>
                   <Input
-                    id={`loc-venue-${loc.key}`}
-                    value={loc.venue}
+                    id={`loc-address-${loc.key}`}
+                    value={loc.address}
                     onChange={(e) =>
-                      updateLocation(loc.key, { venue: e.target.value })
+                      updateLocation(loc.key, { address: e.target.value })
                     }
-                    placeholder="e.g. Velammal Bodhi Campus"
+                    placeholder="e.g. Velammal Bodhi Campus, Ponneri"
                   />
                 </Field>
                 <Field label="Date" htmlFor={`loc-date-${loc.key}`}>

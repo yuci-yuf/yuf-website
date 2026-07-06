@@ -20,7 +20,7 @@ export function EventCard({ event }: { event: EventItem }) {
   const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
   const metaDate = uniq(locations.map((l) => l.date?.trim() ?? "")).join(", ");
   const metaPlace = uniq(
-    locations.map((l) => (l.district || l.venue || "").trim()),
+    locations.map((l) => (l.city || l.address || "").trim()),
   ).join(", ");
 
   return (

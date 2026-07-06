@@ -98,9 +98,9 @@ export default function AdminEventsPage() {
       .filter((e) => {
         if (!term) return true;
         if (e.title.toLowerCase().includes(term)) return true;
-        // Search across every location's district/venue.
+        // Search across every location's city/address.
         return getEventLocations(e).some((loc) =>
-          `${loc.district ?? ""} ${loc.venue ?? ""}`
+          `${loc.city ?? ""} ${loc.address ?? ""}`
             .toLowerCase()
             .includes(term),
         );
@@ -139,7 +139,7 @@ export default function AdminEventsPage() {
     a.href = url;
     // Scope the filename to the event (and location, when given) so multiple
     // exports are distinct, e.g. "kabaddi-ponneri-registrations.csv".
-    const slug = [ev.title, loc?.district || loc?.venue || loc?.date]
+    const slug = [ev.title, loc?.city || loc?.address || loc?.date]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
@@ -302,7 +302,7 @@ export default function AdminEventsPage() {
                             <ul className="flex flex-col gap-1.5">
                               {locs.map((loc) => {
                                 const place =
-                                  loc.district || loc.venue || "Location";
+                                  loc.city || loc.address || "Location";
                                 return (
                                   <li
                                     key={loc.id}

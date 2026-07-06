@@ -18,8 +18,8 @@ export function normalizeLocations(raw: unknown): EventLocation[] | undefined {
     .filter((l): l is Record<string, unknown> => !!l && typeof l === "object")
     .map((l, i) => ({
       id: typeof l.id === "string" && l.id ? l.id : `loc-${i}`,
-      district: typeof l.district === "string" ? l.district : undefined,
-      venue: typeof l.venue === "string" ? l.venue : undefined,
+      city: typeof l.city === "string" ? l.city : undefined,
+      address: typeof l.address === "string" ? l.address : undefined,
       date: typeof l.date === "string" ? l.date : undefined,
       registrationLimit:
         typeof l.registrationLimit === "number" ? l.registrationLimit : undefined,
