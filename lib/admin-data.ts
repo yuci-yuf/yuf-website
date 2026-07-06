@@ -177,6 +177,24 @@ export async function updateEvent(
 }
 
 /**
+ * Persist the home-page display order for a set of events. Each entry writes
+ * only the `homeOrder` field (leaving all other event data untouched), batched
+ * so reordering a whole category is one atomic commit. Used by the "Arrange
+ * Home Order" screen. Batched in chunks of 500 to respect Firestore's limit.
+ */
+export async function setHomeOrder(
+  updates: { id: string; homeOrder: number }[],
+): Promise<void> {
+  for (let i = 0; i < updates.length; i += 500) {
+    const batch = writeBatch(db);
+    for (const u of updates.slice(i, i + 500)) {
+      batch.update(doc(db, "events", u.id), { homeOrder: u.homeOrder });
+    }
+    await batch.commit();
+  }
+}
+
+/**
  * Delete an event and cascade-delete its registrations, so no orphaned
  * registrations linger (which previously reattached to a new event that
  * reclaimed the same slug id). Registrations are removed in batches of 500 to
@@ -218,6 +236,8 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
     isActive: data.isActive !== false,
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,
+    homeOrder:
+      typeof data.homeOrder === "number" ? (data.homeOrder as number) : undefined,
     status: (data.status as EventItem["status"]) ?? "upcoming",
     audience: (data.audience as EventItem["audience"]) ?? "both",
     details: Array.isArray(data.details) ? (data.details as string[]) : undefined,

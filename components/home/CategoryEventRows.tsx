@@ -60,22 +60,26 @@ function CategoryRow({ group }: { group: CategoryGroup }) {
         </Link>
       </div>
 
-      {/* ── Cards ── */}
+      {/* ── Cards ── layout adapts to how many events the category has ── */}
       {group.events.length === 1 ? (
         // A lone event looks like a giant empty banner in the featured layout,
         // so show it as a wide landscape card (poster left, details right).
         <SoloCard event={featured} st={st} />
+      ) : group.events.length === 2 ? (
+        // Two events: a single featured card + one compact card looks lopsided
+        // and leaves dead space, so show them as two equal hero cards instead.
+        <div className="grid gap-5 sm:grid-cols-2">
+          {group.events.map((event) => (
+            <FeaturedCard key={event.id} event={event} st={st} />
+          ))}
+        </div>
       ) : (
         <div className="grid gap-5 lg:grid-cols-[1.55fr_1fr]">
           <FeaturedCard event={featured} st={st} />
 
           <div
             className={`grid gap-4 lg:h-full ${
-              side.length === 1
-                ? "grid-rows-1"
-                : side.length === 2
-                  ? "grid-rows-2"
-                  : "grid-rows-3"
+              side.length === 2 ? "grid-rows-2" : "grid-rows-3"
             }`}
           >
             {side.map((event) => (

@@ -51,6 +51,8 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
     isActive: data.isActive !== false,
     registrationOpen: data.registrationOpen !== false,
     order: typeof data.order === "number" ? (data.order as number) : 0,
+    homeOrder:
+      typeof data.homeOrder === "number" ? (data.homeOrder as number) : undefined,
     status: (data.status as EventItem["status"]) ?? "upcoming",
     audience: (data.audience as EventItem["audience"]) ?? "both",
     details: Array.isArray(data.details) ? (data.details as string[]) : undefined,

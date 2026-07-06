@@ -731,6 +731,12 @@ export const termsAndConditions: LegalPage = {
         "All registration and platform fees are non-refundable. Once a payment is completed, the amount paid will not be refunded under any circumstances, except where an event is cancelled by the organizers. It is the participant's responsibility to verify all details before making the payment.",
       ],
     },
+    {
+      heading: "10. Event Schedule & Scoring",
+      blocks: [
+        "Event timings, schedules, and scoring criteria may be adjusted at the discretion of the organizers based on the number of participating teams. Any such changes will be communicated to participants through official channels prior to the event.",
+      ],
+    },
   ],
 };
 

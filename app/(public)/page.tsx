@@ -43,11 +43,21 @@ export default async function HomePage() {
     ...categoryOrder.filter((c) => presentCategories.includes(c)),
     ...presentCategories.filter((c) => !categoryOrder.includes(c)),
   ];
+  // Within each category, honor the admin-managed home order (index 0 becomes
+  // the featured card). Events without a homeOrder sort after ordered ones,
+  // preserving their existing order (getEvents() already sorts by `order`, and
+  // Array.sort is stable). This ordering applies to the home page only.
   const categoryGroups: CategoryGroup[] = orderedCategories
     .map((key) => ({
       key,
       label: key,
-      events: activeEvents.filter((e) => e.category === key),
+      events: activeEvents
+        .filter((e) => e.category === key)
+        .sort(
+          (a, b) =>
+            (a.homeOrder ?? Number.MAX_SAFE_INTEGER) -
+            (b.homeOrder ?? Number.MAX_SAFE_INTEGER),
+        ),
     }))
     .filter((g) => g.events.length > 0);
 
