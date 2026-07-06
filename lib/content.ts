@@ -28,6 +28,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
+    { label: "YUF 2025", path: "/yuf-2025" },
     { label: "Gallery", path: "/gallery" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
