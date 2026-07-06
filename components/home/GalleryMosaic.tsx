@@ -34,7 +34,7 @@ export function GalleryMosaic({
   }));
 
   return (
-    <section className="relative overflow-hidden bg-slate-50/60 py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-slate-50/60 py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
       <Container className="relative">
         <FadeUp className="mb-14 flex items-end justify-between">
@@ -54,7 +54,15 @@ export function GalleryMosaic({
         </FadeUp>
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:grid-rows-2">
-          {galleryImages.map((img, i) => (
+          {galleryImages.map((img, i) => {
+            // Wide/large tiles (col-span-2) render at ~half the grid, so tell
+            // next/image their true size — otherwise it serves a source sized
+            // for a small cell and the browser upscales it (blurry).
+            const isWide = img.span.includes("col-span-2");
+            const sizes = isWide
+              ? "(min-width: 1024px) 50vw, 100vw"
+              : "(min-width: 1024px) 25vw, 50vw";
+            return (
             <motion.div
               key={img.src}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -68,13 +76,15 @@ export function GalleryMosaic({
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(min-width: 1024px) 20vw, 50vw"
+                  sizes={sizes}
+                  quality={90}
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-festival-purple/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-10 flex justify-center sm:hidden">

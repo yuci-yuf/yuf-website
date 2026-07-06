@@ -15,16 +15,16 @@ interface HeroSectionProps {
   marqueeItems: string[];
 }
 
-/* Real youth-event photos used for the diamond tiles flanking the headline. */
+/* Award-winning YUF 2025 photos for the diamond tiles flanking the headline. */
 const DIAMONDS_LEFT = [
-  { src: "/images/hero/pondicherry-event.jpg", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
-  { src: "/images/about/youth-yoga.jpg", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
-  { src: "/images/gallery/pondicherry-juniors.jpg", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
+  { src: "/images/hero/award/championship-trophy.webp", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
+  { src: "/images/hero/award/trophy-raised.webp", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
+  { src: "/images/hero/award/medalists-marigold.webp", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
 ];
 const DIAMONDS_RIGHT = [
-  { src: "/images/hero/pondicherry-community.jpg", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
-  { src: "/images/about/youth-event.jpg", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
-  { src: "/images/hero/events.jpg", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
+  { src: "/images/hero/award/trophy-handover.webp", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
+  { src: "/images/hero/award/medalists-lawn.webp", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
+  { src: "/images/hero/award/stage-certificate.webp", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
 ];
 
 /* Icon + supporting line for each stat card (matched to the reference). */
@@ -144,10 +144,20 @@ export function HeroSection({
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden pt-20 sm:pt-24">
-      {/* ── Gradient base: blue → cyan → purple ── */}
+      {/* ── Background photo (YUF 2025 participants) ── */}
+      <Image
+        src="/images/hero/group-2025.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="absolute inset-0 z-0 object-cover"
+      />
+
+      {/* ── Gradient wash over the photo: blue → cyan → purple ── */}
       <div
         aria-hidden
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 opacity-75"
         style={{
           background:
             "radial-gradient(110% 90% at 18% 22%, rgba(89,31,172,0.6) 0%, transparent 50%), radial-gradient(100% 90% at 88% 78%, rgba(89,31,172,0.5) 0%, transparent 48%), linear-gradient(125deg, #133a8c 0%, #155fa6 38%, #15938f 58%, #1d5fbf 100%)",
@@ -222,9 +232,9 @@ export function HeroSection({
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
+            className="font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(8,43,61,0.4)] sm:text-6xl lg:text-[5rem]"
           >
-            Youth United<br />Festival <span className="text-highlight-400">{highlight}</span>
+            Youth United Festival<br /><span className="text-highlight-400">{highlight}</span>
           </motion.h1>
 
           <motion.p

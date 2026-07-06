@@ -10,12 +10,18 @@ export function EventCard({ event }: { event: EventItem }) {
   const Icon = style.icon;
   const audience = audienceLabel(event.audience);
 
-  // Location-aware meta: each location is shown with the same calendar-date +
-  // pin-venue layout, so single- and multi-location cards look consistent. A
-  // multi-location event also gets a "N locations" badge and lists every
-  // location. Location picking happens on the detail page.
+  // Location-aware meta: keep the card to two lines — one for date(s), one for
+  // place(s) — even when the event runs in multiple places. Multi-location
+  // events also get a "N locations" badge; the detail page lists each fully.
   const locations = getEventLocations(event);
   const multi = locations.length > 1;
+
+  // Combine dates and places across locations, de-duplicated, into one line each.
+  const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
+  const metaDate = uniq(locations.map((l) => l.date?.trim() ?? "")).join(", ");
+  const metaPlace = uniq(
+    locations.map((l) => (l.district || l.venue || "").trim()),
+  ).join(", ");
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover">
@@ -80,36 +86,28 @@ export function EventCard({ event }: { event: EventItem }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        {/* Schedule meta — one block per location, each with the same
-            calendar-date + pin-venue rows so single/multi cards look alike. */}
-        {locations.some((l) => l.date || l.venue || l.district) && (
-          <div className="flex flex-col gap-2">
-            {locations.map((loc) => {
-              const place = loc.venue || loc.district;
-              if (!loc.date && !place) return null;
-              return (
-                <div
-                  key={loc.id}
-                  className="flex flex-col gap-1.5 text-xs font-medium text-text-muted"
-                >
-                  {loc.date && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <Calendar size={14} className="text-primary-500" />
-                      {loc.date}
-                    </span>
-                  )}
-                  {place && (
-                    <span className="inline-flex min-w-0 items-start gap-1.5">
-                      <MapPin
-                        size={14}
-                        className="mt-0.5 shrink-0 text-primary-500"
-                      />
-                      <span className={multi ? "" : "truncate"}>{place}</span>
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+        {/* Schedule meta — kept to two lines: all dates on one, all places on
+            the other, even for multi-location events. */}
+        {(metaDate || metaPlace) && (
+          <div className="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
+            {metaDate && (
+              <span className="inline-flex min-w-0 items-start gap-1.5">
+                <Calendar
+                  size={14}
+                  className="mt-0.5 shrink-0 text-primary-500"
+                />
+                <span className="line-clamp-1">{metaDate}</span>
+              </span>
+            )}
+            {metaPlace && (
+              <span className="inline-flex min-w-0 items-start gap-1.5">
+                <MapPin
+                  size={14}
+                  className="mt-0.5 shrink-0 text-primary-500"
+                />
+                <span className="line-clamp-1">{metaPlace}</span>
+              </span>
+            )}
           </div>
         )}
 

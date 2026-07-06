@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  ArrowUpDown,
   Download,
   Loader2,
   MapPin,
@@ -190,6 +191,12 @@ export default function AdminEventsPage() {
         description="Create, edit, and remove festival events"
         action={
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" asChild>
+              <Link href="/admin/events/arrange">
+                <ArrowUpDown size={16} />
+                Arrange Home Order
+              </Link>
+            </Button>
             <Button
               size="sm"
               variant="outline"

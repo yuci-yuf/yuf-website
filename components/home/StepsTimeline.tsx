@@ -2,16 +2,15 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { RegistrationStep } from "@/types";
 import { Container } from "@/components/ui/Container";
-import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
-import { FestiveEyebrow, ConfettiDots } from "./FestiveAccents";
+import { FadeUp } from "./MotionWrapper";
+import { ConfettiDots } from "./FestiveAccents";
 
 export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
   return (
-    <section className="relative overflow-hidden bg-slate-50/60 py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-slate-50/60 py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
       <Container className="relative">
         <FadeUp className="mb-16 flex flex-col items-center gap-4 text-center">
-          <FestiveEyebrow>How It Works</FestiveEyebrow>
           <h2 className="max-w-md font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
             Steps to Register
           </h2>
@@ -20,31 +19,34 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
           </p>
         </FadeUp>
 
-        <StaggerContainer stagger={0.12} className="relative">
-          {/* Connecting line (desktop) */}
+        <div className="relative">
+          {/* Connecting line (desktop) — spans only from the first step circle
+             to the last, not edge to edge. */}
           <div
-            className="absolute left-0 right-0 top-7 z-0 hidden h-0.5 bg-primary-200 lg:block"
+            className="absolute left-[12.5%] right-[12.5%] top-7 z-0 hidden h-0.5 bg-primary-200 lg:block"
             aria-hidden
           />
 
-          <div className="grid gap-8 sm:grid-cols-3 lg:grid-cols-3">
-            {steps.map((step) => (
-              <StaggerItem key={step.step}>
-                <div className="group relative flex flex-col items-center gap-5 text-center">
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 font-heading text-lg font-bold text-white shadow-lg shadow-primary-600/25 ring-4 ring-white transition-transform duration-300 group-hover:scale-110">
-                    {step.step}
-                  </div>
-                  <h3 className="font-heading text-base font-bold text-heading">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-body">
-                    {step.description}
-                  </p>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map((step, i) => (
+              <FadeUp
+                key={step.step}
+                delay={i * 0.08}
+                className="group relative flex flex-col items-center gap-5 text-center"
+              >
+                <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 font-heading text-lg font-bold text-white shadow-lg shadow-primary-600/25 ring-4 ring-white transition-transform duration-300 group-hover:scale-110">
+                  {step.step}
                 </div>
-              </StaggerItem>
+                <h3 className="font-heading text-base font-bold text-heading">
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-body">
+                  {step.description}
+                </p>
+              </FadeUp>
             ))}
           </div>
-        </StaggerContainer>
+        </div>
 
         <FadeUp delay={0.3} className="mt-14 flex justify-center">
           <Link

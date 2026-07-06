@@ -20,7 +20,7 @@ export function PartnerStrip({ partners }: { partners: Partner[] }) {
               <img
                 src={partner.logoUrl}
                 alt={partner.name}
-                className="max-h-20 w-auto object-contain opacity-60 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0"
+                className="max-h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
               />
             ) : (
               <span className="whitespace-nowrap text-lg font-semibold text-text-muted transition-colors hover:text-text">

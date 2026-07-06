@@ -3,9 +3,10 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "@/types";
 import { SectionHeading } from "@/components/ui/Section";
+import { ConfettiDots } from "./FestiveAccents";
 
 function initials(name: string) {
   return name
@@ -18,12 +19,10 @@ function initials(name: string) {
 }
 
 export function Testimonials({
-  label,
   title,
   subtitle,
   items,
 }: {
-  label: string;
   title: string;
   subtitle: string;
   items: Testimonial[];
@@ -54,7 +53,7 @@ export function Testimonials({
   const active = items[index];
 
   return (
-    <section className="bg-hero-gradient relative overflow-hidden py-16 sm:py-24 lg:py-32">
+    <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-16 lg:py-20">
       {/* Decorative festival glows */}
       <div
         aria-hidden
@@ -64,19 +63,13 @@ export function Testimonials({
         aria-hidden
         className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-festival-cyan/25 blur-3xl"
       />
+      <ConfettiDots />
 
-      <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
-        <SectionHeading label={label} title={title} subtitle={subtitle} className="mb-14" invert />
+      <div className="relative mx-auto w-full max-w-4xl px-6 lg:px-8">
+        <SectionHeading title={title} subtitle={subtitle} className="mb-10" invert />
 
         <div className="mx-auto max-w-none">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/80 p-8 shadow-card backdrop-blur-sm sm:p-12">
-            {/* Oversized quotation watermark */}
-            <Quote
-              aria-hidden
-              className="absolute right-6 top-6 h-20 w-20 -scale-x-100 text-primary-100"
-              strokeWidth={1.5}
-            />
-
+          <div className="relative flex overflow-hidden rounded-3xl border border-border bg-surface/80 shadow-card backdrop-blur-sm min-h-[230px] sm:min-h-[260px]">
             <AnimatePresence initial={false} mode="wait">
               <motion.div
                 key={index}
@@ -84,34 +77,34 @@ export function Testimonials({
                 animate={{ opacity: 1 }}
                 exit={reduced ? undefined : { opacity: 0 }}
                 transition={{ duration: 0.35 }}
-                className="grid items-center gap-8 sm:grid-cols-[auto_1fr] sm:gap-10"
+                className="grid w-full sm:grid-cols-[30%_1fr]"
               >
-                {/* Portrait */}
+                {/* Portrait — 30% width strip, full card height */}
                 <motion.div
-                  initial={reduced ? false : { opacity: 0, scale: 0.9 }}
+                  initial={reduced ? false : { opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.05 }}
-                  className="mx-auto sm:mx-0"
+                  className="relative min-h-[250px] sm:min-h-[260px]"
                 >
-                  <div className="rounded-full bg-gradient-to-br from-festival-blue via-festival-cyan to-festival-purple p-[3px] shadow-lg">
-                    <div className="relative h-32 w-32 overflow-hidden rounded-full bg-primary-100 ring-4 ring-surface sm:h-36 sm:w-36">
-                      {active.image && !failed[index] ? (
-                        <Image
-                          src={active.image}
-                          alt={active.name}
-                          fill
-                          sizes="144px"
-                          className="object-cover"
-                          onError={() =>
-                            setFailed((f) => ({ ...f, [index]: true }))
-                          }
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center font-display text-4xl font-extrabold text-primary-600">
-                          {initials(active.name)}
-                        </span>
-                      )}
-                    </div>
+                  <div className="absolute inset-0 overflow-hidden bg-primary-100">
+                    {active.image && !failed[index] ? (
+                      <Image
+                        src={active.image}
+                        alt={active.name}
+                        fill
+                        sizes="(min-width: 640px) 30vw, 100vw"
+                        className="object-cover"
+                        onError={() =>
+                          setFailed((f) => ({ ...f, [index]: true }))
+                        }
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center font-display text-6xl font-extrabold text-primary-600 sm:text-8xl">
+                        {initials(active.name)}
+                      </span>
+                    )}
+                    {/* Subtle gradient overlay for readability on mobile stacked layout */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/5 hidden sm:block" />
                   </div>
                 </motion.div>
 
@@ -120,15 +113,15 @@ export function Testimonials({
                   initial={reduced ? false : { opacity: 0, x: dir >= 0 ? 24 : -24 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-                  className="flex flex-col gap-4 text-center sm:text-left"
+                  className="flex flex-col justify-center gap-3 p-5 sm:p-6 lg:p-8 text-center sm:text-left"
                 >
-                  <figcaption className="text-xs font-bold uppercase tracking-[0.18em] text-highlight-600">
+                  <figcaption className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-highlight-600 sm:text-xs">
                     {active.role}
                   </figcaption>
-                  <blockquote className="text-lg leading-relaxed text-body sm:text-xl">
-                    “{active.quote}”
+                  <blockquote className="text-sm leading-relaxed text-body sm:text-base">
+                    &ldquo;{active.quote}&rdquo;
                   </blockquote>
-                  <p className="font-heading text-lg font-bold text-heading">
+                  <p className="font-heading text-base font-bold text-heading sm:text-lg">
                     {active.name}
                   </p>
                 </motion.figure>

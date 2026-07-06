@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
@@ -98,20 +98,21 @@ export default async function EventDetailPage({
             <h1 className="font-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
               {event.title}
             </h1>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/90">
+            <div className="flex flex-wrap gap-3 text-sm">
               {/* Single-location: date + venue on one line. Multi-location:
-                  list every location with its own date. */}
+                  list every location with its own date. Each sits in a
+                  translucent pill so it stays legible over the hero image. */}
               {!multi ? (
                 <>
                   {selectedLocation?.date && (
-                    <span className="inline-flex items-center gap-2">
-                      <CalendarDays size={16} className="text-highlight-400" />{" "}
+                    <span className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
+                      <CalendarDays size={16} className="text-highlight-400" />
                       {selectedLocation.date}
                     </span>
                   )}
                   {(selectedLocation?.venue || selectedLocation?.district) && (
-                    <span className="inline-flex items-center gap-2">
-                      <MapPin size={16} className="text-highlight-400" />{" "}
+                    <span className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
+                      <MapPin size={16} className="text-highlight-400" />
                       {selectedLocation.venue ?? selectedLocation.district}
                     </span>
                   )}
@@ -120,7 +121,7 @@ export default async function EventDetailPage({
                 locations.map((loc) => (
                   <span
                     key={loc.id}
-                    className="inline-flex items-center gap-2"
+                    className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm"
                   >
                     <MapPin size={16} className="text-highlight-400" />
                     {loc.venue || loc.district}
@@ -206,10 +207,14 @@ export default async function EventDetailPage({
                   Secure your spot for {event.title} at Youth United Festival 2026.
                 </p>
                 {typeof event.registrationFee === "number" && (
-                  <p className="mt-4 text-sm text-text">
-                    <span className="font-semibold">Registration fee:</span>{" "}
-                    ₹{event.registrationFee}
-                  </p>
+                  <div className="mt-4 flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 px-4 py-3">
+                    <span className="text-sm font-semibold text-primary-800">
+                      Registration fee
+                    </span>
+                    <span className="font-heading text-2xl font-extrabold text-primary-700">
+                      ₹{event.registrationFee}
+                    </span>
+                  </div>
                 )}
 
                 {multi && (
@@ -272,6 +277,19 @@ export default async function EventDetailPage({
                   <Link href="/events">Browse other events</Link>
                 </Button>
               </>
+            )}
+
+            {event.ruleBook && (
+              <a
+                href={event.ruleBook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary-300 bg-white px-6 text-[15px] font-semibold text-primary-700 transition-colors hover:border-primary-500 hover:bg-primary-50"
+                style={{ height: "3rem" }}
+              >
+                <FileDown size={17} />
+                Download Rule Book (PDF)
+              </a>
             )}
             </div>
           </aside>

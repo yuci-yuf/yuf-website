@@ -17,7 +17,7 @@ export function BenefitsGrid({
   cards: FeatureCard[];
 }) {
   return (
-    <section className="bg-white py-16 sm:py-24 lg:py-32">
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
       <Container>
         <FadeUp className="mb-14 flex flex-col items-center gap-4 text-center">
           <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary-600">

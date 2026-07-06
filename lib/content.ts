@@ -28,9 +28,7 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact", path: "/contact" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
@@ -44,25 +42,22 @@ export const siteConfig: SiteConfig = {
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Events", path: "/events" },
-    { label: "Study Abroad", path: "/study-abroad" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Contact Us", path: "/contact" },
   ],
   usefulLinks: [
     { label: "Register Now", path: "/register" },
     { label: "Privacy Policy", path: "/privacy-policy" },
     { label: "Terms & Conditions", path: "/terms-and-conditions" },
-    { label: "Refund Policy", path: "/refund-policy" },
   ],
   contact: {
-    phone: "+91 93855 38114",
+    phone: "",
     email: "info@youthunitedcouncilofindia.org",
     address:
-      "NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India",
+      "1, 3rd St, Nandanam Extension, Nandanam, Chennai, Tamil Nadu 600035",
   },
-  copyrightText: "© 2026 Youth United Council of India | All Rights Reserved",
+  copyrightText: "© 2026 Youth United Festival | All Rights Reserved",
   stats: [
-    { number: 5000, suffix: "K+", label: "Participation" },
+    { number: 5, suffix: "K+", label: "Participants" },
     { number: 28, suffix: "+", label: "States" },
     { number: 100, suffix: "+", label: "Districts" },
     { number: 10, suffix: "+", label: "Locations" },
@@ -181,12 +176,12 @@ export const eventStatusOrder: { status: EventStatus; label: string }[] = [
 
 // ── Partners & supporting institutions ──
 export const partners: Partner[] = [
-  { name: "De Montfort University, Leicester", logoUrl: "/images/partners/de_montfort.png" },
   { name: "Falmouth University", logoUrl: "/images/partners/falmouth_university.png" },
-  { name: "StudyIn", logoUrl: "/images/partners/studyin.png" },
-  { name: "University of Salford", logoUrl: "/images/partners/university-of-salford.png" },
-  { name: "University of Huddersfield", logoUrl: "/images/partners/university_of_huddersfield.png" },
   { name: "World Youth Book of Records", logoUrl: "/images/partners/world_youth_book_of_records.png" },
+  { name: "Easwari Engineering College", logoUrl: "/images/partners/srm-easwari.png" },
+  { name: "Velammal Engineering College", logoUrl: "/images/partners/velammal.png" },
+  { name: "Jain (JGI)", logoUrl: "/images/partners/jain.png" },
+  { name: "V Vision", logoUrl: "/images/partners/v-vision-Logo.png" },
 ];
 
 // ── Study Abroad page content ──
@@ -238,9 +233,10 @@ export const studyAbroadContent = {
 
 // ── Shared registration steps ──
 export const registrationSteps: RegistrationStep[] = [
-  { step: 1, title: "Select the Competition", description: "Browse the list of available competitions and select the one you're interested in. Ensure it aligns with your interests and skills." },
-  { step: 2, title: "Fill the Form", description: "Complete the registration form with the necessary details, such as participant information, category, and additional required specifics." },
-  { step: 3, title: "Payment", description: "Proceed to payment to confirm your registration. Choose your preferred payment method and ensure the transaction is completed." },
+  { step: 1, title: "Enter Your Details", description: "Add the participant's name, contact number, email, and school or college details, then choose the city where you'll take part." },
+  { step: 2, title: "Choose Your Event", description: "Pick a category and select the competition you want to enter — the events shown are the ones running in your chosen city." },
+  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets. It is your responsibility to verify all details before making the payment." },
+  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass. Please note: once paid, the registration fee is non-refundable." },
 ];
 
 // ── Page content ──
@@ -292,10 +288,7 @@ export const homeContent = {
     title: "Appreciation From Ministry of Youth Affairs and Sports",
     subtitle:
       "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",
-    details: [
-      "Dr. Mansukh L. Mandaviya, Ministry of Youth Affairs and Sports, Government of India.",
-      "Dr. Mansukh L. Mandaviya, Ministry of Labour and Employment, Government of India.",
-    ],
+    details: [],
     images: [
       "/images/recognition/award_5.jpeg",
       "/images/recognition/award_1.jpg",
@@ -310,9 +303,13 @@ export const homeContent = {
     subtitle:
       "YUF proudly supports and aligns with key national programs promoting youth development.",
     cards: [
-      { title: "Proudly Made in India", description: "Support Local, Buy Indian products.", image: "/images/gov/made_in_india_logo.png" },
-      { title: "Fit India", description: "Fit India: Because a Healthy Nation is a Wealthy Nation.", image: "/images/gov/fit-india.png" },
-      { title: "Skill India", description: "Empowering Youth, Building the Nation.", image: "/images/gov/skill-india.png" },
+      { title: "Proudly Made in India", description: "Support local — build a self-reliant nation.", image: "/images/gov/made_in_india_logo.png" },
+      { title: "Fit India", description: "A healthy nation is a wealthy nation.", image: "/images/gov/fit-india.png" },
+      { title: "Skill India", description: "Empowering youth, building the nation.", image: "/images/gov/skill-india.png" },
+      { title: "Digital India", description: "Transforming India into a digitally empowered society.", image: "/images/gov/digital-india.png" },
+      { title: "Startup India", description: "Fuelling innovation and youth entrepreneurship.", image: "/images/gov/startup-india-logo.png" },
+      { title: "Swachh Bharat", description: "A cleaner India for a healthier, brighter future.", image: "/images/gov/swach-bharat-abhiyan-logo.png" },
+      { title: "MyGov", description: "Citizen engagement for participatory governance.", image: "/images/gov/my-gov-logo.png" },
     ] satisfies FeatureCard[],
   },
   eventsPreview: {
@@ -358,6 +355,13 @@ export const homeContent = {
           "This festival is all about celebrating your creativity, energy, and vision for the future. Together, we have the power to inspire change, break barriers, and build a brighter tomorrow. Let's unite, dream big, and make a difference!",
         image: "/images/testimonials/embalam-selvam.png",
       },
+      {
+        name: "Prof. Sukhee Lee",
+        role: "Advisor of International Affairs | Intercultural Communication | Korean Language & Culture",
+        quote:
+          "The Youth United Festival creates meaningful opportunities for young people to connect across cultures, develop leadership skills, and inspire positive change. Together, we can empower the next generation of global changemakers.",
+        image: "/images/testimonials/sukhee-lee.jpg",
+      },
     ] satisfies Testimonial[],
   },
   partners: {
@@ -370,7 +374,6 @@ export const homeContent = {
     body: "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
     buttons: [
       { label: "Let's Go!", href: "/register", variant: "primary" },
-      { label: "Contact Us", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };
@@ -423,7 +426,7 @@ export const aboutContent = {
     label: "Be Part of Something Bigger",
     title: "Why Join Us",
     subtitle:
-      "By participating in YUF, you are joining a global community of passionate, creative, and driven individuals. YUF is not just an event; it's a movement.",
+      "By participating in YUF, you are joining a global community of passionate, creative, and driven individuals. Youth United Festival is not just an event; it's a movement.",
     cards: [
       { title: "Showcase Your Talents", description: "Whether you're an artist, innovator, athlete, or leader, YUF gives you the platform to shine in front of thousands." },
       { title: "Learn & Grow", description: "Gain valuable insights through workshops, talks, and networking opportunities with experts, peers, and national icons." },
@@ -438,7 +441,7 @@ export const aboutContent = {
       "We believe that when youth come together, great things happen. YUF is about building a future where creativity, knowledge, and unity drive positive change for all.",
     ],
     stats: [
-      { number: 5000, suffix: "K+", label: "Youth Participants" },
+      { number: 5, suffix: "K+", label: "Youth Participants" },
       { number: 28, suffix: "+", label: "States Covered" },
       { number: 100, suffix: "+", label: "Districts" },
       { number: 50, suffix: "+", label: "Events Held" },
@@ -480,7 +483,6 @@ export const eventsContent = {
     body: "Discover how YUF initiatives are transforming lives and empowering individuals to achieve their full potential. Join the movement today.",
     buttons: [
       { label: "Register for YUF 2026", href: "/register", variant: "primary" },
-      { label: "Get in Touch", href: "/contact", variant: "outline" },
     ],
   } satisfies CTABanner,
 };
@@ -676,84 +678,63 @@ export const termsAndConditions: LegalPage = {
   updated: "Last updated: January 2026",
   sections: [
     {
-      heading: "Eligibility",
+      heading: "1. Eligibility",
       blocks: [
-        "Participation in the Youth United Festival is open to individuals aged 17 to 25 years. All participants must register through the official YUF website or authorized platforms. For team-based events, it is essential that all team members meet the eligibility requirements.",
+        "Participation is open to students aged 11 to 23 years only.",
       ],
     },
     {
-      heading: "Registration",
+      heading: "2. Student Verification",
       blocks: [
-        "All participants must complete the registration process to take part in the festival and its events. Accurate personal and contact information must be provided during registration. Registration fees and platform fee, if applicable, are non-refundable except in cases where the event is cancelled by the organizers. In such cases, refunds will be Credited within 15 working days. For certain additional events, on-the-spot registration will be available.",
+        "All participants must present their registered email confirmation and a verified QR code during check-in.",
       ],
     },
     {
-      heading: "Code of Conduct",
+      heading: "3. Transportation, Food & Accommodation",
       blocks: [
-        "The festival promotes values of respect, inclusivity, and professionalism, which all participants are expected to uphold throughout the event. Harassment, discrimination, or any form of inappropriate behavior is strictly prohibited. Attendees must comply with the laws of the Republic of India and adhere to the venue's rules.",
-        "All attendees are required to carry a valid government-issued ID for entry into the venue. Participants may bring one additional person if permitted by the authorities.",
-        "Participants must bring their own tools and accessories, as the management will not provide these essentials. Additionally, a printed copy of the email confirmation from the organization is mandatory for entry.",
+        "Transportation, food, and accommodation will not be provided by the organizers. However, food stalls will be available at the venue for participants to purchase refreshments.",
       ],
     },
     {
-      heading: "Event Participation",
+      heading: "4. Approval Requirement",
       blocks: [
-        "Participants must arrive at their designated event locations at the specified time. Late arrivals may forfeit the right to participate. For competitions, decisions made by the jury or organizing committee are final and binding, and no appeals will be entertained. Participants should show their conformation Email before entering into the respective venue.",
+        "No individual or organization may use the YUCI name, logo, event materials, or conduct any related activities without prior approval from YUCI.",
       ],
     },
     {
-      heading: "Intellectual Property",
+      heading: "5. Teacher Accompaniment",
       blocks: [
-        "Participants retain ownership of their original works created for the festival but grant the Youth United Festival permission to use photographs, videos, or content captured during the event for promotional purposes. Any form of plagiarism or misrepresentation will result in immediate disqualification.",
+        "Students must be accompanied by their teacher/faculty coordinator, who must carry a valid institution ID card.",
       ],
     },
     {
-      heading: "Safety and Security",
+      heading: "6. Parents/Guardians",
       blocks: [
-        "Participants are responsible for the safety of their personal belongings during the festival. The organizers will not be held liable for any loss, theft, or damage. Emergency protocols and instructions provided by security personnel must be strictly followed at all times to ensure safety.",
+        "Parents or guardians will not be permitted inside the event venue.",
       ],
     },
     {
-      heading: "Photography and Media",
+      heading: "7. Personal Belongings",
       blocks: [
-        "The festival will be documented through photography, videography, and live streaming. By participating, attendees consent to being recorded. Media captured during the event may be used for promotional or archival purposes without additional permissions or compensation.",
+        "Participants are advised to bring all necessary personal items required for the event. The organizers will not be responsible for providing personal essentials.",
       ],
     },
     {
-      heading: "Workshops and Competitions",
+      heading: "8. Compliance",
       blocks: [
-        "Participation in workshops will be based on a first-come, first-served basis unless otherwise specified. Each competition will have specific rules and guidelines that must be strictly followed by participants.",
+        "All participants are expected to follow the event rules and instructions issued by the organizers. Failure to comply may result in disqualification or removal from the event.",
       ],
     },
     {
-      heading: "Liability",
+      heading: "9. Payment & Refunds",
       blocks: [
-        "Participants attend the festival at their own risk. The organizers are not responsible for any injuries, illnesses, or damages sustained during the event. Willful damage to property or misconduct will lead to immediate disqualification and may result in legal action.",
+        "All registration and platform fees are non-refundable. Once a payment is completed, the amount paid will not be refunded under any circumstances, except where an event is cancelled by the organizers. It is the participant's responsibility to verify all details before making the payment.",
       ],
     },
     {
-      heading: "Cancellations and Modifications",
+      heading: "10. Event Schedule & Scoring",
       blocks: [
-        "The organizers reserve the right to cancel, reschedule, or modify any event without prior notice. In the case of unforeseen circumstances, updates or changes will be communicated through official channels to all participants.",
-      ],
-    },
-    {
-      heading: "Partnerships and Sponsorships",
-      blocks: [
-        "All partnerships and sponsorships must align with the core values and objectives of the Youth United Festival. The display of partner logos or branding during the festival requires prior approval from the organizing committee. VVISION proudly serves as our official accounting partner.",
-      ],
-    },
-    {
-      heading: "Dispute Resolution",
-      blocks: [
-        "Any disputes or grievances related to the festival must be submitted in writing to the organizing committee. The committee's decision in resolving disputes will be considered final.",
-      ],
-    },
-    {
-      heading: "Acknowledgments",
-      blocks: [
-        "By registering for or attending the festival, participants confirm that they have read, understood, and agreed to these terms and conditions. These terms and conditions are subject to change. Updates will be posted on the official Youth United Festival website, and participants are encouraged to review the latest version before the event.",
-        "Note: The organizing committee reserves the right to finalize and announce the scoring format on the spot based on time and event conditions.",
+        "Event timings, schedules, and scoring criteria may be adjusted at the discretion of the organizers based on the number of participating teams. Any such changes will be communicated to participants through official channels prior to the event.",
       ],
     },
   ],

@@ -83,7 +83,7 @@ export function ContactForm() {
 
       <Field label="Subject" htmlFor="subject" required>
         <Select name="subject" required>
-          <SelectTrigger id="subject">
+          <SelectTrigger id="subject" className="w-full">
             <SelectValue placeholder="Select a subject" />
           </SelectTrigger>
           <SelectContent>
