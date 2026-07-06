@@ -282,6 +282,12 @@ export interface Registration {
   createdAt: string | null;
   /** ISO string — when payment was confirmed. */
   paidAt?: string | null;
+  /** Whether the participant has been checked in at the event entry desk. */
+  checkedIn?: boolean;
+  /** ISO string — when the participant was checked in. */
+  checkedInAt?: string | null;
+  /** Identifier (admin email/uid) of who performed the check-in. */
+  checkedInBy?: string;
 }
 
 export interface ContactMessage {

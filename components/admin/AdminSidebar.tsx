@@ -10,6 +10,7 @@ import {
   LogOut,
   ExternalLink,
   Images,
+  ScanLine,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useContacts } from "@/contexts/ContactsContext";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 const nav = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Registrations", href: "/admin/registrations", icon: ClipboardList },
+  { label: "Check-in", href: "/admin/checkin", icon: ScanLine },
   { label: "Contacts", href: "/admin/contacts", icon: Mail },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Gallery", href: "/admin/gallery", icon: Images },
