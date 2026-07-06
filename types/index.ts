@@ -64,6 +64,8 @@ export interface RegistrationStep {
   step: number;
   title: string;
   description: string;
+  /** Optional emphasized note shown below the description (e.g. a caution). */
+  highlight?: string;
 }
 
 // ── Site-wide config ──

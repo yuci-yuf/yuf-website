@@ -54,7 +54,7 @@ export const siteConfig: SiteConfig = {
     phone: "",
     email: "info@youthunitedcouncilofindia.org",
     address:
-      "1, 3rd St, Nandanam Extension, Nandanam, Chennai, Tamil Nadu 600035",
+      "V Vision, SSPDL, Alpha City It Park, Rajiv Gandhi Salai, Navallur, Chennai, Tamil Nadu 600130",
   },
   copyrightText: "© 2026 Youth United Festival | All Rights Reserved",
   stats: [
@@ -236,8 +236,8 @@ export const studyAbroadContent = {
 export const registrationSteps: RegistrationStep[] = [
   { step: 1, title: "Enter Your Details", description: "Add the participant's name, contact number, email, and school or college details, then choose the city where you'll take part." },
   { step: 2, title: "Choose Your Event", description: "Pick a category and select the competition you want to enter — the events shown are the ones running in your chosen city." },
-  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets. It is your responsibility to verify all details before making the payment." },
-  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass. Please note: once paid, the registration fee is non-refundable." },
+  { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets.", highlight: "It is your responsibility to verify all details before making the payment." },
+  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass.", highlight: "Please note: once paid, the registration fee is non-refundable." },
 ];
 
 // ── Page content ──
