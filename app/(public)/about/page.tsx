@@ -76,7 +76,7 @@ export default function AboutPage() {
             >
               <div className="relative aspect-4/3 overflow-hidden rounded-3xl shadow-md">
                 <Image
-                  src="/images/sections/who-we-are-team.jpg"
+                  src="/images/events/event-9.png"
                   alt="YUCI Team"
                   fill
                   sizes="(min-width: 1024px) 40vw, 90vw"
@@ -430,19 +430,19 @@ export default function AboutPage() {
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="relative aspect-4/3 overflow-hidden rounded-2xl">
                   <Image
-                    src="/images/recognition/award_1.jpg"
-                    alt="YUCI Award Ceremony"
+                    src="/images/yuf2025/gallery/g-04.jpg"
+                    alt="YUF 2025 certificate winners"
                     fill
-                    sizes="(min-width:1024px) 20vw, 45vw"
+                    sizes="(min-width:1024px) 30vw, 46vw"
                     className="object-cover"
                   />
                 </div>
                 <div className="relative aspect-4/3 overflow-hidden rounded-2xl">
                   <Image
-                    src="/images/sections/join-us.jpg"
-                    alt="Join YUF"
+                    src="/images/yuf2025/gallery/g-13.jpg"
+                    alt="YUF 2025 participants"
                     fill
-                    sizes="(min-width:1024px) 20vw, 45vw"
+                    sizes="(min-width:1024px) 30vw, 46vw"
                     className="object-cover"
                   />
                 </div>
