@@ -24,19 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { computeInvoice, formatINR, GST_RATE, PLATFORM_FEE_RATE } from "@/lib/pricing";
-import { submitRegistration, RegistrationFullError } from "@/lib/submissions";
 import { cn } from "@/lib/utils";
-
-// Human-friendly, non-sequential entry code (Crockford-ish alphabet, no
-// I/L/O/U). Generated in the browser via Web Crypto.
-function makeRegistrationCode(): string {
-  const ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-  const bytes = new Uint8Array(6);
-  crypto.getRandomValues(bytes);
-  let code = "";
-  for (let i = 0; i < 6; i++) code += ALPHABET[bytes[i] % ALPHABET.length];
-  return `YUF26-${code}`;
-}
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
@@ -318,31 +306,42 @@ export function RegistrationForm({
 
     setStatus("submitting");
     try {
-      // Payment is deferred — record the registration directly. When Razorpay
-      // is re-enabled, this write moves behind the payment API routes.
-      const code = makeRegistrationCode();
+      // Payment is deferred — record the registration server-side (Admin SDK).
+      // The client can't write `registrations` directly (Firestore rules keep
+      // create locked), and the server owns the amount, status, and code so
+      // they can't be forged. When Razorpay is re-enabled, this moves behind
+      // the payment order route instead.
       const { place, date } = locationParts(selectedLocation);
       const venue =
         selectedLocation.address ?? selectedLocation.city ?? place;
       const eventDate = selectedLocation.date ?? date;
 
-      await submitRegistration({
-        firstName,
-        lastName,
-        email: values.email.trim(),
-        phone: values.phone,
-        location: values.location,
-        institution,
-        eventCategory: selectedEvent.category,
-        eventId: selectedEvent.id,
-        eventTitle: selectedEvent.title,
-        ageCategory: values.level,
-        amountPaid: invoice?.total ?? fee ?? 0,
-        registrationCode: code,
-        locationId: effectiveLocationId,
-        locationVenue: venue,
-        locationDate: eventDate,
+      const res = await fetch("/api/registrations/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: values.email.trim(),
+          phone: values.phone,
+          location: values.location,
+          institution,
+          eventId: selectedEvent.id,
+          ageCategory: values.level,
+          locationId: effectiveLocationId,
+        }),
       });
+
+      if (!res.ok) {
+        // 409 = the location filled between page load and submit.
+        if (res.status === 409) {
+          setStatus("full");
+          return;
+        }
+        throw new Error(`Registration failed (${res.status})`);
+      }
+
+      const { code } = (await res.json()) as { code: string };
       finishSuccess(code);
 
       // Fire-and-forget confirmation email — never block or fail the success UI.
@@ -359,10 +358,6 @@ export function RegistrationForm({
         }),
       }).catch(() => {});
     } catch (err) {
-      if (err instanceof RegistrationFullError) {
-        setStatus("full");
-        return;
-      }
       console.error("Registration failed:", err);
       setStatus("error");
     }
