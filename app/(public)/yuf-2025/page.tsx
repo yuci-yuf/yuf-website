@@ -227,12 +227,12 @@ export default function Yuf2025Page() {
 
       {/* ═══════════ THE FESTIVAL IN FRAMES — horizontal film reel ═══════════ */}
       <section className="relative bg-white pt-6 pb-16 lg:pb-24">
-        <Container>
+        <Container className="mb-10 lg:mb-14">
           <FadeUp className="flex flex-col items-center gap-3 text-center">
             <h3 className="font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               The Festival in Frames
             </h3>
-            <p className="max-w-2xl text-body">
+            <p className="max-w-2xl leading-relaxed text-body">
               Every cheer, every performance, every proud smile — watch the reel
               roll by, tap any frame to relive it full-size.
             </p>
