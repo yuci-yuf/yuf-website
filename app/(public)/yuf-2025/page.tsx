@@ -157,18 +157,16 @@ export default function Yuf2025Page() {
       {/* ═══════════ EVENT HIGHLIGHTS — two-part band + staggered grid ═══════════ */}
       <section
         id="highlights"
-        className="relative overflow-hidden scroll-mt-24 bg-white py-20 lg:py-28"
+        className="bg-hero-gradient relative overflow-hidden scroll-mt-24 py-20 text-white lg:py-28"
       >
-        {/* Full-bleed on mobile; padded + centered from sm up. */}
-        <div className="mx-auto w-full max-w-[112rem] sm:px-6 lg:px-8">
-          {/* Feature band — text left · large scroll-play video right */}
+        {/* Ambient accent glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-highlight-500/25 blur-3xl"
+        />
+        <Container className="relative">
           <FadeUp>
-            <div className="relative overflow-hidden rounded-none bg-hero-gradient p-6 text-white shadow-2xl shadow-primary-950/30 sm:rounded-[2rem] sm:p-10 lg:p-12">
-              <div
-                aria-hidden
-                className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-highlight-500/25 blur-3xl"
-              />
-              <div className="relative grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
+            <div className="grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
                 {/* LEFT — portrait scroll-play video (the anchor) */}
                 <div className="order-first">
                   <ScrollVideo
@@ -225,10 +223,8 @@ export default function Yuf2025Page() {
                   </Link>
                 </div>
               </div>
-            </div>
-          </FadeUp>
-
-        </div>
+            </FadeUp>
+          </Container>
       </section>
 
       {/* ═══════════ THE FESTIVAL IN FRAMES — horizontal film reel ═══════════ */}
