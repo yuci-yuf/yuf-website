@@ -117,7 +117,7 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
       />
 
       <Link
-        href={`/events/${event.id}`}
+        href="/events"
         className="absolute inset-0 z-10"
         aria-label={event.title}
       />
@@ -212,7 +212,7 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
       </div>
 
       <Link
-        href={`/events/${event.id}`}
+        href="/events"
         className="absolute inset-0 z-10"
         aria-label={event.title}
       />
@@ -288,7 +288,7 @@ function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
       </div>
 
       <Link
-        href={`/events/${event.id}`}
+        href="/events"
         className="absolute inset-0 z-10"
         aria-label={event.title}
       />
