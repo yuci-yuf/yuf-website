@@ -78,7 +78,8 @@ const SUKHEE = {
   quote:
     "The Youth United Festival creates meaningful opportunities for young people to connect across cultures and inspire positive change.",
   poster: "/images/testimonials/sukhee-lee.jpg",
-  video: "/videos/sukhee_lee_speech.mp4",
+  video:
+    "https://res.cloudinary.com/dudvem6ri/video/upload/q_auto,f_auto/v1783426595/yuf-website/videos/sukhee_lee_speech.mp4",
 };
 
 export default function Yuf2025Page() {
@@ -180,10 +181,7 @@ export default function Yuf2025Page() {
 
                 {/* RIGHT — headline, blurb, recap stats, CTA */}
                 <div>
-                  <span className={`${SERIF} text-xl text-highlight-400`}>
-                    The 2025 reel
-                  </span>
-                  <h2 className="mt-2 font-display text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-5xl lg:text-6xl">
+                  <h2 className="font-display text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                     Event Highlights
                   </h2>
                   <p className="mt-4 max-w-5xl text-lg leading-relaxed text-white/80 lg:text-xl">
@@ -261,12 +259,12 @@ export default function Yuf2025Page() {
 
           {/* Highlighted guest — Prof. Sukhee Lee, with her spotlight video */}
           <FadeUp>
-            <div className="mx-auto grid max-w-6xl items-center gap-10 rounded-[2.5rem] border border-white/12 bg-white/[0.06] p-6 backdrop-blur sm:p-10 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-16">
+            <div className="mx-auto grid max-w-5xl items-center gap-10 rounded-[2.5rem] border border-white/12 bg-white/[0.06] p-6 backdrop-blur sm:p-10 lg:grid-cols-[minmax(0,340px)_1fr] lg:gap-12">
               <ScrollVideo
                 src={SUKHEE.video}
                 poster={SUKHEE.poster}
                 label={SUKHEE.name}
-                className="mx-auto aspect-[4/5] w-full max-w-[440px] rounded-3xl shadow-2xl shadow-primary-950/40 ring-1 ring-white/20 lg:mx-0"
+                className="mx-auto aspect-[9/16] w-full max-w-[340px] rounded-3xl shadow-2xl shadow-primary-950/40 ring-1 ring-white/20 lg:mx-0"
               />
               <div className="text-center lg:text-left">
                 <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/15 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-highlight-400">

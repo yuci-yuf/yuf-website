@@ -74,12 +74,6 @@ export function FilmReel({ images }: { images: GalleryImage[] }) {
 
   return (
     <>
-      {/* Reel label */}
-      <div className="mb-4 flex items-center gap-2 px-6 font-mono text-xs font-semibold uppercase tracking-[0.3em] text-heading/50 lg:px-10">
-        <span className="h-2 w-2 rounded-full bg-highlight-500" />
-        Festival Reel · 2025
-      </div>
-
       {/* Auto-scrolling film strip */}
       <div className="group relative overflow-hidden bg-[#0a131b] shadow-2xl shadow-primary-950/30">
         <SprocketBar position="top" />

@@ -738,6 +738,12 @@ export const termsAndConditions: LegalPage = {
         "Event timings, schedules, and scoring criteria may be adjusted at the discretion of the organizers based on the number of participating teams. Any such changes will be communicated to participants through official channels prior to the event.",
       ],
     },
+    {
+      heading: "11. Identification",
+      blocks: [
+        "Students must bring their valid school or college ID card to the event, and produce it during check-in and whenever requested by the organizers.",
+      ],
+    },
   ],
 };
 

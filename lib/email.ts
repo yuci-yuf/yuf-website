@@ -57,6 +57,8 @@ function registrationEmailText(d: RegistrationEmailData): string {
     `Reporting time: ${REPORTING_TIME}`,
     d.registrationCode ? `Registration code: ${d.registrationCode}` : ``,
     ``,
+    `Important: Students must bring their valid school or college ID card for check-in.`,
+    ``,
     `Please review our Terms & Conditions before the event: ${termsUrl}`,
     ``,
     `— Team YUF, Youth United Council of India`,
@@ -120,7 +122,8 @@ function registrationEmailHtml(d: RegistrationEmailData): string {
                 </table>
 
                 <p style="margin:22px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
-                  Please arrive by the reporting time of <strong style="color:#102330;">${REPORTING_TIME}</strong> and carry a valid ID.
+                  Please arrive by the reporting time of <strong style="color:#102330;">${REPORTING_TIME}</strong>, and
+                  <strong style="color:#102330;">bring your valid school or college ID card</strong> for check-in.
                 </p>
 
                 <p style="margin:20px 0 6px;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
