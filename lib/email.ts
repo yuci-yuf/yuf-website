@@ -134,6 +134,7 @@ function registrationEmailHtml(d: RegistrationEmailData): string {
             <!-- Footer -->
             <tr>
               <td style="padding:26px 40px 32px 40px;border-top:1px solid #eef2f6;">
+                <img src="${SITE_URL}/images/logo.png" alt="Youth United Festival" width="132" style="display:block;width:132px;max-width:60%;height:auto;margin:0 0 14px;border:0;" />
                 <p style="margin:0;font:600 14px/1.5 Arial,Helvetica,sans-serif;color:#102330;">— Team YUF</p>
                 <p style="margin:4px 0 0;font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#8a9aa8;">Youth United Council of India</p>
               </td>
