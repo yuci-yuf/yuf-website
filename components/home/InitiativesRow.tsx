@@ -13,7 +13,7 @@ interface InitiativesRowProps {
 
 function InitiativeCard({ card }: { card: FeatureCard }) {
   return (
-    <div className="flex w-full items-center gap-5 rounded-3xl border border-border bg-white p-6 shadow-card transition-shadow hover:shadow-hover sm:w-[21rem]">
+    <div className="flex w-[21rem] shrink-0 items-center gap-5 rounded-3xl border border-border bg-white p-6 shadow-card">
       {card.image && (
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl">
           <Image
@@ -45,6 +45,9 @@ export function InitiativesRow({
   subtitle,
   cards,
 }: InitiativesRowProps) {
+  // Duplicate the set so the -50% translate loop is seamless on every viewport.
+  const loop = [...cards, ...cards];
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/50 to-white py-12 sm:py-16 lg:py-20">
       <ConfettiDots />
@@ -58,14 +61,17 @@ export function InitiativesRow({
             {subtitle}
           </p>
         </FadeUp>
+      </Container>
 
-        {/* Static, centered grid — every initiative fully visible, no cropping. */}
-        <div className="flex flex-wrap items-stretch justify-center gap-6">
-          {cards.map((card) => (
-            <InitiativeCard key={card.title} card={card} />
+      {/* Full-bleed marquee — pauses on hover. NOTE: it deliberately freezes for
+          visitors who enable OS "reduce motion" (see globals.css). */}
+      <div className="group relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)]">
+        <div className="flex w-max animate-[marquee_40s_linear_infinite] items-stretch gap-6 pr-6 group-hover:[animation-play-state:paused]">
+          {loop.map((card, i) => (
+            <InitiativeCard key={`${card.title}-${i}`} card={card} />
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

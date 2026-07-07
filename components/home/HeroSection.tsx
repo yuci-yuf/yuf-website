@@ -16,14 +16,17 @@ interface HeroSectionProps {
 }
 
 /* Award-winning YUF 2025 photos for the diamond tiles flanking the headline. */
+// Left/right tiles mirror each other exactly (same top/bottom + size), so the
+// arrangement stays symmetric. Horizontal offsets are relative to the capped
+// band below (not the viewport), so they don't drift apart on wide monitors.
 const DIAMONDS_LEFT = [
-  { src: "/images/hero/award/championship-trophy.webp", className: "left-[2%] top-[20%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
-  { src: "/images/hero/award/trophy-raised.webp", className: "left-[12%] top-[50%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
+  { src: "/images/hero/award/championship-trophy.webp", className: "left-[2%] top-[18%] h-44 w-44 lg:h-56 lg:w-56", delay: 0 },
+  { src: "/images/hero/award/trophy-raised.webp", className: "left-[12%] top-[49%] h-40 w-40 lg:h-48 lg:w-48", delay: 0.8 },
   { src: "/images/hero/award/medalists-marigold.webp", className: "left-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.4 },
 ];
 const DIAMONDS_RIGHT = [
-  { src: "/images/hero/award/trophy-handover.webp", className: "right-[2%] top-[16%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
-  { src: "/images/hero/award/medalists-lawn.webp", className: "right-[12%] top-[48%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
+  { src: "/images/hero/award/trophy-handover.webp", className: "right-[2%] top-[18%] h-44 w-44 lg:h-56 lg:w-56", delay: 0.4 },
+  { src: "/images/hero/award/medalists-lawn.webp", className: "right-[12%] top-[49%] h-40 w-40 lg:h-48 lg:w-48", delay: 1.1 },
   { src: "/images/hero/award/stage-certificate.webp", className: "right-[1%] bottom-[8%] h-36 w-36 lg:h-44 lg:w-44", delay: 1.7 },
 ];
 
@@ -57,6 +60,33 @@ function DiamondTile({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/* Mobile-only hero backdrop: a single full-bleed focal photo, with a tuned
+   gradient that darkens the middle band (behind the headline/subtitle) and eases
+   off top & bottom, plus a soft diagonal brand tint for cohesion + legibility. */
+function MobileHeroCollage() {
+  return (
+    <div aria-hidden className="absolute inset-0 z-0 overflow-hidden bg-[#0f2360] sm:hidden">
+      <Image
+        src="/images/hero/overall_champion.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        quality={90}
+        className="object-cover"
+      />
+      {/* Legibility + brand tint */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(9,23,64,0.28) 0%, rgba(9,23,64,0.64) 44%, rgba(9,23,64,0.68) 58%, rgba(9,23,64,0.30) 100%), linear-gradient(150deg, rgba(24,64,150,0.32) 0%, rgba(21,147,143,0.28) 100%)",
+        }}
+      />
+    </div>
   );
 }
 
@@ -144,20 +174,24 @@ export function HeroSection({
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden pt-20 sm:pt-24">
-      {/* ── Background photo (YUF 2025 participants) ── */}
+      {/* ── Background photo (YUF 2025 participants) — desktop/tablet ── */}
       <Image
         src="/images/hero/group-2025.jpg"
         alt=""
         fill
         priority
         sizes="100vw"
-        className="absolute inset-0 z-0 object-cover"
+        className="absolute inset-0 z-0 hidden object-cover sm:block"
       />
 
+      {/* ── Mobile-only: five-photo collage backdrop ── */}
+      <MobileHeroCollage />
+
       {/* ── Gradient wash over the photo: blue → cyan → purple ── */}
+      {/* Desktop/tablet only — the mobile collage carries its own tuned scrim. */}
       <div
         aria-hidden
-        className="absolute inset-0 z-0 opacity-75"
+        className="absolute inset-0 z-0 hidden opacity-75 sm:block"
         style={{
           background:
             "radial-gradient(110% 90% at 18% 22%, rgba(89,31,172,0.6) 0%, transparent 50%), radial-gradient(100% 90% at 88% 78%, rgba(89,31,172,0.5) 0%, transparent 48%), linear-gradient(125deg, #133a8c 0%, #155fa6 38%, #15938f 58%, #1d5fbf 100%)",
@@ -207,7 +241,12 @@ export function HeroSection({
       </div>
 
       {/* ── Diamond photo tiles ── */}
-      <div aria-hidden className="absolute inset-0 z-10">
+      {/* Capped, centered band: on monitors wider than the cap the tiles stay
+          anchored near the content instead of drifting to the screen edges. */}
+      <div
+        aria-hidden
+        className="absolute inset-y-0 left-1/2 z-10 w-full max-w-[1700px] -translate-x-1/2"
+      >
         {[...DIAMONDS_LEFT, ...DIAMONDS_RIGHT].map((d) => (
           <DiamondTile key={d.src} {...d} />
         ))}
@@ -252,11 +291,11 @@ export function HeroSection({
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="flex justify-center pt-1"
+            className="flex w-full justify-center pt-1 sm:w-auto"
           >
             <Link
               href="/register"
-              className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-xl shadow-black/20 transition-all hover:bg-white/90"
+              className="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-bold text-primary-700 shadow-xl shadow-black/20 transition-all hover:bg-white/90 sm:h-13 sm:w-auto sm:text-[15px] sm:font-semibold"
             >
               Register Now
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />

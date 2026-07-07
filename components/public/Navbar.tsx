@@ -64,7 +64,7 @@ export function Navbar() {
               alt="Ministry of Skill Development and Entrepreneurship"
               width={260}
               height={100}
-              className="h-7 w-auto object-contain sm:h-9 md:h-11"
+              className="h-10 w-auto object-contain sm:h-12 md:h-16"
               priority
             />
           </Link>
