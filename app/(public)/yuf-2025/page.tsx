@@ -9,7 +9,6 @@ import { ConfettiDots } from "@/components/home/FestiveAccents";
 import { ScrollVideo } from "@/components/yuf2025/ScrollVideo";
 import { FilmReel } from "@/components/yuf2025/FilmReel";
 import type { GalleryImage } from "@/components/yuf2025/Lightbox";
-import { cn } from "@/lib/utils";
 
 // Elegant italic serif for the accents, scoped to this route.
 const instrumentSerif = Instrument_Serif({
@@ -39,8 +38,38 @@ const range = (a: number, b: number) =>
 /* Photos for the staggered highlights grid + focal / award selections drawn
    from the 71-frame gallery. */
 const HIGHLIGHTS = range(1, 16);
-const FOCAL = img(7);
-const AWARDS = [49, 52, 55, 58, 61, 64].map(img);
+
+/* Headline numbers from the 2025 edition, shown beside the highlights video. */
+const HIGHLIGHT_STATS = [
+  { value: "5K+", label: "Participants" },
+  { value: "5+", label: "States" },
+  { value: "100+", label: "Districts" },
+  { value: "50+", label: "Events" },
+];
+/* The four champion photos with their true aspect ratios, so a justified
+   gallery can show each one in full (no cropping) while still filling the row. */
+const AWARDS = [
+  {
+    src: "/images/hero/award/championship-trophy.webp",
+    alt: "Champions receiving the YUF 2025 championship trophy on stage",
+    aspect: 1.228,
+  },
+  {
+    src: "/images/hero/award/trophy-raised.webp",
+    alt: "Winning team lifting the YUF 2025 trophy together",
+    aspect: 1.55,
+  },
+  {
+    src: "/images/hero/award/medalists-marigold.webp",
+    alt: "Medal and certificate winners felicitated at the ceremony",
+    aspect: 1.909,
+  },
+  {
+    src: "/images/hero/award/medalists-lawn.webp",
+    alt: "Award winners with their certificates and medals",
+    aspect: 1.778,
+  },
+];
 
 /* Highlighted chief guest — carries her own spotlight video. */
 const SUKHEE = {
@@ -49,7 +78,7 @@ const SUKHEE = {
   quote:
     "The Youth United Festival creates meaningful opportunities for young people to connect across cultures and inspire positive change.",
   poster: "/images/testimonials/sukhee-lee.jpg",
-  video: "/videos/sukhee-lee.mp4",
+  video: "/videos/sukhee_lee_speech.mp4",
 };
 
 export default function Yuf2025Page() {
@@ -130,74 +159,76 @@ export default function Yuf2025Page() {
         id="highlights"
         className="relative overflow-hidden scroll-mt-24 bg-white py-20 lg:py-28"
       >
-        <Container>
-          {/* Two-part feature band (left text · center image · right video) */}
+        {/* Full-bleed on mobile; padded + centered from sm up. */}
+        <div className="mx-auto w-full max-w-[112rem] sm:px-6 lg:px-8">
+          {/* Feature band — text left · large scroll-play video right */}
           <FadeUp>
-            <div className="relative overflow-hidden rounded-[2rem] bg-hero-gradient p-6 text-white shadow-2xl shadow-primary-950/30 sm:p-10 lg:p-12">
+            <div className="relative overflow-hidden rounded-none bg-hero-gradient p-6 text-white shadow-2xl shadow-primary-950/30 sm:rounded-[2rem] sm:p-10 lg:p-12">
               <div
                 aria-hidden
                 className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-highlight-500/25 blur-3xl"
               />
-              <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
-                {/* LEFT */}
+              <div className="relative grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
+                {/* LEFT — portrait scroll-play video (the anchor) */}
+                <div className="order-first">
+                  <ScrollVideo
+                    src="https://res.cloudinary.com/dudvem6ri/video/upload/q_auto,f_auto/v1783423728/yuf-website/videos/events_montage.mp4"
+                    poster={img(11).src}
+                    label="YUF 2025 event film"
+                    hasAudio={false}
+                    className="mx-auto aspect-[9/16] w-full max-w-[340px] rounded-3xl shadow-2xl shadow-primary-950/40 ring-1 ring-white/20 sm:max-w-[400px] lg:mx-0 lg:max-w-[440px]"
+                  />
+                </div>
+
+                {/* RIGHT — headline, blurb, recap stats, CTA */}
                 <div>
                   <span className={`${SERIF} text-xl text-highlight-400`}>
                     The 2025 reel
                   </span>
-                  <h2 className="mt-2 font-display text-4xl font-extrabold leading-[1.0] tracking-tight sm:text-5xl">
-                    Event
-                    <br />
-                    Highlights
+                  <h2 className="mt-2 font-display text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-5xl lg:text-6xl">
+                    Event Highlights
                   </h2>
-                  <p className="mt-4 max-w-sm leading-relaxed text-white/80">
-                    From the roar of the arena to the spotlight of the stage —
-                    the moments that defined YUF 2025.
+                  <p className="mt-4 max-w-5xl text-lg leading-relaxed text-white/80 lg:text-xl">
+                    From the roar of the arena to the spotlight of the stage,
+                    Youth United Festival 2025 brought young talent together to
+                    compete, perform and celebrate. Relive the standout moments —
+                    the performances, the champions and the memories that made
+                    the year unforgettable.
                   </p>
+
+                  <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-highlight-400">
+                    By the numbers
+                  </p>
+                  {/* Recap stats — full-width bar with dividers */}
+                  <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-7 border-y border-white/15 py-8 sm:flex sm:gap-0 sm:divide-x sm:divide-white/15">
+                    {HIGHLIGHT_STATS.map((s) => (
+                      <div
+                        key={s.label}
+                        className="sm:flex-1 sm:px-8 sm:first:pl-0 sm:last:pr-0"
+                      >
+                        <div className="font-display text-4xl font-extrabold leading-none text-white lg:text-5xl">
+                          {s.value}
+                        </div>
+                        <div className="mt-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-white/60">
+                          {s.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                   <Link
                     href="/gallery"
-                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white underline decoration-highlight-400 decoration-2 underline-offset-4 transition-opacity hover:opacity-80"
+                    className="mt-8 inline-flex items-center gap-2 rounded-full bg-white/12 px-6 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/20"
                   >
                     Explore the full gallery
                     <ArrowUpRight size={16} className="text-highlight-400" />
                   </Link>
                 </div>
-
-                {/* CENTER image */}
-                <ScaleIn className="order-first lg:order-none">
-                  <div className="relative mx-auto">
-                    <div
-                      aria-hidden
-                      className="absolute -inset-4 rounded-full bg-highlight-500/30 blur-2xl"
-                    />
-                    <div className="relative aspect-square w-[min(64vw,17rem)] overflow-hidden rounded-full shadow-2xl ring-4 ring-white/20">
-                      <Image
-                        src={FOCAL.src}
-                        alt={FOCAL.alt}
-                        fill
-                        sizes="17rem"
-                        className="object-cover"
-                      />
-                    </div>
-                  </div>
-                </ScaleIn>
-
-                {/* RIGHT — scroll-play video */}
-                <div>
-                  <ScrollVideo
-                    src="/videos/event-highlights.mp4"
-                    poster={img(11).src}
-                    label="YUF 2025 event film"
-                    className="aspect-video w-full rounded-2xl shadow-xl ring-1 ring-white/20"
-                  />
-                  <p className="mt-3 text-center text-xs text-white/60">
-                    The festival in motion — plays as you scroll.
-                  </p>
-                </div>
               </div>
             </div>
           </FadeUp>
 
-        </Container>
+        </div>
       </section>
 
       {/* ═══════════ THE FESTIVAL IN FRAMES — horizontal film reel ═══════════ */}
@@ -208,8 +239,8 @@ export default function Yuf2025Page() {
               The Festival in Frames
             </h3>
             <p className="max-w-2xl text-body">
-              Every cheer, every performance, every proud smile — scroll the reel,
-              tap any frame to relive it full-size.
+              Every cheer, every performance, every proud smile — watch the reel
+              roll by, tap any frame to relive it full-size.
             </p>
           </FadeUp>
         </Container>
@@ -217,10 +248,10 @@ export default function Yuf2025Page() {
       </section>
 
       {/* ═══════════ CHIEF GUEST — highlighted spotlight ═══════════ */}
-      <section className="relative overflow-hidden bg-hero-gradient py-20 text-white lg:py-28">
+      <section className="relative overflow-hidden bg-hero-gradient py-16 text-white lg:py-20">
         <ConfettiDots />
         <Container className="relative">
-          <FadeUp className="mb-12 flex flex-col items-center gap-3 text-center">
+          <FadeUp className="mb-10 flex flex-col items-center gap-3 text-center">
             <span className={`${SERIF} text-xl text-highlight-400`}>
               Guest of Honour
             </span>
@@ -234,24 +265,24 @@ export default function Yuf2025Page() {
 
           {/* Highlighted guest — Prof. Sukhee Lee, with her spotlight video */}
           <FadeUp>
-            <div className="mx-auto grid max-w-5xl items-center gap-8 rounded-[2rem] border border-white/12 bg-white/[0.05] p-5 backdrop-blur sm:p-7 lg:grid-cols-2 lg:gap-10">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 rounded-[2.5rem] border border-white/12 bg-white/[0.06] p-6 backdrop-blur sm:p-10 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-16">
               <ScrollVideo
                 src={SUKHEE.video}
                 poster={SUKHEE.poster}
                 label={SUKHEE.name}
-                className="aspect-[5/4] w-full rounded-3xl ring-1 ring-white/20 lg:aspect-[4/5]"
+                className="mx-auto aspect-[4/5] w-full max-w-[440px] rounded-3xl shadow-2xl shadow-primary-950/40 ring-1 ring-white/20 lg:mx-0"
               />
-              <div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-highlight-400">
+              <div className="text-center lg:text-left">
+                <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/15 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-highlight-400">
                   Highlighted Guest
                 </span>
-                <Quote size={30} className="mt-4 text-highlight-400" />
-                <p className={`${SERIF} mt-3 text-2xl leading-snug text-white sm:text-3xl`}>
+                <Quote size={44} className="mx-auto mt-6 text-highlight-400 lg:mx-0" />
+                <p className={`${SERIF} mt-3 text-3xl leading-[1.15] text-white sm:text-4xl lg:text-[2.9rem]`}>
                   &ldquo;{SUKHEE.quote}&rdquo;
                 </p>
-                <div className="mt-5">
-                  <h3 className="font-display text-2xl font-bold">{SUKHEE.name}</h3>
-                  <p className="mt-0.5 text-white/70">{SUKHEE.role}</p>
+                <div className="mt-8">
+                  <h3 className="font-display text-2xl font-bold sm:text-3xl">{SUKHEE.name}</h3>
+                  <p className="mt-1 text-white/70 sm:text-lg">{SUKHEE.role}</p>
                 </div>
               </div>
             </div>
@@ -261,66 +292,102 @@ export default function Yuf2025Page() {
 
       {/* ═══════════ AWARD CEREMONY — curated collage ═══════════ */}
       <section className="section-tint relative overflow-hidden py-20 lg:py-28">
-        <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        {/* Wide feature band — header row on top, full-width photo gallery below,
+            so the horizontal space is used at every screen size. */}
+        <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-8 lg:px-12">
+          {/* Header: title left · intro + highlights right */}
+          <div className="mb-10 grid gap-8 lg:mb-14 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-20">
             <FadeUp>
-              <span className="inline-flex items-center gap-2 rounded-full bg-highlight-500/12 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-highlight-600">
+              <h2 className="font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-heading sm:text-5xl lg:text-6xl">
+                Champions Crowned
+              </h2>
+              <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-highlight-500/12 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-highlight-600">
                 <Trophy size={16} /> Moment of Glory
               </span>
-              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-heading sm:text-5xl lg:text-6xl">
-                Champions
-                <br />
-                Crowned
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-body">
-                The brightest talents of YUF 2025 were felicitated on stage —
-                honoured for creativity, skill and sportsmanship. The festival
-                also earned prestigious appreciation at{" "}
-                <span className="font-semibold text-highlight-600">Raj Bhavan</span>
-                , a proud milestone for the Youth United Council of India.
+            </FadeUp>
+
+            <FadeUp delay={0.1}>
+              <p className="max-w-2xl text-lg leading-relaxed text-body">
+                The brightest talents of YUF 2025 took the stage to collect their
+                honours — celebrated for their creativity, skill and
+                sportsmanship. From solo stars to winning teams,{" "}
+                <span className="font-semibold text-highlight-600">
+                  every champion
+                </span>{" "}
+                earned their moment in the spotlight.
               </p>
-              <ul className="mt-6 flex flex-col gap-3">
+              <ul className="mt-5 flex flex-wrap gap-x-7 gap-y-2.5">
                 {[
-                  "State & national-level winners felicitated",
+                  "Individual & team champions felicitated",
                   "Trophies, medals & merit certificates awarded",
-                  "Appreciation received at Raj Bhavan",
+                  "Winners across arts, sports & innovation",
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-heading/85">
+                  <li key={t} className="flex items-center gap-2 text-heading/85">
                     <Star
-                      size={16}
-                      className="mt-1 shrink-0 fill-highlight-500 text-highlight-500"
+                      size={15}
+                      className="shrink-0 fill-highlight-500 text-highlight-500"
                     />
-                    <span className="text-[15px] leading-relaxed">{t}</span>
+                    <span className="text-[15px] leading-snug">{t}</span>
                   </li>
                 ))}
               </ul>
             </FadeUp>
-
-            <FadeUp delay={0.15}>
-              <div className="grid grid-cols-2 gap-4">
-                {AWARDS.map((a, i) => (
-                  <div
-                    key={a.src}
-                    className={cn(
-                      "relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-primary-900/10",
-                      i % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]",
-                      i === 1 ? "mt-8" : "",
-                      i === 4 ? "-mt-8" : "",
-                    )}
-                  >
-                    <Image
-                      src={a.src}
-                      alt={a.alt}
-                      fill
-                      sizes="(min-width: 1024px) 22vw, 45vw"
-                      className="object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            </FadeUp>
           </div>
-        </Container>
+
+          {/* Full-width gallery row */}
+          <FadeUp delay={0.15}>
+            {/* Desktop — two justified rows of two. Each pair's widths follow
+                their aspect ratios, so both share one height with no cropping,
+                filling the full width at a large, impactful size. */}
+            <div className="hidden flex-col gap-5 lg:flex">
+              {[[0, 1], [2, 3]].map((pair) => (
+                <div key={pair.join("-")} className="flex gap-5">
+                  {pair.map((idx) => {
+                    const a = AWARDS[idx];
+                    return (
+                      <div
+                        key={a.src}
+                        style={{ flexGrow: a.aspect, flexBasis: 0, aspectRatio: String(a.aspect) }}
+                        className="group relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-primary-900/10"
+                      >
+                        <Image
+                          src={a.src}
+                          alt={a.alt}
+                          fill
+                          sizes="50vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary-950/25 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile / tablet — full-width stack at each photo's natural aspect. */}
+            <div className="flex flex-col gap-4 lg:hidden">
+              {AWARDS.map((a) => (
+                <div
+                  key={a.src}
+                  style={{ aspectRatio: String(a.aspect) }}
+                  className="group relative w-full overflow-hidden rounded-2xl shadow-lg ring-1 ring-primary-900/10"
+                >
+                  <Image
+                    src={a.src}
+                    alt={a.alt}
+                    fill
+                    sizes="100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          </FadeUp>
+        </div>
       </section>
 
       {/* ═══════════ CTA ═══════════ */}

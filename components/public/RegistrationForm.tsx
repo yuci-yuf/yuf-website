@@ -418,8 +418,11 @@ export function RegistrationForm({
         </h2>
         <p className="text-text-muted">
           It only takes a couple of minutes. Fields marked{" "}
-          <span className="text-error">*</span> are required. You don&apos;t pay
-          anything now — our team will call you about payment.
+          <span className="text-error">*</span> are required.{" "}
+          <strong className="font-semibold text-text">
+            Please review your details carefully before submitting —
+            registrations are non-refundable.
+          </strong>
         </p>
       </div>
 
@@ -466,7 +469,7 @@ export function RegistrationForm({
                 label="Phone number"
                 htmlFor="phone"
                 required
-                description="We'll call this number about the registration."
+                description="Participant's mobile number"
               >
                 <>
                   <Input
@@ -495,7 +498,7 @@ export function RegistrationForm({
                 label="Email"
                 htmlFor="email"
                 required
-                description="Confirmation is sent here."
+                description="Participant's email"
               >
                 <>
                   <Input
@@ -514,6 +517,8 @@ export function RegistrationForm({
               </Field>
             </div>
 
+            {/* School/college + location — side by side */}
+            <div className="grid gap-5 sm:grid-cols-2">
             {/* School / College dropdown */}
             <Field
               label="Are you in school or college?"
@@ -559,6 +564,51 @@ export function RegistrationForm({
                 <ErrorText>{errors.institutionType}</ErrorText>
               </>
             </Field>
+
+            {/* Your location */}
+            <Field
+              label="Location"
+              htmlFor="location"
+              required
+            >
+              <>
+                <Select
+                  value={values.location}
+                  onValueChange={(v) => {
+                    // Changing city changes which events are available,
+                    // so clear any category/event/location for the old city.
+                    setValues((prev) => ({ ...prev, location: v }));
+                    setCategory("");
+                    setEventId("");
+                    setLocationId("");
+                    setErrors((e) => ({
+                      ...e,
+                      location: undefined,
+                      category: undefined,
+                      event: undefined,
+                      eventLocation: undefined,
+                    }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="location"
+                    data-field="location"
+                    aria-invalid={!!errors.location}
+                  >
+                    <SelectValue placeholder="Select location to participate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <ErrorText>{errors.location}</ErrorText>
+              </>
+            </Field>
+            </div>
 
             {/* Conditional detail: name + standard (school) or year (college) */}
             {values.institutionType && (
@@ -637,50 +687,6 @@ export function RegistrationForm({
                 </Field>
               </div>
             )}
-
-            <Field
-              label="Your location"
-              htmlFor="location"
-              required
-              description="Select the city where you'll take part."
-            >
-              <>
-                <Select
-                  value={values.location}
-                  onValueChange={(v) => {
-                    // Changing city changes which events are available,
-                    // so clear any category/event/location for the old city.
-                    setValues((prev) => ({ ...prev, location: v }));
-                    setCategory("");
-                    setEventId("");
-                    setLocationId("");
-                    setErrors((e) => ({
-                      ...e,
-                      location: undefined,
-                      category: undefined,
-                      event: undefined,
-                      eventLocation: undefined,
-                    }));
-                  }}
-                >
-                  <SelectTrigger
-                    id="location"
-                    data-field="location"
-                    aria-invalid={!!errors.location}
-                  >
-                    <SelectValue placeholder="Select location to participate" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <ErrorText>{errors.location}</ErrorText>
-              </>
-            </Field>
         </FormSection>
 
         <div className="h-px bg-border" />

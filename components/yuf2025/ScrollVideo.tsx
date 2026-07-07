@@ -1,32 +1,34 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * A muted, looping video that auto-plays while it's in view and pauses when it
- * scrolls away. The viewer can pause/resume by clicking — a manual pause sticks
- * until they press play again. If `src` is missing or fails to load (e.g. the
- * real file hasn't been dropped in `public/videos/` yet) it falls back to the
- * poster image with a "coming soon" badge, so the layout never breaks.
+ * A looping video that auto-plays while it's in view and pauses when it scrolls
+ * away (for performance only — the viewer can't pause it). It starts muted so
+ * browsers allow the autoplay; a speaker button lets the viewer turn the sound
+ * on. Pass `hasAudio={false}` for silent clips — the video stays muted and no
+ * speaker button is shown. If `src` is missing or fails to load, it falls back
+ * to the poster image with a "coming soon" badge so the layout never breaks.
  */
 export function ScrollVideo({
   src,
   poster,
   label,
   className,
+  hasAudio = true,
 }: {
   src?: string;
   poster: string;
   label?: string;
   className?: string;
+  hasAudio?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(!src);
-  const [manualPaused, setManualPaused] = useState(false);
   const [inView, setInView] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   // Track whether the player is at least half in view.
   useEffect(() => {
@@ -40,29 +42,22 @@ export function ScrollVideo({
     return () => io.disconnect();
   }, [failed]);
 
-  // Auto play/pause from view state, unless the viewer paused it manually.
-  // `playing` is derived from the element's own play/pause events (below), so
-  // we never call setState synchronously in the effect body.
+  // Play while in view, pause when it scrolls away. Not user-pausable.
   useEffect(() => {
     const el = ref.current;
     if (!el || failed) return;
-    if (inView && !manualPaused) {
-      void el.play().catch(() => {});
-    } else {
-      el.pause();
-    }
-  }, [inView, manualPaused, failed]);
+    if (inView) void el.play().catch(() => {});
+    else el.pause();
+  }, [inView, failed]);
 
-  function toggle() {
+  function toggleMute() {
     const el = ref.current;
     if (!el || failed) return;
-    if (el.paused) {
-      setManualPaused(false);
-      void el.play().catch(() => {});
-    } else {
-      setManualPaused(true);
-      el.pause();
-    }
+    const next = !el.muted;
+    el.muted = next;
+    setMuted(next);
+    // A tap counts as a user gesture, so make sure it's rolling with sound.
+    if (!next) void el.play().catch(() => {});
   }
 
   return (
@@ -83,8 +78,6 @@ export function ScrollVideo({
           loop
           playsInline
           preload="metadata"
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
           onError={() => setFailed(true)}
           className="relative z-10 h-full w-full object-cover"
         />
@@ -105,21 +98,16 @@ export function ScrollVideo({
           </span>
         </span>
       ) : (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={playing ? "Pause video" : "Play video"}
-          className="absolute inset-0 z-30 flex items-center justify-center"
-        >
-          <span
-            className={cn(
-              "grid h-16 w-16 place-items-center rounded-full bg-white/90 text-primary-700 shadow-xl transition-opacity duration-300",
-              playing ? "opacity-0 group-hover:opacity-100" : "opacity-100",
-            )}
+        hasAudio && (
+          <button
+            type="button"
+            onClick={toggleMute}
+            aria-label={muted ? "Unmute video" : "Mute video"}
+            className="absolute bottom-3 right-3 z-30 grid h-11 w-11 place-items-center rounded-full bg-white/90 text-primary-700 shadow-lg backdrop-blur transition-transform hover:scale-105"
           >
-            {playing ? <Pause size={24} /> : <Play size={24} className="ml-0.5" />}
-          </span>
-        </button>
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+        )
       )}
     </div>
   );
