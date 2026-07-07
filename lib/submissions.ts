@@ -114,6 +114,7 @@ export async function submitRegistration(
       amountPaid,
       paymentStatus: "pending",
       status: "confirmed",
+      checkedIn: false,
       createdAt: serverTimestamp(),
     });
     // Only bump the counter when the event doc exists (so the public update

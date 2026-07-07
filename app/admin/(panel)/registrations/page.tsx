@@ -67,6 +67,7 @@ export default function RegistrationsPage() {
       "Name", "Email", "Phone", "City", "Institution",
       "Category", "Event", "Loc. Venue", "Loc. Date",
       "Age", "Amount", "Payment", "Status", "Date",
+      "Checked In", "Check-in Date",
     ];
     const lines = filtered.map((r) =>
       [
@@ -74,6 +75,7 @@ export default function RegistrationsPage() {
         r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
         r.ageCategory, r.amountPaid, r.paymentStatus,
         r.status, formatDate(r.createdAt),
+        r.checkedIn ? "Yes" : "No", formatDate(r.checkedInAt ?? null),
       ]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
         .join(","),
@@ -145,6 +147,7 @@ export default function RegistrationsPage() {
                   <th className="px-4 py-3 font-semibold">Event</th>
                   <th className="px-4 py-3 font-semibold">Amount</th>
                   <th className="px-4 py-3 font-semibold">Payment</th>
+                  <th className="px-4 py-3 font-semibold">Check-in</th>
                   <th className="px-4 py-3 font-semibold">Date</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                 </tr>
@@ -173,6 +176,15 @@ export default function RegistrationsPage() {
                     </td>
                     <td className="px-4 py-3 text-text">₹ {r.amountPaid.toLocaleString("en-IN")}</td>
                     <td className="px-4 py-3"><StatusBadge status={r.paymentStatus} /></td>
+                    <td className="px-4 py-3">
+                      {r.checkedIn ? (
+                        <span className="inline-flex rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-semibold text-success">
+                          Checked in
+                        </span>
+                      ) : (
+                        <span className="text-xs text-text-muted">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-text-muted">{formatDate(r.createdAt)}</td>
                     <td className="px-4 py-3">
                       <Select

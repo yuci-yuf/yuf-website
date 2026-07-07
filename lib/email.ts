@@ -7,6 +7,7 @@
  * base for links like Terms & Conditions.
  */
 import { Resend } from "resend";
+import QRCode from "qrcode";
 
 const FROM = "Youth United Festival <registration@youthunitedfestival.com>";
 const SITE_URL = (
@@ -33,12 +34,41 @@ export interface RegistrationEmailData {
 
 export async function sendRegistrationEmail(data: RegistrationEmailData) {
   const resend = getResend();
+
+  // Build the entry-pass QR (encodes the registration code) so it can be
+  // scanned at the gate. If the code is missing or QR rendering fails we simply
+  // send the email without it — the code is always printed as text, which is the
+  // supported manual fallback at the entry desk.
+  let qrBuffer: Buffer | null = null;
+  if (data.registrationCode) {
+    try {
+      qrBuffer = await QRCode.toBuffer(data.registrationCode, {
+        errorCorrectionLevel: "M",
+        margin: 2,
+        width: 320,
+      });
+    } catch (err) {
+      console.error("QR render failed:", err);
+    }
+  }
+
   return resend.emails.send({
     from: FROM,
     to: data.to,
     subject: `You're registered — ${data.eventTitle} · Youth United Festival 2026`,
-    html: registrationEmailHtml(data),
+    html: registrationEmailHtml(data, qrBuffer != null),
     text: registrationEmailText(data),
+    attachments: qrBuffer
+      ? [
+          {
+            // Referenced inline via cid:qrcode in the HTML, and also downloadable
+            // so the pass survives clients that strip inline images.
+            filename: "yuf-entry-pass.png",
+            content: qrBuffer,
+            contentId: "qrcode",
+          },
+        ]
+      : undefined,
   });
 }
 
@@ -68,7 +98,10 @@ function registrationEmailText(d: RegistrationEmailData): string {
 }
 
 /* ── Branded HTML email (inline styles + tables for client compatibility) ── */
-function registrationEmailHtml(d: RegistrationEmailData): string {
+function registrationEmailHtml(
+  d: RegistrationEmailData,
+  hasQr: boolean,
+): string {
   const termsUrl = `${SITE_URL}/terms-and-conditions`;
   const row = (label: string, value: string) => `
     <tr>
@@ -121,6 +154,8 @@ function registrationEmailHtml(d: RegistrationEmailData): string {
                   ${details}
                 </table>
 
+                ${entryPass(d, hasQr)}
+
                 <p style="margin:22px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
                   Please arrive by the reporting time of <strong style="color:#102330;">${REPORTING_TIME}</strong>, and
                   <strong style="color:#102330;">bring your valid school or college ID card</strong> for check-in.
@@ -148,6 +183,29 @@ function registrationEmailHtml(d: RegistrationEmailData): string {
     </table>
   </body>
 </html>`;
+}
+
+/* ── Entry pass block: scannable QR (cid) + the code as the manual fallback ── */
+function entryPass(d: RegistrationEmailData, hasQr: boolean): string {
+  if (!d.registrationCode) return "";
+  const code = escapeHtml(d.registrationCode);
+  const qrImg = hasQr
+    ? `<img src="cid:qrcode" alt="Entry QR code" width="180" height="180" style="display:block;margin:0 auto 14px;width:180px;height:180px;border-radius:8px;" />`
+    : "";
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;background:#ffffff;border:1px solid #e3eef4;border-radius:12px;">
+      <tr>
+        <td style="padding:24px;text-align:center;">
+          <div style="font:700 12px/1 Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#1787b3;margin-bottom:14px;">Your entry pass</div>
+          ${qrImg}
+          <div style="font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#6b7f92;">Show this QR at the entry desk${hasQr ? " (also attached to this email)" : ""}.</div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px dashed #d8e6ee;">
+            <div style="font:600 12px/1 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b7f92;margin-bottom:6px;">If the QR won't scan, give this code</div>
+            <div style="font:700 22px/1.3 'Courier New',monospace;letter-spacing:.08em;color:#102330;">${code}</div>
+          </div>
+        </td>
+      </tr>
+    </table>`;
 }
 
 function escapeHtml(s: string): string {

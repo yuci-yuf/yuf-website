@@ -12,13 +12,16 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
   where,
   writeBatch,
+  type DocumentData,
   type Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -38,36 +41,111 @@ function toISO(value: unknown): string | null {
   return null;
 }
 
+function mapRegistration(id: string, data: DocumentData): Registration {
+  return {
+    id,
+    firstName: data.firstName ?? "",
+    lastName: data.lastName ?? "",
+    email: data.email ?? "",
+    phone: data.phone ?? "",
+    location: data.location ?? "",
+    institution: data.institution ?? "",
+    eventCategory: data.eventCategory ?? "",
+    eventId: data.eventId ?? "",
+    eventTitle: data.eventTitle ?? "",
+    locationId: data.locationId ?? "",
+    locationVenue: data.locationVenue ?? "",
+    locationDate: data.locationDate ?? "",
+    ageCategory: data.ageCategory ?? "",
+    message: data.message ?? "",
+    amountPaid: data.amountPaid ?? 0,
+    registrationCode: data.registrationCode ?? "",
+    orderId: data.orderId ?? "",
+    paymentId: data.paymentId ?? "",
+    paymentStatus: data.paymentStatus ?? "pending",
+    status: data.status ?? "pending",
+    createdAt: toISO(data.createdAt),
+    paidAt: toISO(data.paidAt),
+    checkedIn: Boolean(data.checkedIn),
+    checkedInAt: toISO(data.checkedInAt),
+    checkedInBy: data.checkedInBy ?? "",
+  } satisfies Registration;
+}
+
 export async function getRegistrations(): Promise<Registration[]> {
   const q = query(collection(db, "registrations"), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      firstName: data.firstName ?? "",
-      lastName: data.lastName ?? "",
-      email: data.email ?? "",
-      phone: data.phone ?? "",
-      location: data.location ?? "",
-      institution: data.institution ?? "",
-      eventCategory: data.eventCategory ?? "",
-      eventId: data.eventId ?? "",
-      eventTitle: data.eventTitle ?? "",
-      locationId: data.locationId ?? "",
-      locationVenue: data.locationVenue ?? "",
-      locationDate: data.locationDate ?? "",
-      ageCategory: data.ageCategory ?? "",
-      message: data.message ?? "",
-      amountPaid: data.amountPaid ?? 0,
-      registrationCode: data.registrationCode ?? "",
-      orderId: data.orderId ?? "",
-      paymentId: data.paymentId ?? "",
-      paymentStatus: data.paymentStatus ?? "pending",
-      status: data.status ?? "pending",
-      createdAt: toISO(data.createdAt),
-      paidAt: toISO(data.paidAt),
-    } satisfies Registration;
+  return snap.docs.map((d) => mapRegistration(d.id, d.data()));
+}
+
+/**
+ * Result of an entry-desk verification. `registration` is present for every
+ * outcome except `not_found`, so the desk can still show who a code belongs to
+ * even when it can't be admitted.
+ */
+export type CheckInResult =
+  | { result: "ok"; registration: Registration }
+  | { result: "already"; registration: Registration; checkedInAt: string | null }
+  | { result: "not_confirmed"; registration: Registration }
+  | { result: "not_found" };
+
+/**
+ * Pull the registration code out of a scanned QR value. The QR encodes the raw
+ * code, but tolerate a full URL (…/YUF26-XXXXXX) or surrounding whitespace so a
+ * pass scanned from a different source still resolves. Uppercased to match how
+ * codes are stored/typed.
+ */
+export function normalizeCode(raw: string): string {
+  const trimmed = raw.trim();
+  const tail = trimmed.split(/[/?#]/).filter(Boolean).pop() ?? trimmed;
+  return tail.toUpperCase();
+}
+
+/**
+ * Verify a registration code (from a QR scan or manual entry) and, if it's a
+ * confirmed registration that hasn't been used, atomically mark it checked in.
+ *
+ * The transaction guarantees single-use: if two desks scan the same pass at
+ * once, exactly one gets `ok` and the other gets `already`.
+ */
+export async function verifyAndCheckIn(
+  rawCode: string,
+  by: string,
+): Promise<CheckInResult> {
+  const code = normalizeCode(rawCode);
+  if (!code) return { result: "not_found" };
+
+  const q = query(
+    collection(db, "registrations"),
+    where("registrationCode", "==", code),
+    limit(1),
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return { result: "not_found" };
+  const ref = snap.docs[0].ref;
+
+  return runTransaction(db, async (tx) => {
+    const fresh = await tx.get(ref);
+    if (!fresh.exists()) return { result: "not_found" };
+    const data = fresh.data();
+    const registration = mapRegistration(fresh.id, data);
+
+    if (data.status !== "confirmed") {
+      return { result: "not_confirmed", registration };
+    }
+    if (data.checkedIn === true) {
+      return {
+        result: "already",
+        registration,
+        checkedInAt: toISO(data.checkedInAt),
+      };
+    }
+    tx.update(ref, {
+      checkedIn: true,
+      checkedInAt: serverTimestamp(),
+      checkedInBy: by,
+    });
+    return { result: "ok", registration: { ...registration, checkedIn: true } };
   });
 }
 
