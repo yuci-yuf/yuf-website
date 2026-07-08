@@ -361,7 +361,7 @@ export const homeContent = {
         role: "Advisor of International Affairs | Intercultural Communication | Korean Language & Culture",
         quote:
           "The Youth United Festival creates meaningful opportunities for young people to connect across cultures, develop leadership skills, and inspire positive change. Together, we can empower the next generation of global changemakers.",
-        image: "/images/testimonials/sukhee-lee.jpg",
+        image: "/images/testimonials/sukhee-lee.jpeg",
       },
     ] satisfies Testimonial[],
   },
