@@ -77,7 +77,7 @@ const SUKHEE = {
   role: "Advisor, International Affairs · Republic of Korea",
   quote:
     "The Youth United Festival creates meaningful opportunities for young people to connect across cultures and inspire positive change.",
-  poster: "/images/testimonials/sukhee-lee.jpg",
+  poster: "/images/testimonials/sukhee-lee.jpeg",
   video:
     "https://res.cloudinary.com/dudvem6ri/video/upload/q_auto,f_auto/v1783426595/yuf-website/videos/sukhee_lee_speech.mp4",
 };
