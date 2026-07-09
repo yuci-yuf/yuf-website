@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Lock } from "lucide-react";
 import { RegistrationForm } from "@/components/public/RegistrationForm";
 import { Section } from "@/components/ui/Section";
-import { getEvents, getCategoryOrder } from "@/lib/cms-data";
+import { getEvents, getCategoryOrder, getRegistrationSettings } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
   title: "Register",
@@ -15,9 +16,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
-  const [events, categoryOrder] = await Promise.all([
+  const [events, categoryOrder, settings] = await Promise.all([
     getEvents(),
     getCategoryOrder(),
+    getRegistrationSettings(),
   ]);
   // Only events that are visible AND still accepting sign-ups are registrable.
   const activeEvents = events.filter(
@@ -35,7 +37,17 @@ export default async function RegisterPage() {
   return (
     <>
       <Section tone="glow" className="pt-28 sm:pt-32">
-        {activeEvents.length > 0 ? (
+        {!settings.open ? (
+          <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-3xl border border-border bg-surface p-10 text-center shadow-card">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+              <Lock size={26} />
+            </span>
+            <h2 className="font-heading text-2xl font-bold text-heading">
+              Registration is closed
+            </h2>
+            <p className="text-text-muted">{settings.closedMessage}</p>
+          </div>
+        ) : activeEvents.length > 0 ? (
           <Suspense fallback={<div className="h-64 sm:h-96" />}>
             <RegistrationForm events={activeEvents} categories={categories} />
           </Suspense>

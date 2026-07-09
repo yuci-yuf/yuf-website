@@ -37,6 +37,7 @@ import {
   getAdminEvents,
 } from "@/lib/admin-data";
 import type { ContactMessage, EventItem, Registration } from "@/types";
+import { RegistrationToggle } from "@/components/admin/RegistrationToggle";
 
 const chartConfig = {
   count: { label: "Registrations", color: "#1fa8d7" },
@@ -122,6 +123,8 @@ export default function DashboardPage() {
       />
 
       <div className="flex flex-col gap-8 p-8">
+        <RegistrationToggle />
+
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-primary-600" size={32} />

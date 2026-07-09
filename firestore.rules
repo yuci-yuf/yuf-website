@@ -28,6 +28,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    // Global site settings (e.g. the registration on/off switch). Public read so
+    // the register page can reflect it; only admins may change it.
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // ── Public submissions ──
     // Visitors may create a submission; only admins may read or modify them.

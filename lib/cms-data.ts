@@ -9,7 +9,31 @@
  */
 import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { EventItem, EventLocation } from "@/types";
+import type { EventItem, EventLocation, RegistrationSettings } from "@/types";
+
+/** Default copy shown when registration is switched off (no admin message set). */
+export const DEFAULT_CLOSED_MESSAGE =
+  "Registrations are currently closed. Please check back soon.";
+
+/**
+ * Global registration on/off switch + closed message, stored in the Firestore
+ * `settings/registration` doc and toggled from the admin dashboard. Defaults to
+ * open when the doc is missing or unreadable.
+ */
+export async function getRegistrationSettings(): Promise<RegistrationSettings> {
+  try {
+    const snap = await getDoc(doc(db, "settings", "registration"));
+    const data = snap.exists() ? snap.data() : {};
+    return {
+      open: data.open !== false,
+      closedMessage:
+        (data.closedMessage as string)?.trim() || DEFAULT_CLOSED_MESSAGE,
+    };
+  } catch (e) {
+    console.error("getRegistrationSettings failed", e);
+    return { open: true, closedMessage: DEFAULT_CLOSED_MESSAGE };
+  }
+}
 
 /** Read a stored `locations` array into typed EventLocation[]. */
 export function normalizeLocations(raw: unknown): EventLocation[] | undefined {
