@@ -15,6 +15,7 @@ interface OrderBody {
   phone: string;
   location: string;
   institution: string;
+  institutionType?: "school" | "college" | "";
   ageCategory: string;
   eventId: string;
   /** Which event location the participant is registering for. */
@@ -146,6 +147,7 @@ export async function POST(req: Request) {
         phone: body.phone,
         location: body.location,
         institution: body.institution,
+        institutionType: body.institutionType ?? "",
         ageCategory: body.ageCategory ?? "",
         eventCategory: category,
         eventId: body.eventId,

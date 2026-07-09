@@ -299,10 +299,9 @@ export function RegistrationForm({
     // Map the friendly fields onto the stored schema.
     const firstName = values.firstName.trim();
     const lastName = values.lastName.trim();
-    const institution =
-      values.institutionType === "school"
-        ? `${values.institutionName.trim()} (School — ${values.level} standard)`
-        : `${values.institutionName.trim()} (College — ${values.level})`;
+    // Store just the raw name — the school/college type and standard/year are
+    // persisted separately (institutionType / ageCategory), so no suffix here.
+    const institution = values.institutionName.trim();
 
     setStatus("submitting");
     try {
@@ -326,6 +325,7 @@ export function RegistrationForm({
           phone: values.phone,
           location: values.location,
           institution,
+          institutionType: values.institutionType,
           eventId: selectedEvent.id,
           ageCategory: values.level,
           locationId: effectiveLocationId,
