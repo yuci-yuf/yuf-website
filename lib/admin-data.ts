@@ -41,6 +41,20 @@ function toISO(value: unknown): string | null {
   return null;
 }
 
+/**
+ * Human-readable "School" / "College" for a registration. Prefers the stored
+ * `institutionType`; for legacy records that predate that field, infers it from
+ * the `institution` string (which was formatted as "... (School — ...)" /
+ * "... (College — ...)"). Returns "" when neither is available.
+ */
+export function institutionTypeLabel(r: Registration): string {
+  if (r.institutionType === "school") return "School";
+  if (r.institutionType === "college") return "College";
+  if (/\(School\b/i.test(r.institution)) return "School";
+  if (/\(College\b/i.test(r.institution)) return "College";
+  return "";
+}
+
 function mapRegistration(id: string, data: DocumentData): Registration {
   return {
     id,
@@ -50,6 +64,7 @@ function mapRegistration(id: string, data: DocumentData): Registration {
     phone: data.phone ?? "",
     location: data.location ?? "",
     institution: data.institution ?? "",
+    institutionType: data.institutionType ?? "",
     eventCategory: data.eventCategory ?? "",
     eventId: data.eventId ?? "",
     eventTitle: data.eventTitle ?? "",
@@ -290,6 +305,47 @@ export async function deleteEvent(id: string): Promise<void> {
   }
 
   await deleteDoc(doc(db, "events", id));
+}
+
+/**
+ * Delete EVERY registration and reset all event capacity counters to zero.
+ *
+ * Intended for clearing test data before launch. Registrations are removed in
+ * batches of 500 (Firestore's per-batch write cap). After the wipe, each event's
+ * whole-doc `registrationCount` and every per-location `registrationCount` are
+ * reset to 0 so nothing shows as "full" against registrations that no longer
+ * exist. Returns the number of registrations deleted.
+ */
+export async function deleteAllRegistrations(): Promise<number> {
+  const snap = await getDocs(collection(db, "registrations"));
+  const regDocs = snap.docs;
+
+  for (let i = 0; i < regDocs.length; i += 500) {
+    const batch = writeBatch(db);
+    for (const d of regDocs.slice(i, i + 500)) batch.delete(d.ref);
+    await batch.commit();
+  }
+
+  // Reset counters on every event so capacity math matches the now-empty
+  // registrations collection.
+  const eventsSnap = await getDocs(collection(db, "events"));
+  const eventDocs = eventsSnap.docs;
+  for (let i = 0; i < eventDocs.length; i += 500) {
+    const batch = writeBatch(db);
+    for (const d of eventDocs.slice(i, i + 500)) {
+      const data = d.data();
+      const update: Record<string, unknown> = { registrationCount: 0 };
+      if (Array.isArray(data.locations)) {
+        update.locations = (data.locations as Record<string, unknown>[]).map(
+          (loc) => ({ ...loc, registrationCount: 0 }),
+        );
+      }
+      batch.update(d.ref, update);
+    }
+    await batch.commit();
+  }
+
+  return regDocs.length;
 }
 
 function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {

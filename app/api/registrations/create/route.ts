@@ -1,14 +1,24 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb, releaseLocationSlot } from "@/lib/firebase-admin";
-import { getRazorpay } from "@/lib/razorpay";
+import { getAdminDb } from "@/lib/firebase-admin";
 import { computeInvoice } from "@/lib/pricing";
 import { generateRegistrationCode } from "@/lib/registration-code";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-interface OrderBody {
+/**
+ * Public registration WITHOUT a payment step.
+ *
+ * Payment is currently deferred, so the browser can't be trusted to create the
+ * `registrations` doc itself (Firestore rules keep `create: if false`). This
+ * route writes it authoritatively via the Admin SDK: it re-reads the event to
+ * honour the latest fee, reserves a per-location slot atomically, and records
+ * the registration as confirmed / payment-pending. The client only supplies
+ * participant details and the chosen event/location — the amount, status, and
+ * registration code are all decided here so they can't be forged.
+ */
+interface CreateBody {
   firstName: string;
   lastName: string;
   email: string;
@@ -16,68 +26,44 @@ interface OrderBody {
   location: string;
   institution: string;
   institutionType?: "school" | "college" | "";
-  ageCategory: string;
+  ageCategory?: string;
   eventId: string;
   /** Which event location the participant is registering for. */
   locationId?: string;
-  idempotencyKey: string;
 }
 
-function isValid(b: Partial<OrderBody>): b is OrderBody {
+function isValid(b: Partial<CreateBody>): b is CreateBody {
   return Boolean(
     b &&
       b.firstName?.trim() &&
+      b.lastName?.trim() &&
       b.email?.trim() &&
-      /^\d{10}$/.test(b.phone ?? "") &&
+      /^[6-9]\d{9}$/.test(b.phone ?? "") &&
       b.location?.trim() &&
       b.institution?.trim() &&
-      b.eventId?.trim() &&
-      b.idempotencyKey?.trim(),
+      b.eventId?.trim(),
   );
 }
 
 export async function POST(req: Request) {
-  let body: Partial<OrderBody>;
+  let body: Partial<CreateBody>;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
   if (!isValid(body)) {
-    return NextResponse.json({ error: "Missing or invalid fields." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing or invalid fields." },
+      { status: 400 },
+    );
   }
 
   const adminDb = getAdminDb();
-  const regs = adminDb.collection("registrations");
-
-  // ── Idempotency: if this attempt already reserved + ordered, return it ──
-  const existing = await regs
-    .where("idempotencyKey", "==", body.idempotencyKey)
-    .limit(1)
-    .get();
-  if (!existing.empty) {
-    const d = existing.docs[0];
-    const data = d.data();
-    if (data.orderId) {
-      return NextResponse.json({
-        registrationId: d.id,
-        code: data.registrationCode,
-        orderId: data.orderId,
-        amount: Math.round((data.amountPaid ?? 0) * 100),
-        currency: "INR",
-        keyId: process.env.RAZORPAY_KEY_ID,
-      });
-    }
-  }
-
   const eventRef = adminDb.collection("events").doc(body.eventId);
-  const regRef = regs.doc();
+  const regRef = adminDb.collection("registrations").doc();
   const code = generateRegistrationCode();
 
-  // ── Reserve a slot + create the pending registration atomically ──
-  let base = 0;
-  let category = "";
-  let title = "";
   try {
     await adminDb.runTransaction(async (tx) => {
       const snap = await tx.get(eventRef);
@@ -85,9 +71,9 @@ export async function POST(req: Request) {
       const ev = snap.data()!;
       if (ev.registrationOpen === false) throw new Error("CLOSED");
 
-      base = typeof ev.registrationFee === "number" ? ev.registrationFee : 0;
-      category = (ev.category as string) ?? "";
-      title = (ev.title as string) ?? "";
+      const base = typeof ev.registrationFee === "number" ? ev.registrationFee : 0;
+      const category = (ev.category as string) ?? "";
+      const title = (ev.title as string) ?? "";
       const total = computeInvoice(base).total;
 
       // Per-location capacity. When the event has a `locations` array we reserve
@@ -156,10 +142,11 @@ export async function POST(req: Request) {
         locationVenue: locationSnapshot.venue,
         locationDate: locationSnapshot.date,
         registrationCode: code,
-        idempotencyKey: body.idempotencyKey,
         amountPaid: total,
+        // Payment deferred: the spot is held (confirmed) but not yet paid.
         paymentStatus: "pending",
-        status: "pending",
+        status: "confirmed",
+        checkedIn: false,
         createdAt: FieldValue.serverTimestamp(),
       });
     });
@@ -168,7 +155,10 @@ export async function POST(req: Request) {
     if (msg === "FULL")
       return NextResponse.json({ error: "This event is full." }, { status: 409 });
     if (msg === "CLOSED")
-      return NextResponse.json({ error: "Registration is closed." }, { status: 409 });
+      return NextResponse.json(
+        { error: "Registration is closed." },
+        { status: 409 },
+      );
     if (msg === "EVENT_NOT_FOUND")
       return NextResponse.json({ error: "Event not found." }, { status: 404 });
     if (msg === "LOCATION_NOT_FOUND")
@@ -176,43 +166,12 @@ export async function POST(req: Request) {
         { error: "Selected location not found." },
         { status: 404 },
       );
-    console.error("order: reservation failed", err);
-    return NextResponse.json({ error: "Could not reserve a spot." }, { status: 500 });
-  }
-
-  const invoice = computeInvoice(base);
-
-  // Free event → confirm immediately, no payment needed.
-  if (invoice.total <= 0) {
-    await regRef.update({ paymentStatus: "paid", status: "confirmed" });
-    return NextResponse.json({ registrationId: regRef.id, code, free: true });
-  }
-
-  // ── Create the Razorpay order; roll the reservation back on failure ──
-  try {
-    const order = await getRazorpay().orders.create({
-      amount: invoice.total * 100, // paise
-      currency: "INR",
-      receipt: regRef.id,
-      notes: { registrationId: regRef.id, code, eventId: body.eventId },
-    });
-    await regRef.update({ orderId: order.id });
-    return NextResponse.json({
-      registrationId: regRef.id,
-      code,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
-    });
-  } catch (err) {
-    console.error("order: razorpay create failed", err);
-    // Release the slot we reserved so it isn't stuck, then drop the pending reg.
-    await releaseLocationSlot(adminDb, eventRef, body.locationId);
-    await regRef.delete();
+    console.error("create: registration failed", err);
     return NextResponse.json(
-      { error: "Could not start payment. Please try again." },
-      { status: 502 },
+      { error: "Could not save your registration." },
+      { status: 500 },
     );
   }
+
+  return NextResponse.json({ registrationId: regRef.id, code });
 }

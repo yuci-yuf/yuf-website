@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
   Download,
   Loader2,
   MapPin,
@@ -14,6 +16,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { Dialog } from "radix-ui";
 import { PageHeader, StatusBadge, EmptyState, formatDate } from "@/components/admin/AdminUI";
 import { CategoryManager } from "@/components/admin/CategoryManager";
 import { Button } from "@/components/ui/button";
@@ -23,6 +26,7 @@ import {
   getAdminCategories,
   getRegistrations,
   deleteEvent,
+  institutionTypeLabel,
 } from "@/lib/admin-data";
 import type {
   EventCategoryDoc,
@@ -34,6 +38,7 @@ import { getEventLocations } from "@/lib/event-groups";
 import { useDialog } from "@/components/ui/confirm-dialog";
 
 const ALL = "All";
+const PAGE_SIZE = 10;
 
 export default function AdminEventsPage() {
   const { confirm, notify } = useDialog();
@@ -46,6 +51,9 @@ export default function AdminEventsPage() {
   const [managingCats, setManagingCats] = useState(false);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>(ALL);
+  const [page, setPage] = useState(1);
+  // Event whose location-picker download dialog is open (multi-location events).
+  const [downloadEvent, setDownloadEvent] = useState<EventItem | null>(null);
 
   function load() {
     return Promise.all([
@@ -108,6 +116,20 @@ export default function AdminEventsPage() {
       .sort((a, b) => a.order - b.order);
   }, [events, activeCategory, search]);
 
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  // Clamp in case the filtered list shrank below the current page (e.g. after
+  // a search narrows results or an event is deleted).
+  const currentPage = Math.min(page, pageCount);
+  const paginated = useMemo(
+    () => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filtered, currentPage],
+  );
+
+  // Reset to the first page whenever the filters change.
+  useEffect(() => {
+    setPage(1);
+  }, [search, activeCategory]);
+
   /**
    * Download an event's registrations as CSV. When `loc` is given, only that
    * location's registrations are exported and the filename is scoped to it —
@@ -119,13 +141,13 @@ export default function AdminEventsPage() {
     );
     const headers = [
       "Name", "Email", "Phone", "City", "Institution",
-      "Category", "Event", "Loc. Venue", "Loc. Date",
-      "Age", "Amount", "Payment", "Status", "Date",
+      "Type", "Category", "Event", "Loc. Venue", "Loc. Date",
+      "Standard / Year", "Amount", "Payment", "Status", "Date",
     ];
     const lines = rows.map((r) =>
       [
         `${r.firstName} ${r.lastName}`, r.email, r.phone, r.location, r.institution,
-        r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
+        institutionTypeLabel(r), r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
         r.ageCategory, r.amountPaid, r.paymentStatus,
         r.status, formatDate(r.createdAt),
       ]
@@ -148,6 +170,27 @@ export default function AdminEventsPage() {
     a.download = `${slug || ev.id}-registrations.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  /** Registrations for a given location of an event. */
+  function locationRegCount(ev: EventItem, loc: EventLocation): number {
+    return registrations.filter(
+      (r) => r.eventId === ev.id && r.locationId === loc.id,
+    ).length;
+  }
+
+  /**
+   * Download entry point. Events with a single location export straight away;
+   * events with multiple locations open a dialog so the admin can pick one
+   * location or grab all of them at once.
+   */
+  function handleDownload(ev: EventItem) {
+    const locs = getEventLocations(ev);
+    if (locs.length > 1) {
+      setDownloadEvent(ev);
+    } else {
+      exportEventCsv(ev);
+    }
   }
 
   async function handleDelete(ev: EventItem) {
@@ -276,7 +319,7 @@ export default function AdminEventsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filtered.map((e) => (
+                  {paginated.map((e) => (
                     <tr
                       key={e.id}
                       className="align-middle transition-colors hover:bg-surface-alt/50"
@@ -374,7 +417,7 @@ export default function AdminEventsPage() {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
-                            onClick={() => exportEventCsv(e)}
+                            onClick={() => handleDownload(e)}
                             disabled={(regCounts[e.id] ?? 0) === 0}
                             className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-alt hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-muted"
                             aria-label={`Download registrations for ${e.title}`}
@@ -408,6 +451,45 @@ export default function AdminEventsPage() {
                 </tbody>
               </table>
             </div>
+
+            {pageCount > 1 && (
+              <div className="flex items-center justify-between gap-4 border-t border-border px-5 py-3.5">
+                <p className="text-sm text-text-muted">
+                  Showing{" "}
+                  <span className="font-medium text-text">
+                    {(currentPage - 1) * PAGE_SIZE + 1}–
+                    {Math.min(currentPage * PAGE_SIZE, filtered.length)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-text">{filtered.length}</span>
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft size={16} />
+                    Prev
+                  </Button>
+                  <span className="px-3 text-sm text-text-muted">
+                    Page{" "}
+                    <span className="font-medium text-text">{currentPage}</span> of{" "}
+                    {pageCount}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                    disabled={currentPage === pageCount}
+                  >
+                    Next
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -419,6 +501,96 @@ export default function AdminEventsPage() {
           onChanged={load}
         />
       )}
+
+      {/* Location picker for downloading a multi-location event's registrations. */}
+      <Dialog.Root
+        open={downloadEvent !== null}
+        onOpenChange={(next) => {
+          if (!next) setDownloadEvent(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-100 bg-primary-950/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-6 shadow-hover focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+            <Dialog.Title className="font-heading text-lg font-bold text-heading">
+              Download registrations
+            </Dialog.Title>
+            <Dialog.Description className="mt-1 text-sm leading-relaxed text-text-muted">
+              {downloadEvent?.title} runs in multiple locations. Choose which
+              registrations to download.
+            </Dialog.Description>
+
+            {downloadEvent && (
+              <div className="mt-5 flex flex-col gap-2">
+                {/* All locations */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    exportEventCsv(downloadEvent);
+                    setDownloadEvent(null);
+                  }}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-alt/50 px-4 py-3 text-left transition-colors hover:border-primary-500 hover:bg-primary-50"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Download size={16} className="text-primary-600" />
+                    <span className="font-medium text-text">All locations</span>
+                  </span>
+                  <span className="text-xs font-semibold text-text-muted">
+                    {regCounts[downloadEvent.id] ?? 0}
+                  </span>
+                </button>
+
+                <div className="my-1 flex items-center gap-3">
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="text-xs uppercase tracking-wide text-text-muted">
+                    Or a single location
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                {/* Per-location */}
+                {getEventLocations(downloadEvent).map((loc) => {
+                  const count = locationRegCount(downloadEvent, loc);
+                  const place = loc.city || loc.address || "Location";
+                  return (
+                    <button
+                      key={loc.id}
+                      type="button"
+                      disabled={count === 0}
+                      onClick={() => {
+                        exportEventCsv(downloadEvent, loc);
+                        setDownloadEvent(null);
+                      }}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-left transition-colors hover:border-primary-500 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border disabled:hover:bg-transparent"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <MapPin size={16} className="shrink-0 text-text-muted" />
+                        <span className="flex flex-col">
+                          <span className="font-medium text-text">{place}</span>
+                          {loc.date && (
+                            <span className="text-xs text-text-muted">
+                              {loc.date}
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      <span className="text-xs font-semibold text-text-muted">
+                        {count === 0 ? "None" : count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <Dialog.Close asChild>
+                <Button variant="outline">Cancel</Button>
+              </Dialog.Close>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 }
