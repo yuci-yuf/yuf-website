@@ -203,7 +203,7 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
           className="mt-1.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white py-2.5 text-sm font-bold shadow-sm transition-transform group-hover:scale-[1.015]"
           style={{ color: st.accent }}
         >
-          View
+          View Details
           <ArrowUpRight
             size={15}
             className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

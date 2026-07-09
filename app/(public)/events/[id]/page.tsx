@@ -9,6 +9,26 @@ import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
 import { getEventLocations, audienceLabel } from "@/lib/event-groups";
+import { SITE_URL } from "@/app/layout";
+
+/** Best-effort conversion of a human date label ("2nd Sept 2026") to ISO. */
+function toIsoDate(label?: string): string | undefined {
+  if (!label) return undefined;
+  let s = label
+    .replace(/(\d+)(st|nd|rd|th)/gi, "$1")
+    .replace(/\bsept\b/gi, "Sep");
+  const range = s.match(/^(\d{1,2})\s*[–—-]\s*\d{1,2}(\s+\w+\s+\d{4})$/);
+  if (range) s = `${range[1]}${range[2]}`;
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Make an image path absolute for OG tags / structured data. */
+function absImage(src?: string): string | undefined {
+  if (!src) return undefined;
+  return src.startsWith("http") ? src : `${SITE_URL}${src}`;
+}
 
 // Read fresh CMS data on every request so admin edits (including fee changes)
 // show after a reload, and events created post-build resolve without a rebuild.
@@ -22,9 +42,18 @@ export async function generateMetadata({
   const { id } = await params;
   const event = await getEventById(id);
   if (!event) return { title: "Event Not Found" };
+  const img = absImage(event.image);
   return {
-    title: event.title,
+    title: `${event.title} — YUF 2026`,
     description: event.description,
+    alternates: { canonical: `/events/${id}` },
+    openGraph: {
+      type: "website",
+      url: `${SITE_URL}/events/${id}`,
+      title: `${event.title} — Youth United Festival 2026`,
+      description: event.description,
+      images: img ? [{ url: img }] : undefined,
+    },
   };
 }
 
@@ -52,8 +81,49 @@ export default async function EventDetailPage({
     .filter((e) => e.category === event.category && e.id !== event.id)
     .slice(0, 3);
 
+  // Event structured data — makes the page eligible for rich event results.
+  const startDate = toIsoDate(selectedLocation?.date);
+  const eventSchema = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description,
+    ...(absImage(event.image) ? { image: [absImage(event.image)] } : {}),
+    ...(startDate ? { startDate } : {}),
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    organizer: {
+      "@type": "Organization",
+      name: "Youth United Council of India",
+      url: SITE_URL,
+    },
+    location: (locations.length ? locations : [{ city: "", address: "" }]).map(
+      (l) => ({
+        "@type": "Place",
+        name: l.address || l.city || "Youth United Festival",
+        address:
+          [l.address, l.city].filter(Boolean).join(", ") || "Tamil Nadu, India",
+      }),
+    ),
+    ...(typeof event.registrationFee === "number"
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: event.registrationFee,
+            priceCurrency: "INR",
+            url: `${SITE_URL}/register?event=${event.id}`,
+            availability: "https://schema.org/InStock",
+          },
+        }
+      : {}),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
+      />
       {/* Header */}
       <section className="bg-festival-gradient relative overflow-hidden py-24 text-white lg:py-36">
         {event.image && (
