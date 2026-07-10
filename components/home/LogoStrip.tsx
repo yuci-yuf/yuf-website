@@ -22,7 +22,11 @@ export function LogoStrip({ partners }: { partners: Partner[] }) {
                   <img
                     src={partner.logoUrl}
                     alt={partner.name}
-                    className="h-12 w-auto max-w-[180px] object-contain transition-transform duration-300 hover:scale-105 sm:h-16"
+                    className={
+                      partner.prominent
+                        ? "h-24 w-auto max-w-[240px] object-contain transition-transform duration-300 hover:scale-105 sm:h-28"
+                        : "h-16 w-auto max-w-[220px] object-contain transition-transform duration-300 hover:scale-105 sm:h-20"
+                    }
                   />
                 ) : (
                   <span className="whitespace-nowrap text-sm font-medium text-gray-500">
