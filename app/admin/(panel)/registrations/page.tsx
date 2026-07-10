@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, Download, Loader2 } from "lucide-react";
+import { Search, Download, Loader2, Trash2 } from "lucide-react";
 import {
   PageHeader,
   StatusBadge,
@@ -17,18 +17,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { getRegistrations, setRegistrationStatus } from "@/lib/admin-data";
+import {
+  getRegistrations,
+  setRegistrationStatus,
+  institutionTypeLabel,
+  deleteAllRegistrations,
+} from "@/lib/admin-data";
+import { useDialog } from "@/components/ui/confirm-dialog";
 import type { Registration } from "@/types";
 
 const STATUSES = ["confirmed", "pending", "cancelled"] as const;
 
 export default function RegistrationsPage() {
+  const { confirm, notify } = useDialog();
   const [rows, setRows] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   // "all" is the sentinel for no filter (Radix Select disallows empty values).
   const [statusFilter, setStatusFilter] = useState("all");
+  const [deletingAll, setDeletingAll] = useState(false);
 
   useEffect(() => {
     getRegistrations()
@@ -65,14 +73,14 @@ export default function RegistrationsPage() {
   function exportCsv() {
     const headers = [
       "Name", "Email", "Phone", "City", "Institution",
-      "Category", "Event", "Loc. Venue", "Loc. Date",
-      "Age", "Amount", "Payment", "Status", "Date",
+      "Type", "Category", "Event", "Loc. Venue", "Loc. Date",
+      "Standard / Year", "Amount", "Payment", "Status", "Date",
       "Checked In", "Check-in Date",
     ];
     const lines = filtered.map((r) =>
       [
         `${r.firstName} ${r.lastName}`, r.email, r.phone, r.location, r.institution,
-        r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
+        institutionTypeLabel(r), r.eventCategory, r.eventTitle, r.locationVenue ?? "", r.locationDate ?? "",
         r.ageCategory, r.amountPaid, r.paymentStatus,
         r.status, formatDate(r.createdAt),
         r.checkedIn ? "Yes" : "No", formatDate(r.checkedInAt ?? null),
@@ -90,16 +98,59 @@ export default function RegistrationsPage() {
     URL.revokeObjectURL(url);
   }
 
+  // TEMPORARY: bulk-clear test registrations. Remove this action (and the
+  // deleteAllRegistrations helper) before launch.
+  async function handleDeleteAll() {
+    const ok = await confirm({
+      title: "Delete ALL registrations?",
+      description: `This permanently deletes all ${rows.length} registration${
+        rows.length === 1 ? "" : "s"
+      } and resets every event's spot counts to zero. This cannot be undone.`,
+      confirmLabel: "Delete all",
+      tone: "danger",
+    });
+    if (!ok) return;
+    setDeletingAll(true);
+    try {
+      await deleteAllRegistrations();
+      setRows([]);
+    } catch (e) {
+      console.error(e);
+      notify({
+        title: "Delete failed",
+        description: "We couldn't delete the registrations. Please try again.",
+      });
+    } finally {
+      setDeletingAll(false);
+    }
+  }
+
   return (
     <>
       <PageHeader
         title="Registrations"
         description={`${filtered.length} of ${rows.length} shown`}
         action={
-          <Button variant="outline" size="sm" onClick={exportCsv}>
-            <Download size={16} />
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download size={16} />
+              Export CSV
+            </Button>
+            {/* TEMPORARY: clears test registrations — remove before launch. */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteAll}
+              disabled={rows.length === 0 || deletingAll}
+            >
+              {deletingAll ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Trash2 size={16} />
+              )}
+              Delete all
+            </Button>
+          </div>
         }
       />
 

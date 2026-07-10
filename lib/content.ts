@@ -237,7 +237,7 @@ export const registrationSteps: RegistrationStep[] = [
   { step: 1, title: "Enter Your Details", description: "Add the participant's name, contact number, email, and school or college details, then choose the city where you'll take part." },
   { step: 2, title: "Choose Your Event", description: "Pick a category and select the competition you want to enter — the events shown are the ones running in your chosen city." },
   { step: 3, title: "Review & Pay", description: "Check your registration summary and pay the fee securely online via Razorpay — UPI, cards, net banking, or wallets.", highlight: "It is your responsibility to verify all details before making the payment." },
-  { step: 4, title: "Get Confirmed", description: "Receive an instant confirmation email with your unique registration code and event entry pass.", highlight: "Please note: once paid, the registration fee is non-refundable." },
+  { step: 4, title: "Receive Confirmation", description: "Receive an instant confirmation email with your unique registration code and event entry pass.", highlight: "Please note: once paid, the registration fee is non-refundable." },
 ];
 
 // ── Page content ──
@@ -248,7 +248,7 @@ export const homeContent = {
     title: "Youth United Festival",
     highlight: "2026",
     subtitle:
-      "Celebrating Youth Talent, Innovation, and Unity. Join thousands of young leaders, artists, athletes, and innovators from across India.",
+      "Empowering students across India through sports, arts, innovation, leadership, and cultural excellence. Join thousands of young changemakers at Youth United Festival 2026.",
     buttons: [
       { label: "Join Now", href: "/events", variant: "primary" },
       { label: "Learn More", href: "/about", variant: "outline" },
@@ -285,7 +285,7 @@ export const homeContent = {
     ] satisfies CTAButton[],
   },
   recognition: {
-    label: "Recognition",
+    label: "Government Recognition",
     title: "Appreciation From Ministry of Youth Affairs and Sports",
     subtitle:
       "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",

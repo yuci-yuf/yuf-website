@@ -21,6 +21,15 @@ import {
   tickerItems,
 } from "@/lib/content";
 import { getEvents, getGalleryPhotos, getCategoryOrder } from "@/lib/cms-data";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title:
+    "Youth United Festival 2026 — Youth Talent, Sports, Arts & Innovation",
+  description:
+    "Youth United Festival (YUF) 2026 by Youth United Council of India — empowering students across India through sports, arts, innovation, leadership, and culture. Register for YUF 2026 today.",
+  alternates: { canonical: "/" },
+};
 
 export const dynamic = "force-dynamic";
 
@@ -197,7 +206,7 @@ export default async function HomePage() {
             {/* Paragraph + list — below the image on mobile, bottom-right on desktop */}
             <FadeUp className="order-3 flex flex-col gap-6 lg:col-start-2 lg:row-start-2 lg:self-start">
               <p className="text-base leading-relaxed text-body sm:text-lg">
-                The Youth United Council of India (YUCI) to has received prestigious
+                The Youth United Council of India (YUCI) has received prestigious
                 recognition for its commendable contributions. Awards of appreciation
                 were presented by esteemed dignitaries:
               </p>

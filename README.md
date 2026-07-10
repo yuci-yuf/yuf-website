@@ -1,7 +1,7 @@
 # Youth United Festival 2026 (YUF) Website
 
 Marketing site, event catalogue, participant **registration**, and a self-serve **admin CMS**
-for the Youth United Council of India (YUCI). Built as a Next.js App Router app backed by
+for the Youth United Council of India (YUCI). Built a Next.js App Router app backed by
 Firebase (Firestore + Auth), with images on Cloudinary.
 
 ---

@@ -244,6 +244,15 @@ export interface Partner {
   link?: string;
 }
 
+// ── Global registration settings (Firestore `settings/registration`) ──
+
+export interface RegistrationSettings {
+  /** Master switch — when false, registration is closed site-wide. */
+  open: boolean;
+  /** Message shown to visitors while registration is closed. */
+  closedMessage: string;
+}
+
 // ── Submissions (stored in Firestore) ──
 
 export type PaymentStatus = "paid" | "pending" | "failed";
@@ -257,6 +266,8 @@ export interface Registration {
   phone: string;
   location: string;
   institution: string;
+  /** Whether the participant is in "school" or "college" (empty if unknown, e.g. legacy records). */
+  institutionType?: "school" | "college" | "";
   eventCategory: string;
   eventId: string;
   eventTitle: string;

@@ -399,6 +399,11 @@ export default function Yuf2025Page() {
                 Registrations for Youth United Festival 2026 are open. Your
                 spotlight is waiting.
               </p>
+              <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80">
+                Thank you to every participant, volunteer, mentor, teacher,
+                partner and supporter who made Youth United Festival 2025
+                unforgettable.
+              </p>
               <Link
                 href="/register"
                 className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-white px-9 text-base font-semibold text-primary-700 shadow-xl transition hover:bg-white/90"
