@@ -25,6 +25,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Legacy URLs from the old WordPress site that Google still has indexed.
+  // Permanent (308) so search engines transfer ranking to the new path.
+  async redirects() {
+    return [
+      {
+        source: "/about-us",
+        destination: "/about",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
