@@ -44,7 +44,7 @@ export default async function RegisterPage() {
               <Lock size={26} />
             </span>
             <h2 className="font-heading text-2xl font-bold text-heading">
-              Registration is closed
+              {settings.closedTitle}
             </h2>
             <p className="text-text-muted">{settings.closedMessage}</p>
           </div>

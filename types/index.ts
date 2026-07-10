@@ -249,6 +249,8 @@ export interface Partner {
 export interface RegistrationSettings {
   /** Master switch — when false, registration is closed site-wide. */
   open: boolean;
+  /** Heading shown to visitors while registration is closed. */
+  closedTitle: string;
   /** Message shown to visitors while registration is closed. */
   closedMessage: string;
 }

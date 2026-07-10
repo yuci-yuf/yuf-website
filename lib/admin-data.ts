@@ -410,11 +410,12 @@ export async function createCategory(name: string, order: number): Promise<void>
 /** Turn registration on/off site-wide and set the closed message. */
 export async function setRegistrationSettings(
   open: boolean,
+  closedTitle: string,
   closedMessage: string,
 ): Promise<void> {
   await setDoc(
     doc(db, "settings", "registration"),
-    { open, closedMessage: closedMessage.trim() },
+    { open, closedTitle: closedTitle.trim(), closedMessage: closedMessage.trim() },
     { merge: true },
   );
 }
