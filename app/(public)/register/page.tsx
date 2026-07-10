@@ -7,6 +7,7 @@ import { getEvents, getCategoryOrder, getRegistrationSettings } from "@/lib/cms-
 
 export const metadata: Metadata = {
   title: "Register",
+  alternates: { canonical: "/register" },
   description:
     "Register for Youth United Festival 2026. Choose your event category, fill in your details, and complete payment to secure your spot at YUF 2026.",
 };

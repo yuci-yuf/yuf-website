@@ -129,13 +129,14 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
         <p className="line-clamp-2 max-w-xl text-sm leading-relaxed text-white/75">
           {event.description}
         </p>
-        <span
-          className="mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
+        <Link
+          href="/events"
+          className="relative z-20 mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
           style={{ borderColor: st.accent }}
         >
           View Details
           <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-        </span>
+        </Link>
       </div>
     </motion.article>
   );
@@ -278,13 +279,14 @@ function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
         <p className="line-clamp-3 max-w-2xl text-sm leading-relaxed text-white/70">
           {event.description}
         </p>
-        <span
-          className="mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
+        <Link
+          href="/events"
+          className="relative z-20 mt-3 inline-flex w-fit items-center gap-2 border-b-2 pb-1 text-sm font-bold text-white transition-all [text-shadow:0_2px_10px_rgba(0,0,0,0.55)] group-hover:gap-3"
           style={{ borderColor: st.accent }}
         >
           View Details
           <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-        </span>
+        </Link>
       </div>
 
       <Link

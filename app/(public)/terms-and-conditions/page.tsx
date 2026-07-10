@@ -4,6 +4,7 @@ import { termsAndConditions } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
+  alternates: { canonical: "/terms-and-conditions" },
   description:
     "Eligibility, registration, code of conduct, and other terms for participating in the Youth United Festival.",
 };

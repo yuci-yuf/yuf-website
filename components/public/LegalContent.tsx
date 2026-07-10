@@ -5,10 +5,7 @@ export function LegalContent({ data }: { data: LegalPage }) {
   return (
     <>
       <Section className="bg-festival-gradient text-white" containerClassName="max-w-6xl">
-        <p className="text-sm font-semibold uppercase tracking-widest text-highlight-400">
-          {data.updated}
-        </p>
-        <h1 className="mt-3 font-heading text-4xl font-bold sm:text-5xl">
+        <h1 className="font-heading text-4xl font-bold sm:text-5xl">
           {data.title}
         </h1>
         {data.intro && (

@@ -19,6 +19,7 @@ import { FadeUp, FadeIn, StaggerContainer, StaggerItem, ScaleIn } from "@/compon
 
 export const metadata: Metadata = {
   title: "About Us",
+  alternates: { canonical: "/about" },
   description:
     "Learn about Youth United Council of India (YUCI) — our mission, what we do, and how YUF empowers the next generation of leaders, innovators, and changemakers.",
 };

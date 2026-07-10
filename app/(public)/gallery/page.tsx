@@ -6,6 +6,7 @@ import { getGalleryPhotos } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
   title: "Gallery",
+  alternates: { canonical: "/gallery" },
   description:
     "Photos, videos, and highlights from the Youth United Festival — celebrating youth talent, innovation, and unity across India.",
 };

@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/content";
 
 // Canonical origin for metadata, sitemap, and structured data. Update this if
 // the production domain changes (also mirrored in app/sitemap.ts + robots.ts).
-export const SITE_URL = "https://youthunitedfestival.org";
+export const SITE_URL = "https://youthunitedfestival.com";
 
 const poppins = Poppins({
   variable: "--font-poppins",
