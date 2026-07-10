@@ -11,7 +11,8 @@ import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/fires
 import { db } from "@/lib/firebase";
 import type { EventItem, EventLocation, RegistrationSettings } from "@/types";
 
-/** Default copy shown when registration is switched off (no admin message set). */
+/** Default copy shown when registration is switched off (no admin text set). */
+export const DEFAULT_CLOSED_TITLE = "Registration is closed";
 export const DEFAULT_CLOSED_MESSAGE =
   "Registrations are currently closed. Please check back soon.";
 
@@ -26,12 +27,17 @@ export async function getRegistrationSettings(): Promise<RegistrationSettings> {
     const data = snap.exists() ? snap.data() : {};
     return {
       open: data.open !== false,
+      closedTitle: (data.closedTitle as string)?.trim() || DEFAULT_CLOSED_TITLE,
       closedMessage:
         (data.closedMessage as string)?.trim() || DEFAULT_CLOSED_MESSAGE,
     };
   } catch (e) {
     console.error("getRegistrationSettings failed", e);
-    return { open: true, closedMessage: DEFAULT_CLOSED_MESSAGE };
+    return {
+      open: true,
+      closedTitle: DEFAULT_CLOSED_TITLE,
+      closedMessage: DEFAULT_CLOSED_MESSAGE,
+    };
   }
 }
 

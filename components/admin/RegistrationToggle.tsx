@@ -10,9 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { getRegistrationSettings, DEFAULT_CLOSED_MESSAGE } from "@/lib/cms-data";
+import {
+  getRegistrationSettings,
+  DEFAULT_CLOSED_TITLE,
+  DEFAULT_CLOSED_MESSAGE,
+} from "@/lib/cms-data";
 import { setRegistrationSettings } from "@/lib/admin-data";
 
 /**
@@ -22,6 +27,7 @@ import { setRegistrationSettings } from "@/lib/admin-data";
  */
 export function RegistrationToggle() {
   const [open, setOpen] = useState(true);
+  const [title, setTitle] = useState(DEFAULT_CLOSED_TITLE);
   const [message, setMessage] = useState(DEFAULT_CLOSED_MESSAGE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,18 +38,23 @@ export function RegistrationToggle() {
     getRegistrationSettings()
       .then((s) => {
         setOpen(s.open);
+        setTitle(s.closedTitle);
         setMessage(s.closedMessage);
       })
       .catch(() => setError("Couldn't load the current setting."))
       .finally(() => setLoading(false));
   }, []);
 
-  async function save(nextOpen: boolean, nextMessage: string) {
+  async function save(nextOpen: boolean, nextTitle: string, nextMessage: string) {
     setSaving(true);
     setSaved(false);
     setError(null);
     try {
-      await setRegistrationSettings(nextOpen, nextMessage || DEFAULT_CLOSED_MESSAGE);
+      await setRegistrationSettings(
+        nextOpen,
+        nextTitle || DEFAULT_CLOSED_TITLE,
+        nextMessage || DEFAULT_CLOSED_MESSAGE,
+      );
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (e) {
@@ -54,10 +65,10 @@ export function RegistrationToggle() {
     }
   }
 
-  // Flipping the switch saves immediately; the message has its own Save button.
+  // Flipping the switch saves immediately; the text has its own Save button.
   function toggle(next: boolean) {
     setOpen(next);
-    void save(next, message);
+    void save(next, title, message);
   }
 
   return (
@@ -94,8 +105,22 @@ export function RegistrationToggle() {
 
       <CardContent className="flex flex-col gap-3">
         <label
-          htmlFor="reg-closed-message"
+          htmlFor="reg-closed-title"
           className="text-sm font-medium text-text"
+        >
+          Title shown when closed
+        </label>
+        <Input
+          id="reg-closed-title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={DEFAULT_CLOSED_TITLE}
+          disabled={loading}
+        />
+
+        <label
+          htmlFor="reg-closed-message"
+          className="mt-1 text-sm font-medium text-text"
         >
           Message shown when closed
         </label>
@@ -111,10 +136,10 @@ export function RegistrationToggle() {
           <Button
             type="button"
             size="sm"
-            onClick={() => save(open, message)}
+            onClick={() => save(open, title, message)}
             disabled={saving || loading}
           >
-            {saving ? <Loader2 size={16} className="animate-spin" /> : "Save message"}
+            {saving ? <Loader2 size={16} className="animate-spin" /> : "Save text"}
           </Button>
           {saved && (
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-success">
