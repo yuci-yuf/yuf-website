@@ -1,0 +1,33 @@
+# cPanel Git Version Control deployment tasks.
+#
+# Runs when you click "Update from Remote" then "Deploy HEAD Commit" in cPanel,
+# or on push if auto-deploy is wired up. The repository IS the application root
+# (/home/youthuni/repositories/yuf-website), so we install + build in place.
+#
+# NOTE: cPanel runs these tasks with the system shell, which does NOT have the
+# CloudLinux Node.js virtualenv on PATH by default. We source the app's env so
+# `npm`/`node` resolve to the version selected in Node.js Manager (Node 24).
+# Adjust the virtualenv path if your Node.js Manager shows a different one
+# (Node.js Manager → your app → "Enter to the virtual environment" command).
+---
+deployment:
+  tasks:
+    - export APP_ROOT=/home/youthuni/repositories/yuf-website
+    - export NODE_ENV=production
+    # Load the CloudLinux Node.js virtualenv so npm/node are on PATH.
+    - source /home/youthuni/nodevenv/repositories/yuf-website/24/bin/activate
+    - cd $APP_ROOT
+    # Reproducible install from the committed lockfile; omit dev deps at runtime.
+    # `npm ci` wipes node_modules and installs EXACTLY the lockfile — but it also
+    # drops devDependencies with --omit=dev, and Next needs `typescript`,
+    # `@types/*`, tailwind, eslint at BUILD time. So install full deps to build,
+    # then prune dev deps afterward to shrink the runtime footprint.
+    # After `activate`, the virtualenv's bin is on PATH — use bare npm/node so
+    # they resolve to the Node 24 version, NOT a system npm at /bin/npm (which
+    # often doesn't exist on CloudLinux, or points at the wrong Node).
+    - npm ci
+    - npm run build
+    - npm prune --omit=dev
+    # Ask Passenger to reload the app on next request (picks up the new build).
+    - mkdir -p tmp
+    - touch tmp/restart.txt
