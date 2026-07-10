@@ -8,6 +8,7 @@ import { getEvents, getCategoryOrder } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
   title: "Events",
+  alternates: { canonical: "/events" },
   description:
     "Explore all YUF 2026 events — Arts & Culturals, Sports & Games, Indian Youth Parliament, India's Young Scientists, Youth Talent Icon, and more.",
 };

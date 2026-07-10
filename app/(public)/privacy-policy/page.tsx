@@ -4,6 +4,7 @@ import { privacyPolicy } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
+  alternates: { canonical: "/privacy-policy" },
   description:
     "How the Youth United Festival collects, uses, and protects your personal information.",
 };

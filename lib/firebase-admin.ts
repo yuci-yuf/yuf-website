@@ -97,3 +97,25 @@ export async function releaseLocationSlot(
     }
   });
 }
+
+/**
+ * Server-side read of the global registration switch (Admin SDK), so the
+ * create/order routes can reject sign-ups when registration is closed even if
+ * the request bypasses the UI. Defaults to open on any read failure.
+ */
+export async function getRegistrationSettings(
+  adminDb: Firestore,
+): Promise<{ open: boolean; closedMessage: string }> {
+  const FALLBACK =
+    "Registrations are currently closed. Please check back soon.";
+  try {
+    const snap = await adminDb.collection("settings").doc("registration").get();
+    const data = snap.exists ? snap.data()! : {};
+    return {
+      open: data.open !== false,
+      closedMessage: (data.closedMessage as string)?.trim() || FALLBACK,
+    };
+  } catch {
+    return { open: true, closedMessage: FALLBACK };
+  }
+}

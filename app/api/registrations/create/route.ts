@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { getAdminDb, getRegistrationSettings } from "@/lib/firebase-admin";
 import { computeInvoice } from "@/lib/pricing";
 import { generateRegistrationCode } from "@/lib/registration-code";
 
@@ -60,6 +60,13 @@ export async function POST(req: Request) {
   }
 
   const adminDb = getAdminDb();
+
+  // Global switch — refuse sign-ups when registration is closed site-wide.
+  const settings = await getRegistrationSettings(adminDb);
+  if (!settings.open) {
+    return NextResponse.json({ error: settings.closedMessage }, { status: 403 });
+  }
+
   const eventRef = adminDb.collection("events").doc(body.eventId);
   const regRef = adminDb.collection("registrations").doc();
   const code = generateRegistrationCode();

@@ -22,6 +22,7 @@ const SERIF = "font-[family-name:var(--font-instrument)] italic";
 
 export const metadata: Metadata = {
   title: "YUF 2025 — Event Highlights",
+  alternates: { canonical: "/yuf-2025" },
   description:
     "Relive the Youth United Festival 2025 — event highlights, the festival film, distinguished chief guests, and the crowning of champions. Every unforgettable moment in one place.",
 };
@@ -147,7 +148,7 @@ export default function Yuf2025Page() {
                   width={1080}
                   height={540}
                   priority
-                  className="animate-float relative w-full drop-shadow-[0_24px_50px_rgba(16,35,48,0.20)]"
+                  className="relative w-full drop-shadow-[0_24px_50px_rgba(16,35,48,0.20)]"
                 />
               </div>
             </FadeUp>
@@ -398,6 +399,11 @@ export default function Yuf2025Page() {
               <p className="mx-auto mt-5 max-w-xl text-lg text-white/90">
                 Registrations for Youth United Festival 2026 are open. Your
                 spotlight is waiting.
+              </p>
+              <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80">
+                Thank you to every participant, volunteer, mentor, teacher,
+                partner and supporter who made Youth United Festival 2025
+                unforgettable.
               </p>
               <Link
                 href="/register"

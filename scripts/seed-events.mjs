@@ -159,8 +159,52 @@ async function loadEventContent() {
   return merged;
 }
 
-// Flat registration fee applied to every event (₹).
+// Fallback fee (₹) for any event without an explicit entry in FEES below.
 const REGISTRATION_FEE = 200;
+
+// Per-event registration fee (₹) keyed by title, from the official Event
+// Schedule with Fee. Anything not listed falls back to REGISTRATION_FEE.
+// Kho-Kho carries no amount in the schedule, so it uses the fallback.
+const FEES = {
+  // Sports & Games
+  "Cricket": 1000,
+  "Throwball": 700,
+  "Volleyball": 700,
+  "Kabaddi": 700,
+  "Badminton Doubles": 500,
+  "Badminton Singles": 400,
+  "Chess": 500,
+  "Shot Put (Senior)": 300,
+  "Long Jump (Senior)": 300,
+  "High Jump (Senior)": 300,
+  "Yoga": 250,
+  "Silambam": 350,
+  "Swimming": 500,
+  "Table Tennis Singles": 400,
+  // Athletics
+  "100 Metres": 350,
+  "200 Metres": 400,
+  "4×100m Relay (Senior)": 700,
+  // Arts & Culturals
+  "Battle of Bands": 1000,
+  "Solo Singing": 300,
+  "Acoustics / Instrumental": 350,
+  "Solo Dance": 300,
+  "Group Dance": 800,
+  "Poetry": 200,
+  "Face Painting": 300,
+  "Pencil Sketching": 300,
+  "Painting": 300,
+  "Youth Talent Icon": 400,
+  // Technical
+  "Quiz": 300,
+  "Debate": 300,
+  "Indian Youth Parliament": 350,
+  "India's Young Scientist": 350,
+  // Fun Events
+  "Treasure Hunt": 250,
+  "Guess the Song": 250,
+};
 
 // ── Categories (drive the filter tabs on /events) ──
 const CATEGORIES = [
@@ -190,7 +234,7 @@ const SCHEDULE = [
   ["Sports & Games", "Silambam", "Dhanraj Baid Jain College, Thoraipakkam", "11th Sept 2026"],
   ["Sports & Games", "Swimming", "Velammal Bodhi Campus, Ponneri", "7th Sept 2026"],
   ["Sports & Games", "Table Tennis Singles", "Velammal Bodhi Campus, Ponneri", "2nd Sept 2026"],
-  ["Sports & Games", "Kho-Kho", "Chennai", ""],
+  ["Sports & Games", "Kho-Kho", "Chennai", "15th Sept 2026"],
   // II. Athletics
   ["Athletics", "100 Metres", "Velammal Bodhi Campus, Ponneri", "7th Sept 2026"],
   ["Athletics", "200 Metres", "Velammal Bodhi Campus, Ponneri", "7th Sept 2026"],
@@ -341,7 +385,7 @@ function buildEvents(content) {
         category,
         description: c?.about || describe(category, title),
         image: eventImage(category, title),
-        registrationFee: REGISTRATION_FEE,
+        registrationFee: FEES[title] ?? REGISTRATION_FEE,
         isActive: true,
         registrationOpen: true,
         status: "upcoming",

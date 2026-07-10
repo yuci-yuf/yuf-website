@@ -406,6 +406,19 @@ export async function createCategory(name: string, order: number): Promise<void>
   await addDoc(collection(db, "eventCategories"), { name, order });
 }
 
+// ── Global registration settings ──
+/** Turn registration on/off site-wide and set the closed message. */
+export async function setRegistrationSettings(
+  open: boolean,
+  closedMessage: string,
+): Promise<void> {
+  await setDoc(
+    doc(db, "settings", "registration"),
+    { open, closedMessage: closedMessage.trim() },
+    { merge: true },
+  );
+}
+
 export async function updateCategory(
   id: string,
   data: Partial<Omit<EventCategoryDoc, "id">>,
