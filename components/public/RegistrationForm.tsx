@@ -7,9 +7,12 @@ import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import type { EventItem, EventLocation } from "@/types";
 import {
   getEventLocations,
-  locationParts,
   locationSpotsLeft,
 } from "@/lib/event-groups";
+import {
+  loadRazorpay,
+  type RazorpayHandlerResponse,
+} from "@/lib/razorpay-checkout";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -160,8 +163,12 @@ export function RegistrationForm({
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error" | "full"
   >("idle");
+  const [payError, setPayError] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [regCode, setRegCode] = useState<string>("");
+  // Stable across retries of the same submission so the /order route dedupes
+  // instead of reserving a second slot. Regenerated after a success.
+  const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
 
   const setField = (key: keyof FormValues, value: string) => {
     setValues((v) => ({ ...v, [key]: value }));
@@ -302,20 +309,18 @@ export function RegistrationForm({
     // Store just the raw name — the school/college type and standard/year are
     // persisted separately (institutionType / ageCategory), so no suffix here.
     const institution = values.institutionName.trim();
+    // For the confirmation email (sent after payment succeeds).
+    const venue =
+      selectedLocation.address ?? selectedLocation.city ?? "";
+    const eventDate = selectedLocation.date ?? "";
 
     setStatus("submitting");
+    setPayError("");
     try {
-      // Payment is deferred — record the registration server-side (Admin SDK).
-      // The client can't write `registrations` directly (Firestore rules keep
-      // create locked), and the server owns the amount, status, and code so
-      // they can't be forged. When Razorpay is re-enabled, this moves behind
-      // the payment order route instead.
-      const { place, date } = locationParts(selectedLocation);
-      const venue =
-        selectedLocation.address ?? selectedLocation.city ?? place;
-      const eventDate = selectedLocation.date ?? date;
-
-      const res = await fetch("/api/registrations/create", {
+      // ── 1. Reserve the slot + create the Razorpay order (server-side) ──
+      // The server owns the amount, status, and registration code so they can't
+      // be forged; it also holds a per-location slot before payment begins.
+      const res = await fetch("/api/registrations/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -329,6 +334,7 @@ export function RegistrationForm({
           eventId: selectedEvent.id,
           ageCategory: values.level,
           locationId: effectiveLocationId,
+          idempotencyKey: idempotencyKeyRef.current,
         }),
       });
 
@@ -338,34 +344,151 @@ export function RegistrationForm({
           setStatus("full");
           return;
         }
-        throw new Error(`Registration failed (${res.status})`);
+        throw new Error(`Could not start registration (${res.status})`);
       }
 
-      const { code } = (await res.json()) as { code: string };
-      finishSuccess(code);
+      const order = (await res.json()) as {
+        registrationId: string;
+        code: string;
+        free?: boolean;
+        orderId?: string;
+        amount?: number;
+        currency?: string;
+        keyId?: string;
+      };
 
-      // Fire-and-forget confirmation email — never block or fail the success UI.
-      void fetch("/api/registrations/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: values.email.trim(),
-          firstName,
-          eventTitle: selectedEvent.title,
-          date: eventDate,
-          venue,
-          registrationCode: code,
-        }),
-      }).catch(() => {});
+      // Free event → the server already confirmed it, no payment needed.
+      if (order.free) {
+        sendConfirmationEmail(order.code, firstName, eventDate, venue);
+        finishSuccess(order.code);
+        return;
+      }
+
+      if (!order.orderId || !order.keyId || !order.amount) {
+        throw new Error("Payment order is missing required fields.");
+      }
+
+      // ── 2. Open Razorpay Checkout ──
+      const Razorpay = await loadRazorpay();
+      const rzp = new Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency ?? "INR",
+        name: "Youth United Festival",
+        description: selectedEvent.title,
+        order_id: order.orderId,
+        prefill: {
+          name: `${firstName} ${lastName}`.trim(),
+          email: values.email.trim(),
+          contact: values.phone,
+        },
+        notes: { registrationId: order.registrationId, code: order.code },
+        theme: { color: "#6d28d9" },
+        modal: {
+          ondismiss: () => {
+            // User closed the modal without paying — let them retry. The
+            // reserved slot is released by the webhook when the payment is
+            // eventually cancelled/failed, or reused via the idempotency key.
+            setStatus("idle");
+            setPayError(
+              "Payment was not completed. Your spot is held briefly — you can try again.",
+            );
+          },
+        },
+        // ── 3. On success, verify the signature server-side ──
+        handler: (response: RazorpayHandlerResponse) => {
+          void confirmPayment(
+            response,
+            order.registrationId,
+            order.code,
+            firstName,
+            eventDate,
+            venue,
+          );
+        },
+      });
+
+      rzp.on("payment.failed", (resp) => {
+        console.error("Razorpay payment failed:", resp.error);
+        setStatus("idle");
+        setPayError(
+          resp.error?.description ||
+            "Your payment could not be processed. Please try again.",
+        );
+      });
+
+      rzp.open();
     } catch (err) {
       console.error("Registration failed:", err);
       setStatus("error");
     }
   }
 
+  /** Verify the checkout signature server-side, then show the success screen. */
+  async function confirmPayment(
+    response: RazorpayHandlerResponse,
+    registrationId: string,
+    code: string,
+    firstName: string,
+    eventDate: string,
+    venue: string,
+  ) {
+    setStatus("submitting");
+    try {
+      const res = await fetch("/api/payments/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          registrationId,
+        }),
+      });
+      if (!res.ok) throw new Error(`Verification failed (${res.status})`);
+
+      const { code: confirmedCode } = (await res.json()) as { code?: string };
+      sendConfirmationEmail(confirmedCode ?? code, firstName, eventDate, venue);
+      finishSuccess(confirmedCode ?? code);
+    } catch (err) {
+      // Payment went through but our fast-path verify failed. The webhook is
+      // authoritative and will still confirm the registration, so reassure the
+      // user rather than implying the payment was lost.
+      console.error("Payment verification failed:", err);
+      setStatus("idle");
+      setPayError(
+        "Your payment was received but we couldn't confirm it instantly. " +
+          "It will be confirmed shortly and you'll get an email — no need to pay again.",
+      );
+    }
+  }
+
+  /** Fire-and-forget confirmation email — never blocks or fails the success UI. */
+  function sendConfirmationEmail(
+    code: string,
+    firstName: string,
+    date: string,
+    venue: string,
+  ) {
+    void fetch("/api/registrations/email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: values.email.trim(),
+        firstName,
+        eventTitle: selectedEvent?.title,
+        date,
+        venue,
+        registrationCode: code,
+      }),
+    }).catch(() => {});
+  }
+
   function finishSuccess(code?: string) {
     setRegCode(code ?? "");
     setStatus("success");
+    // New submission after this one gets a fresh idempotency key.
+    idempotencyKeyRef.current = crypto.randomUUID();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -912,13 +1035,19 @@ export function RegistrationForm({
 
             <p className="flex items-start gap-2 text-xs text-text-muted">
               <ShieldCheck size={16} className="mt-0.5 shrink-0 text-success" />
-              No payment required now — your spot is reserved and our team will
-              share fee &amp; payment details later. Your details are kept private.
+              Payments are processed securely by Razorpay (UPI, cards, net
+              banking &amp; wallets). Your card details never touch our servers.
+              Registrations are non-refundable.
             </p>
 
+            {payError && (
+              <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+                {payError}
+              </p>
+            )}
             {status === "error" && (
               <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-                Something went wrong saving your registration. Please try again
+                Something went wrong starting your payment. Please try again
                 or contact us.
               </p>
             )}
@@ -936,10 +1065,12 @@ export function RegistrationForm({
             >
               <CheckCircle2 size={18} />
               {status === "submitting"
-                ? "Submitting…"
+                ? "Processing…"
                 : selectedFull
                   ? "Event Full"
-                  : "Complete Registration"}
+                  : invoice
+                    ? `Pay ${formatINR(invoice.total)} & Register`
+                    : "Complete Registration"}
             </Button>
 
             <p className="text-center text-xs text-text-muted">
