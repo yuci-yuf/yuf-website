@@ -54,7 +54,7 @@ export const siteConfig: SiteConfig = {
     phone: "",
     email: "info@youthunitedcouncilofindia.org",
     address:
-      "V Vision, SSPDL, Alpha City It Park, Rajiv Gandhi Salai, Navallur, Chennai, Tamil Nadu 600130",
+      "YUCI, SSPDL, Alpha City It Park, Rajiv Gandhi Salai, Navallur, Chennai, Tamil Nadu 600130",
   },
   copyrightText: "© 2026 Youth United Festival | All Rights Reserved",
   stats: [
