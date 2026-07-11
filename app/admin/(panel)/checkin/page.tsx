@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  BadgeCheck,
   Camera,
   CameraOff,
   Loader2,
@@ -18,63 +19,91 @@ import { PageHeader } from "@/components/admin/AdminUI";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { verifyAndCheckIn, type CheckInResult } from "@/lib/admin-data";
+import {
+  verifyRegistration,
+  checkInRegistration,
+  type CheckInResult,
+  type VerifyResult,
+} from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
 
-type Outcome = CheckInResult["result"];
-
-/** How long a result card stays before the scanner is ready for the next code. */
-const RESULT_HOLD_MS = 3500;
+/** What the result card is currently showing: a lookup, or a final check-in. */
+type View = VerifyResult | CheckInResult;
+type Outcome = View["result"];
 
 export default function CheckInPage() {
   const { user } = useAuth();
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [view, setView] = useState<View | null>(null);
   const [manualCode, setManualCode] = useState("");
   const [checkedInCount, setCheckedInCount] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
-  // Guards against the camera firing many decodes for the same held-up QR while
-  // a verification is in flight or a result is being shown.
+  // Guards against the camera firing many decodes for the same held-up QR. Stays
+  // locked while a result card is on screen so the desk can review at its pace;
+  // cleared by "Scan next" / "Cancel" (reset).
   const lockRef = useRef(false);
 
-  const handleCode = useCallback(
-    async (raw: string) => {
-      if (lockRef.current || !raw.trim()) return;
-      lockRef.current = true;
-      setBusy(true);
-      try {
-        const res = await verifyAndCheckIn(raw, user?.email ?? "admin");
-        setResult(res);
-        if (res.result === "ok") setCheckedInCount((c) => c + 1);
-      } catch (err) {
-        console.error("check-in failed", err);
-        setResult(null);
-        setCameraError("Verification failed. Check your connection and retry.");
-      } finally {
-        setBusy(false);
-        // Hold the result briefly, then unlock for the next scan.
-        window.setTimeout(() => {
-          lockRef.current = false;
-        }, RESULT_HOLD_MS);
-      }
-    },
-    [user],
-  );
+  // Step 1 — look up the pass and show who it belongs to (no check-in yet).
+  const handleVerify = useCallback(async (raw: string) => {
+    if (lockRef.current || !raw.trim()) return;
+    lockRef.current = true;
+    setBusy(true);
+    setView(null);
+    setCameraError(null);
+    try {
+      const res = await verifyRegistration(raw);
+      setView(res);
+    } catch (err) {
+      console.error("verify failed", err);
+      setView(null);
+      setCameraError("Verification failed. Check your connection and retry.");
+      lockRef.current = false; // let the desk try again
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  // Step 2 — after the operator has reviewed the identity, confirm the check-in.
+  const confirmCheckIn = useCallback(async () => {
+    if (!view || view.result !== "eligible") return;
+    const code = view.registration.registrationCode ?? "";
+    setConfirming(true);
+    setCameraError(null);
+    try {
+      const res = await checkInRegistration(code, user?.email ?? "admin");
+      setView(res);
+      if (res.result === "ok") setCheckedInCount((c) => c + 1);
+    } catch (err) {
+      console.error("check-in failed", err);
+      setCameraError("Check-in failed. Check your connection and retry.");
+    } finally {
+      setConfirming(false);
+    }
+  }, [view, user]);
+
+  // Clear the card and arm the scanner for the next pass.
+  const reset = useCallback(() => {
+    setView(null);
+    setCameraError(null);
+    lockRef.current = false;
+  }, []);
 
   const startScanner = useCallback(async () => {
     setCameraError(null);
-    setResult(null);
+    setView(null);
+    lockRef.current = false;
     const reader = new BrowserMultiFormatReader();
     try {
       const controls = await reader.decodeFromVideoDevice(
         undefined,
         videoRef.current!,
         (res) => {
-          if (res) void handleCode(res.getText());
+          if (res) void handleVerify(res.getText());
         },
       );
       controlsRef.current = controls;
@@ -86,7 +115,7 @@ export default function CheckInPage() {
       );
       setScanning(false);
     }
-  }, [handleCode]);
+  }, [handleVerify]);
 
   const stopScanner = useCallback(() => {
     controlsRef.current?.stop();
@@ -103,7 +132,7 @@ export default function CheckInPage() {
     if (!code) return;
     // Manual path bypasses the scan lock so the desk can verify on demand.
     lockRef.current = false;
-    void handleCode(code);
+    void handleVerify(code);
     setManualCode("");
   }
 
@@ -111,7 +140,7 @@ export default function CheckInPage() {
     <>
       <PageHeader
         title="Entry Check-in"
-        description="Scan a participant's QR pass, or type their code if it won't scan."
+        description="Scan a pass, verify the participant's identity, then confirm check-in."
         action={
           <div className="rounded-xl bg-success/10 px-4 py-2 text-center">
             <div className="font-heading text-xl font-bold text-success">
@@ -122,7 +151,7 @@ export default function CheckInPage() {
         }
       />
 
-      <div className="flex flex-col gap-6 p-8 lg:flex-row">
+      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:p-8">
         {/* ── Scanner ── */}
         <div className="flex flex-1 flex-col gap-4">
           <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-border bg-black/90 shadow-card">
@@ -191,11 +220,32 @@ export default function CheckInPage() {
           </form>
         </div>
 
-        {/* ── Result ── */}
-        <div className="flex flex-1 items-start">
-          <ResultCard busy={busy} result={result} />
+        {/* ── Result — inline beside the scanner on desktop ── */}
+        <div className="hidden flex-1 items-start lg:flex">
+          <ResultCard
+            busy={busy}
+            view={view}
+            confirming={confirming}
+            onCheckIn={confirmCheckIn}
+            onReset={reset}
+          />
         </div>
       </div>
+
+      {/* ── Result — popup on mobile so the desk sees it without scrolling ── */}
+      {(busy || view) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 lg:hidden">
+          <div className="max-h-[88vh] w-full max-w-md overflow-y-auto">
+            <ResultCard
+              busy={busy}
+              view={view}
+              confirming={confirming}
+              onCheckIn={confirmCheckIn}
+              onReset={reset}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -204,6 +254,11 @@ const OUTCOME: Record<
   Outcome,
   { title: string; tone: string; Icon: typeof CheckCircle2 }
 > = {
+  eligible: {
+    title: "Confirmed — verify identity",
+    tone: "primary",
+    Icon: BadgeCheck,
+  },
   ok: { title: "Checked in", tone: "success", Icon: CheckCircle2 },
   already: {
     title: "Already checked in",
@@ -220,10 +275,16 @@ const OUTCOME: Record<
 
 function ResultCard({
   busy,
-  result,
+  view,
+  confirming,
+  onCheckIn,
+  onReset,
 }: {
   busy: boolean;
-  result: CheckInResult | null;
+  view: View | null;
+  confirming: boolean;
+  onCheckIn: () => void;
+  onReset: () => void;
 }) {
   if (busy) {
     return (
@@ -232,7 +293,7 @@ function ResultCard({
       </div>
     );
   }
-  if (!result) {
+  if (!view) {
     return (
       <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-surface p-12 text-center text-text-muted shadow-card">
         <Camera size={32} className="opacity-50" />
@@ -241,20 +302,23 @@ function ResultCard({
     );
   }
 
-  const meta = OUTCOME[result.result];
+  const meta = OUTCOME[view.result];
   const Icon = meta.Icon;
   const toneBg = {
+    primary: "bg-primary-50 border-primary-200",
     success: "bg-success/10 border-success/30",
     accent: "bg-accent-50 border-accent-200",
     error: "bg-error/10 border-error/30",
   }[meta.tone]!;
   const toneText = {
+    primary: "text-primary-700",
     success: "text-success",
     accent: "text-accent-700",
     error: "text-error",
   }[meta.tone]!;
 
-  const reg = result.result === "not_found" ? null : result.registration;
+  const reg = view.result === "not_found" ? null : view.registration;
+  const eligible = view.result === "eligible";
 
   return (
     <div
@@ -264,24 +328,29 @@ function ResultCard({
       )}
     >
       <div className={cn("flex items-center gap-3", toneText)}>
-        <Icon size={40} />
+        <Icon size={40} className="shrink-0" />
         <div>
           <div className="font-heading text-2xl font-bold">{meta.title}</div>
-          {result.result === "already" && result.checkedInAt && (
+          {eligible && (
+            <div className="text-sm opacity-80">
+              Check the participant matches these details, then confirm.
+            </div>
+          )}
+          {view.result === "already" && view.checkedInAt && (
             <div className="text-sm opacity-80">
               First scanned{" "}
-              {new Date(result.checkedInAt).toLocaleString("en-IN", {
+              {new Date(view.checkedInAt).toLocaleString("en-IN", {
                 dateStyle: "medium",
                 timeStyle: "short",
               })}
             </div>
           )}
-          {result.result === "not_confirmed" && (
+          {view.result === "not_confirmed" && (
             <div className="text-sm opacity-80">
-              Registration is {result.registration.status} — do not admit.
+              Registration is {view.registration.status} — do not admit.
             </div>
           )}
-          {result.result === "not_found" && (
+          {view.result === "not_found" && (
             <div className="text-sm opacity-80">
               No registration matches this code.
             </div>
@@ -305,6 +374,31 @@ function ResultCard({
           <DetailRow label="Phone" value={reg.phone} />
           <DetailRow label="Code" value={reg.registrationCode ?? ""} mono />
         </div>
+      )}
+
+      {/* ── Actions ── */}
+      {eligible ? (
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            onClick={onCheckIn}
+            disabled={confirming}
+            className="flex-1 bg-success text-white hover:bg-success/90"
+          >
+            {confirming ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <CheckCircle2 size={18} />
+            )}
+            Check in
+          </Button>
+          <Button variant="outline" onClick={onReset} disabled={confirming}>
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button variant="outline" onClick={onReset} className="w-full">
+          Scan next
+        </Button>
       )}
     </div>
   );

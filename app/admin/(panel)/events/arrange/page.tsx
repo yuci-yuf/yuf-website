@@ -182,7 +182,7 @@ export default function ArrangeHomeOrderPage() {
         }
       />
 
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-primary-600" size={32} />

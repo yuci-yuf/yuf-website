@@ -154,7 +154,7 @@ export default function RegistrationsPage() {
         }
       />
 
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-60">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
