@@ -8,7 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
-import { getEventLocations, audienceLabel } from "@/lib/event-groups";
+import {
+  getEventLocations,
+  audienceLabel,
+  eventAudienceLabel,
+  locationAudience,
+} from "@/lib/event-groups";
 import { SITE_URL } from "@/app/layout";
 
 /** Best-effort conversion of a human date label ("2nd Sept 2026") to ISO. */
@@ -28,6 +33,18 @@ function toIsoDate(label?: string): string | undefined {
 function absImage(src?: string): string | undefined {
   if (!src) return undefined;
   return src.startsWith("http") ? src : `${SITE_URL}${src}`;
+}
+
+/**
+ * Turn a Cloudinary file URL into a forced-download URL: insert the
+ * `fl_attachment` flag so the browser downloads the file (Content-Disposition:
+ * attachment) with a friendly name instead of opening it in the PDF viewer.
+ * Non-Cloudinary URLs (e.g. an admin-pasted link) are returned unchanged.
+ */
+function ruleBookDownloadUrl(url: string): string {
+  if (!url.includes("res.cloudinary.com") || url.includes("/fl_attachment"))
+    return url;
+  return url.replace("/upload/", "/upload/fl_attachment:YUF-Rule-Book/");
 }
 
 // Read fresh CMS data on every request so admin edits (including fee changes)
@@ -159,9 +176,9 @@ export default async function EventDetailPage({
               <Badge className="bg-white/15 px-4 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
                 {event.category}
               </Badge>
-              {audienceLabel(event.audience) && (
+              {eventAudienceLabel(event) && (
                 <Badge className="bg-highlight-400/20 px-4 py-1.5 text-sm text-white ring-1 ring-highlight-300/40 backdrop-blur-sm">
-                  {audienceLabel(event.audience)}
+                  {eventAudienceLabel(event)}
                 </Badge>
               )}
             </div>
@@ -190,20 +207,28 @@ export default async function EventDetailPage({
                   )}
                 </>
               ) : (
-                locations.map((loc) => (
-                  <span
-                    key={loc.id}
-                    className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm"
-                  >
-                    <MapPin size={16} className="text-highlight-400" />
-                    {[loc.address, loc.city].filter(Boolean).join(" · ")}
-                    {loc.date && (
-                      <span className="font-semibold text-highlight-300">
-                        · {loc.date}
-                      </span>
-                    )}
-                  </span>
-                ))
+                locations.map((loc) => {
+                  const locAudience = audienceLabel(locationAudience(event, loc));
+                  return (
+                    <span
+                      key={loc.id}
+                      className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm"
+                    >
+                      <MapPin size={16} className="text-highlight-400" />
+                      {[loc.address, loc.city].filter(Boolean).join(" · ")}
+                      {loc.date && (
+                        <span className="font-semibold text-highlight-300">
+                          · {loc.date}
+                        </span>
+                      )}
+                      {locAudience && (
+                        <span className="rounded-full bg-highlight-400/25 px-2 py-0.5 text-xs font-semibold text-white">
+                          {locAudience}
+                        </span>
+                      )}
+                    </span>
+                  );
+                })
               )}
             </div>
           </div>
@@ -355,8 +380,8 @@ export default async function EventDetailPage({
 
             {event.ruleBook && (
               <a
-                href={event.ruleBook}
-                target="_blank"
+                href={ruleBookDownloadUrl(event.ruleBook)}
+                download
                 rel="noopener noreferrer"
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary-300 bg-white px-6 text-[15px] font-semibold text-primary-700 transition-colors hover:border-primary-500 hover:bg-primary-50"
                 style={{ height: "3rem" }}

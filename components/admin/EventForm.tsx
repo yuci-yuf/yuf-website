@@ -56,6 +56,8 @@ interface LocationDraft {
   originalDateLabel: string;
   limit: string;
   count: number;
+  /** Who this specific location is open to (school / college / both). */
+  audience: EventAudience;
 }
 
 let locationKeySeq = 0;
@@ -74,6 +76,7 @@ function emptyLocation(): LocationDraft {
     originalDateLabel: "",
     limit: "",
     count: 0,
+    audience: "both",
   };
 }
 
@@ -193,9 +196,6 @@ export function EventForm({
     event?.registrationFee != null ? String(event.registrationFee) : "",
   );
   const [status, setStatus] = useState<EventStatus>(event?.status ?? "upcoming");
-  const [audience, setAudience] = useState<EventAudience>(
-    event?.audience ?? "both",
-  );
   const [order, setOrder] = useState(String(event?.order ?? ""));
   const [isActive, setIsActive] = useState(event?.isActive ?? true);
   const [registrationOpen, setRegistrationOpen] = useState(
@@ -215,6 +215,8 @@ export function EventForm({
       originalDateLabel: loc.date ?? "",
       limit: loc.registrationLimit != null ? String(loc.registrationLimit) : "",
       count: loc.registrationCount ?? 0,
+      // Fall back to the legacy event-level audience for old events.
+      audience: loc.audience ?? event?.audience ?? "both",
     }));
   });
   const [details, setDetails] = useState((event?.details ?? []).join("\n"));
@@ -289,6 +291,7 @@ export function EventForm({
           date,
           registrationLimit: l.limit.trim() ? Number(l.limit) : undefined,
           registrationCount: l.count,
+          audience: l.audience,
         };
       });
 
@@ -314,7 +317,9 @@ export function EventForm({
       registrationOpen,
       order: order.trim() ? Number(order) : 0,
       status,
-      audience,
+      // "Open to" is now per-location (see builtLocations); clear the legacy
+      // event-level audience so there's a single source of truth.
+      audience: undefined,
       locations: builtLocations,
       // Legacy flat fields are superseded by `locations`; clear them so there's
       // a single source of truth.
@@ -409,7 +414,7 @@ export function EventForm({
           Registration &amp; scheduling
         </h2>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           <Field
             label="Registration Fee (₹)"
             htmlFor="ev-fee"
@@ -423,27 +428,6 @@ export function EventForm({
               onChange={(e) => setFee(e.target.value)}
               placeholder="0 (free)"
             />
-          </Field>
-          <Field
-            label="Open to"
-            htmlFor="ev-audience"
-            description="Who can register for this event."
-          >
-            <Select
-              value={audience}
-              onValueChange={(v) => setAudience(v as EventAudience)}
-            >
-              <SelectTrigger id="ev-audience" className="w-full">
-                <SelectValue placeholder="School & College" />
-              </SelectTrigger>
-              <SelectContent>
-                {AUDIENCES.map((a) => (
-                  <SelectItem key={a.value} value={a.value}>
-                    {a.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </Field>
           <Field
             label="Status"
@@ -541,7 +525,7 @@ export function EventForm({
                 )}
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Field label="City" htmlFor={`loc-city-${loc.key}`} required>
                   <Input
                     id={`loc-city-${loc.key}`}
@@ -583,6 +567,28 @@ export function EventForm({
                     }
                     placeholder="Unlimited"
                   />
+                </Field>
+                <Field label="Open to" htmlFor={`loc-audience-${loc.key}`}>
+                  <Select
+                    value={loc.audience}
+                    onValueChange={(v) =>
+                      updateLocation(loc.key, { audience: v as EventAudience })
+                    }
+                  >
+                    <SelectTrigger
+                      id={`loc-audience-${loc.key}`}
+                      className="w-full"
+                    >
+                      <SelectValue placeholder="School & College" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AUDIENCES.map((a) => (
+                        <SelectItem key={a.value} value={a.value}>
+                          {a.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </div>
             </div>

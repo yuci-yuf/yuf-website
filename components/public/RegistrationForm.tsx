@@ -7,6 +7,7 @@ import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import type { EventItem, EventLocation } from "@/types";
 import {
   getEventLocations,
+  locationAudience,
   locationSpotsLeft,
 } from "@/lib/event-groups";
 import {
@@ -54,14 +55,28 @@ function locationLabel(loc: EventLocation): string {
 }
 
 /**
- * True if the event is open to the given student type. An event with audience
- * "both" (or unset) accepts anyone; otherwise it must match. Before the student
- * picks school/college (`type === ""`), everything is allowed.
+ * True if a specific location is open to the given student type. A location with
+ * audience "both" (or unset) accepts anyone; otherwise it must match. Before the
+ * student picks school/college (`type === ""`), everything is allowed. Audience
+ * is per-location, falling back to the event-level value for legacy events.
+ */
+function locationForStudentType(
+  ev: EventItem,
+  loc: EventLocation,
+  type: InstitutionType,
+): boolean {
+  if (!type) return true;
+  const audience = locationAudience(ev, loc);
+  return audience === "both" || audience === type;
+}
+
+/**
+ * True if the event has ANY location open to the given student type — used to
+ * decide whether the event/category is offered at all.
  */
 function eventForStudentType(ev: EventItem, type: InstitutionType): boolean {
   if (!type) return true;
-  const audience = ev.audience ?? "both";
-  return audience === "both" || audience === type;
+  return getEventLocations(ev).some((l) => locationForStudentType(ev, l, type));
 }
 
 /** School class levels (6th–12th). */
@@ -169,12 +184,14 @@ export function RegistrationForm({
   // that before choosing a category/event. The venue is picked afterwards.
   const canChooseEvent = !!values.institutionType;
 
-  // All venues/dates the selected event runs in — the participant picks between
-  // them. Fee is shared across venues.
+  // The venues/dates the selected event runs in that are open to the student's
+  // type — a College student only sees the college venues, etc. Fee is shared.
   const locationsForSelection = useMemo(() => {
     if (!selectedEvent) return [];
-    return getEventLocations(selectedEvent);
-  }, [selectedEvent]);
+    return getEventLocations(selectedEvent).filter((l) =>
+      locationForStudentType(selectedEvent, l, values.institutionType),
+    );
+  }, [selectedEvent, values.institutionType]);
 
   // When an event has just one location in the city, use it implicitly so the
   // participant isn't asked to "choose" from a list of one.

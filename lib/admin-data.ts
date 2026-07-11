@@ -10,6 +10,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDocs,
   limit,
@@ -286,6 +287,7 @@ function prepareLocationsForWrite(
     if (loc.date) out.date = loc.date;
     if (typeof loc.registrationLimit === "number")
       out.registrationLimit = loc.registrationLimit;
+    if (loc.audience) out.audience = loc.audience;
     return out;
   });
 }
@@ -309,10 +311,17 @@ export async function updateEvent(
 ): Promise<void> {
   const hasLocations = "locations" in data;
   const locations = prepareLocationsForWrite(data.locations, true);
-  await updateDoc(doc(db, "events", id), {
-    ...stripUndefined(data),
-    ...(hasLocations ? { locations: locations ?? [] } : {}),
-  });
+  // Map any explicitly-cleared field (undefined) to deleteField() so it is
+  // REMOVED from the doc rather than left untouched — otherwise clearing an
+  // optional field (e.g. the rule book) has no effect on an update. Fields not
+  // present in `data` are never touched.
+  const payload: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (key === "locations") continue; // handled below
+    payload[key] = value === undefined ? deleteField() : value;
+  }
+  if (hasLocations) payload.locations = locations ?? [];
+  await updateDoc(doc(db, "events", id), payload);
 }
 
 /**
