@@ -242,6 +242,11 @@ export interface Partner {
   name: string;
   logoUrl?: string;
   link?: string;
+  /**
+   * Render this logo larger in the partner strip. Use for tall/square marks
+   * that otherwise look small next to wide, text-heavy logos at the same height.
+   */
+  prominent?: boolean;
 }
 
 // ── Global registration settings (Firestore `settings/registration`) ──
