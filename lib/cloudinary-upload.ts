@@ -30,10 +30,17 @@ export interface UploadResult {
 /**
  * Upload a single file to Cloudinary and return its secure URL + dimensions.
  * Throws if Cloudinary is not configured or the upload fails.
+ *
+ * `resourceType` picks the Cloudinary endpoint: "image" (default) for photos,
+ * or "raw" for documents like PDFs. Raw files are delivered as-is and are NOT
+ * subject to the account's "PDF & ZIP delivery" restriction, so a rule-book PDF
+ * uploaded as raw downloads without needing that setting enabled. Raw uploads
+ * have no width/height, so those default to 0.
  */
 export async function uploadToCloudinary(
   file: File,
   folder = "yuf-website/uploads",
+  resourceType: "image" | "raw" = "image",
 ): Promise<UploadResult> {
   if (!CLOUD_NAME || !UPLOAD_PRESET) {
     throw new Error(
@@ -47,7 +54,7 @@ export async function uploadToCloudinary(
   form.append("folder", folder);
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`,
     { method: "POST", body: form },
   );
 
@@ -65,7 +72,7 @@ export async function uploadToCloudinary(
   const data = await res.json();
   return {
     url: data.secure_url as string,
-    width: data.width as number,
-    height: data.height as number,
+    width: (data.width as number) ?? 0,
+    height: (data.height as number) ?? 0,
   };
 }

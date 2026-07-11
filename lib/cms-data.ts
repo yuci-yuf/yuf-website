@@ -55,6 +55,10 @@ export function normalizeLocations(raw: unknown): EventLocation[] | undefined {
         typeof l.registrationLimit === "number" ? l.registrationLimit : undefined,
       registrationCount:
         typeof l.registrationCount === "number" ? l.registrationCount : 0,
+      audience:
+        l.audience === "school" || l.audience === "college" || l.audience === "both"
+          ? (l.audience as EventLocation["audience"])
+          : undefined,
     }));
   return locations.length > 0 ? locations : undefined;
 }

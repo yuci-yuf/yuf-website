@@ -142,6 +142,12 @@ export interface EventLocation {
   registrationLimit?: number;
   /** Running count of registrations for this location. Defaults to 0. */
   registrationCount?: number;
+  /**
+   * Who THIS location is open to — school, college, or both. Lets one event run
+   * a school-only date in one city and a college-only date in another. Defaults
+   * to "both" (falling back to the event-level `audience` for legacy events).
+   */
+  audience?: EventAudience;
 }
 
 export interface EventItem {

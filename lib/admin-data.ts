@@ -10,6 +10,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDocs,
   limit,
@@ -105,6 +106,51 @@ export type CheckInResult =
   | { result: "not_found" };
 
 /**
+ * Result of a lookup-only verification (no write). `eligible` means the code
+ * belongs to a confirmed registration that hasn't been checked in yet, so the
+ * desk can review the identity and then confirm the check-in.
+ */
+export type VerifyResult =
+  | { result: "eligible"; registration: Registration }
+  | { result: "already"; registration: Registration; checkedInAt: string | null }
+  | { result: "not_confirmed"; registration: Registration }
+  | { result: "not_found" };
+
+/**
+ * Look up a registration by its code WITHOUT checking it in. Used by the entry
+ * desk to display who the pass belongs to so the operator can verify identity
+ * before admitting them (the actual check-in is a separate confirm step —
+ * `checkInRegistration`).
+ */
+export async function verifyRegistration(
+  rawCode: string,
+): Promise<VerifyResult> {
+  const code = normalizeCode(rawCode);
+  if (!code) return { result: "not_found" };
+
+  const q = query(
+    collection(db, "registrations"),
+    where("registrationCode", "==", code),
+    limit(1),
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return { result: "not_found" };
+
+  const registration = mapRegistration(snap.docs[0].id, snap.docs[0].data());
+  if (registration.status !== "confirmed") {
+    return { result: "not_confirmed", registration };
+  }
+  if (registration.checkedIn) {
+    return {
+      result: "already",
+      registration,
+      checkedInAt: registration.checkedInAt ?? null,
+    };
+  }
+  return { result: "eligible", registration };
+}
+
+/**
  * Pull the registration code out of a scanned QR value. The QR encodes the raw
  * code, but tolerate a full URL (…/YUF26-XXXXXX) or surrounding whitespace so a
  * pass scanned from a different source still resolves. Uppercased to match how
@@ -121,9 +167,10 @@ export function normalizeCode(raw: string): string {
  * confirmed registration that hasn't been used, atomically mark it checked in.
  *
  * The transaction guarantees single-use: if two desks scan the same pass at
- * once, exactly one gets `ok` and the other gets `already`.
+ * once, exactly one gets `ok` and the other gets `already`. Called only after
+ * the operator has reviewed the identity (see `verifyRegistration`).
  */
-export async function verifyAndCheckIn(
+export async function checkInRegistration(
   rawCode: string,
   by: string,
 ): Promise<CheckInResult> {
@@ -240,6 +287,7 @@ function prepareLocationsForWrite(
     if (loc.date) out.date = loc.date;
     if (typeof loc.registrationLimit === "number")
       out.registrationLimit = loc.registrationLimit;
+    if (loc.audience) out.audience = loc.audience;
     return out;
   });
 }
@@ -263,10 +311,17 @@ export async function updateEvent(
 ): Promise<void> {
   const hasLocations = "locations" in data;
   const locations = prepareLocationsForWrite(data.locations, true);
-  await updateDoc(doc(db, "events", id), {
-    ...stripUndefined(data),
-    ...(hasLocations ? { locations: locations ?? [] } : {}),
-  });
+  // Map any explicitly-cleared field (undefined) to deleteField() so it is
+  // REMOVED from the doc rather than left untouched — otherwise clearing an
+  // optional field (e.g. the rule book) has no effect on an update. Fields not
+  // present in `data` are never touched.
+  const payload: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (key === "locations") continue; // handled below
+    payload[key] = value === undefined ? deleteField() : value;
+  }
+  if (hasLocations) payload.locations = locations ?? [];
+  await updateDoc(doc(db, "events", id), payload);
 }
 
 /**

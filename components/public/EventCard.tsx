@@ -3,12 +3,12 @@ import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle } from "@/lib/category-style";
-import { getEventLocations, audienceLabel } from "@/lib/event-groups";
+import { getEventLocations, eventAudienceLabel } from "@/lib/event-groups";
 
 export function EventCard({ event }: { event: EventItem }) {
   const style = categoryStyle(event.category);
   const Icon = style.icon;
-  const audience = audienceLabel(event.audience);
+  const audience = eventAudienceLabel(event);
 
   // Location-aware meta: keep the card to two lines — one for date(s), one for
   // place(s) — even when the event runs in multiple places. Multi-location

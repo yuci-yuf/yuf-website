@@ -7,15 +7,16 @@ import {
   uploadToCloudinary,
 } from "@/lib/cloudinary-upload";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 /** Max single upload size for a rule-book PDF. */
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
 /**
  * Optional rule-book PDF uploader for the admin event form. Enforces a 10 MB
- * limit and PDF-only files. Reuses the unsigned Cloudinary upload (the image
- * endpoint accepts PDFs and returns a downloadable secure URL). Falls back to a
- * URL input when Cloudinary isn't configured.
+ * limit and PDF-only files, and supports drag-and-drop. Uploads to Cloudinary
+ * (requires the account's "PDF & ZIP delivery" setting to be enabled). Falls
+ * back to a URL input when Cloudinary isn't configured.
  */
 export function PdfUploader({
   value,
@@ -28,6 +29,7 @@ export function PdfUploader({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const configured = isCloudinaryConfigured();
 
@@ -49,6 +51,10 @@ export function PdfUploader({
     setError(null);
     setUploading(true);
     try {
+      // Upload as an image-type resource: with "PDF & ZIP delivery" enabled on
+      // the account, image-type PDFs deliver fine AND support the fl_attachment
+      // flag used to force a direct download (transformations, incl.
+      // fl_attachment, are ignored on Cloudinary "raw" files).
       const result = await uploadToCloudinary(file, folder);
       onChange(result.url);
     } catch (e) {
@@ -58,6 +64,13 @@ export function PdfUploader({
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    if (uploading) return;
+    handleFile(e.dataTransfer.files?.[0]);
   }
 
   // Uploaded state — show the file with a view + remove control.
@@ -108,17 +121,37 @@ export function PdfUploader({
         type="button"
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="flex h-24 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border text-sm text-text-muted transition-colors hover:border-primary-300 hover:text-primary-700 disabled:opacity-60"
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!uploading) setDragging(true);
+        }}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          if (!uploading) setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        className={cn(
+          "flex h-24 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed text-sm transition-colors disabled:opacity-60",
+          dragging
+            ? "border-primary-500 bg-primary-50 text-primary-700"
+            : "border-border text-text-muted hover:border-primary-300 hover:text-primary-700",
+        )}
       >
         {uploading ? (
           <>
             <Loader2 size={20} className="animate-spin" />
             Uploading…
           </>
+        ) : dragging ? (
+          <>
+            <Upload size={20} />
+            Drop the PDF to upload
+          </>
         ) : (
           <>
             <Upload size={20} />
-            Upload rule book (PDF, max 10 MB)
+            Drag &amp; drop or click to upload (PDF, max 10 MB)
           </>
         )}
       </button>

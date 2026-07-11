@@ -7,9 +7,13 @@ import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import type { EventItem, EventLocation } from "@/types";
 import {
   getEventLocations,
-  locationParts,
+  locationAudience,
   locationSpotsLeft,
 } from "@/lib/event-groups";
+import {
+  loadRazorpay,
+  type RazorpayHandlerResponse,
+} from "@/lib/razorpay-checkout";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,39 +40,43 @@ function cityOf(loc: EventLocation): string {
   return (loc.city ?? "").trim();
 }
 
-/** True if an event location is in the given city (case-insensitive match). */
-function locationInCity(loc: EventLocation, city: string): boolean {
-  if (!city) return false;
-  return cityOf(loc).toLowerCase() === city.trim().toLowerCase();
-}
-
-/** True if any of the event's locations is in the given city. */
-function eventInCity(ev: EventItem, city: string): boolean {
-  if (!city) return false;
-  return getEventLocations(ev).some((l) => locationInCity(l, city));
-}
-
 /**
- * Participant-facing label for a location: full address, then city, then date
- * (e.g. "Velammal Bodhi Campus, Ponneri · Chennai · 2nd Sept 2026"). Any empty
- * part is dropped so short data still reads cleanly.
+ * Participant-facing label for a venue: the full street address (falling back
+ * to the city only when no address is set), then the date — e.g. "Velammal
+ * Bodhi Campus, Ponneri · 2nd Sept 2026". Any empty part is dropped so short
+ * data still reads cleanly.
  */
 function locationLabel(loc: EventLocation): string {
   const address = (loc.address ?? "").trim(); // full street address
   const city = cityOf(loc);
   const date = (loc.date ?? "").trim();
-  return [address, city, date].filter(Boolean).join(" · ");
+  const place = address || city; // prefer the address over the bare city
+  return [place, date].filter(Boolean).join(" · ");
 }
 
 /**
- * True if the event is open to the given student type. An event with audience
- * "both" (or unset) accepts anyone; otherwise it must match. Before the student
- * picks school/college (`type === ""`), everything is allowed.
+ * True if a specific location is open to the given student type. A location with
+ * audience "both" (or unset) accepts anyone; otherwise it must match. Before the
+ * student picks school/college (`type === ""`), everything is allowed. Audience
+ * is per-location, falling back to the event-level value for legacy events.
+ */
+function locationForStudentType(
+  ev: EventItem,
+  loc: EventLocation,
+  type: InstitutionType,
+): boolean {
+  if (!type) return true;
+  const audience = locationAudience(ev, loc);
+  return audience === "both" || audience === type;
+}
+
+/**
+ * True if the event has ANY location open to the given student type — used to
+ * decide whether the event/category is offered at all.
  */
 function eventForStudentType(ev: EventItem, type: InstitutionType): boolean {
   if (!type) return true;
-  const audience = ev.audience ?? "both";
-  return audience === "both" || audience === type;
+  return getEventLocations(ev).some((l) => locationForStudentType(ev, l, type));
 }
 
 /** School class levels (6th–12th). */
@@ -83,7 +91,6 @@ interface FormValues {
   lastName: string;
   phone: string;
   email: string;
-  location: string;
   institutionType: InstitutionType;
   institutionName: string; // name of the school / college
   level: string; // standard (school) or year (college)
@@ -94,7 +101,6 @@ const EMPTY: FormValues = {
   lastName: "",
   phone: "",
   email: "",
-  location: "",
   institutionType: "",
   institutionName: "",
   level: "",
@@ -115,42 +121,14 @@ export function RegistrationForm({
   const preselectedLoc = searchParams.get("loc");
   const preselected = events.find((e) => e.id === preselectedId);
 
-  // Cities offered in the "Your location" dropdown, derived from the events'
-  // data (each location's City field) — no hardcoded list, so adding an
-  // event in a new city automatically surfaces it here. De-duplicated
-  // case-insensitively, keeping the first spelling an admin used, in first-seen
-  // order.
-  const cities = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const ev of events) {
-      for (const loc of getEventLocations(ev)) {
-        const city = cityOf(loc);
-        if (city && !seen.has(city.toLowerCase())) {
-          seen.set(city.toLowerCase(), city);
-        }
-      }
-    }
-    return Array.from(seen.values());
-  }, [events]);
-
   // Deep-link (?event=&loc=): the explicitly chosen location, if any. Only an
-  // explicit ?loc pre-selects a location — otherwise a multi-location event
-  // starts with none chosen so the user must consciously pick the date/place.
+  // explicit ?loc pre-selects a venue — otherwise a multi-venue event starts
+  // with none chosen so the user must consciously pick the venue/date.
   const explicitLocation = preselected
     ? getEventLocations(preselected).find((l) => l.id === preselectedLoc)
     : undefined;
-  // For pre-filling the city, fall back to the event's first location so the
-  // city-filtered dropdowns include the event even without an explicit ?loc.
-  const cityHintLocation =
-    explicitLocation ??
-    (preselected ? getEventLocations(preselected)[0] : undefined);
-  const preselectedCity =
-    preselected && cityHintLocation ? cityOf(cityHintLocation) : "";
 
-  const [values, setValues] = useState<FormValues>({
-    ...EMPTY,
-    location: preselectedCity,
-  });
+  const [values, setValues] = useState<FormValues>({ ...EMPTY });
   const [category, setCategory] = useState<string>(preselected?.category ?? "");
   const [eventId, setEventId] = useState<string>(preselected?.id ?? "");
   const [locationId, setLocationId] = useState<string>(
@@ -160,8 +138,12 @@ export function RegistrationForm({
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error" | "full"
   >("idle");
+  const [payError, setPayError] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [regCode, setRegCode] = useState<string>("");
+  // Stable across retries of the same submission so the /order route dedupes
+  // instead of reserving a second slot. Regenerated after a success.
+  const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
 
   const setField = (key: keyof FormValues, value: string) => {
     setValues((v) => ({ ...v, [key]: value }));
@@ -169,53 +151,47 @@ export function RegistrationForm({
   };
 
   // Categories that have at least one event open to the student's type
-  // (school/college) AND running in the chosen city.
+  // (school/college).
   const availableCategories = useMemo(() => {
     return categories.filter((c) =>
       events.some(
         (e) =>
           e.category === c &&
-          eventForStudentType(e, values.institutionType) &&
-          eventInCity(e, values.location),
+          eventForStudentType(e, values.institutionType),
       ),
     );
-  }, [categories, events, values.institutionType, values.location]);
+  }, [categories, events, values.institutionType]);
 
-  // Events for the picker (filtered by the student's school/college type AND the
-  // chosen city): the selected category first, then every other eligible event
-  // below it — so a participant can still reach events outside the category.
+  // Events for the picker (filtered by the student's school/college type): the
+  // selected category first, then every other eligible event below it — so a
+  // participant can still reach events outside the category.
   const { primaryEvents, otherEvents } = useMemo(() => {
     if (!category) {
       return { primaryEvents: [] as EventItem[], otherEvents: [] as EventItem[] };
     }
-    const eligible = events.filter(
-      (e) =>
-        eventForStudentType(e, values.institutionType) &&
-        eventInCity(e, values.location),
+    const eligible = events.filter((e) =>
+      eventForStudentType(e, values.institutionType),
     );
     return {
       primaryEvents: eligible.filter((e) => e.category === category),
       otherEvents: eligible.filter((e) => e.category !== category),
     };
-  }, [events, category, values.institutionType, values.location]);
+  }, [events, category, values.institutionType]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
 
-  // The category/event lists are filtered by BOTH school/college and city, so
-  // the user must pick both before choosing a category/event.
-  const canChooseEvent = !!values.institutionType && !!values.location;
+  // The category/event lists are gated on school/college, so the user must pick
+  // that before choosing a category/event. The venue is picked afterwards.
+  const canChooseEvent = !!values.institutionType;
 
-  // All locations of the selected event (what the participant picks between).
-  // Fee is shared across locations.
+  // The venues/dates the selected event runs in that are open to the student's
+  // type — a College student only sees the college venues, etc. Fee is shared.
   const locationsForSelection = useMemo(() => {
     if (!selectedEvent) return [];
-    const all = getEventLocations(selectedEvent);
-    // Only offer the locations that are in the city the participant picked, so
-    // choosing "Chennai" never shows a Coimbatore date and vice-versa.
-    return values.location
-      ? all.filter((l) => locationInCity(l, values.location))
-      : all;
-  }, [selectedEvent, values.location]);
+    return getEventLocations(selectedEvent).filter((l) =>
+      locationForStudentType(selectedEvent, l, values.institutionType),
+    );
+  }, [selectedEvent, values.institutionType]);
 
   // When an event has just one location in the city, use it implicitly so the
   // participant isn't asked to "choose" from a list of one.
@@ -246,7 +222,6 @@ export function RegistrationForm({
       e.phone = "Enter a valid 10-digit mobile number.";
     if (!EMAIL_RE.test(values.email.trim()))
       e.email = "Please enter a valid email address.";
-    if (!values.location) e.location = "Please select your city.";
     if (!values.institutionType)
       e.institutionType = "Please choose school or college.";
     else {
@@ -263,9 +238,9 @@ export function RegistrationForm({
     }
     if (!category) e.category = "Please choose a category.";
     if (!eventId) e.event = "Please choose an event.";
-    // A location must be chosen whenever the event offers more than one.
+    // A venue must be chosen whenever the event runs in more than one place.
     if (eventId && locationsForSelection.length > 1 && !selectedLocation)
-      e.eventLocation = "Please choose a location.";
+      e.eventLocation = "Please select a venue.";
     return e;
   }
 
@@ -302,20 +277,23 @@ export function RegistrationForm({
     // Store just the raw name — the school/college type and standard/year are
     // persisted separately (institutionType / ageCategory), so no suffix here.
     const institution = values.institutionName.trim();
+    // For the confirmation email (sent after payment succeeds).
+    const venue =
+      selectedLocation.address ?? selectedLocation.city ?? "";
+    const eventDate = selectedLocation.date ?? "";
+    // The participant's location is now taken from the venue they picked (the
+    // standalone city field was removed) — prefer the address, fall back to city.
+    const participantLocation =
+      (selectedLocation.address ?? "").trim() ||
+      (selectedLocation.city ?? "").trim();
 
     setStatus("submitting");
+    setPayError("");
     try {
-      // Payment is deferred — record the registration server-side (Admin SDK).
-      // The client can't write `registrations` directly (Firestore rules keep
-      // create locked), and the server owns the amount, status, and code so
-      // they can't be forged. When Razorpay is re-enabled, this moves behind
-      // the payment order route instead.
-      const { place, date } = locationParts(selectedLocation);
-      const venue =
-        selectedLocation.address ?? selectedLocation.city ?? place;
-      const eventDate = selectedLocation.date ?? date;
-
-      const res = await fetch("/api/registrations/create", {
+      // ── 1. Reserve the slot + create the Razorpay order (server-side) ──
+      // The server owns the amount, status, and registration code so they can't
+      // be forged; it also holds a per-location slot before payment begins.
+      const res = await fetch("/api/registrations/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -323,12 +301,13 @@ export function RegistrationForm({
           lastName,
           email: values.email.trim(),
           phone: values.phone,
-          location: values.location,
+          location: participantLocation,
           institution,
           institutionType: values.institutionType,
           eventId: selectedEvent.id,
           ageCategory: values.level,
           locationId: effectiveLocationId,
+          idempotencyKey: idempotencyKeyRef.current,
         }),
       });
 
@@ -338,34 +317,151 @@ export function RegistrationForm({
           setStatus("full");
           return;
         }
-        throw new Error(`Registration failed (${res.status})`);
+        throw new Error(`Could not start registration (${res.status})`);
       }
 
-      const { code } = (await res.json()) as { code: string };
-      finishSuccess(code);
+      const order = (await res.json()) as {
+        registrationId: string;
+        code: string;
+        free?: boolean;
+        orderId?: string;
+        amount?: number;
+        currency?: string;
+        keyId?: string;
+      };
 
-      // Fire-and-forget confirmation email — never block or fail the success UI.
-      void fetch("/api/registrations/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: values.email.trim(),
-          firstName,
-          eventTitle: selectedEvent.title,
-          date: eventDate,
-          venue,
-          registrationCode: code,
-        }),
-      }).catch(() => {});
+      // Free event → the server already confirmed it, no payment needed.
+      if (order.free) {
+        sendConfirmationEmail(order.code, firstName, eventDate, venue);
+        finishSuccess(order.code);
+        return;
+      }
+
+      if (!order.orderId || !order.keyId || !order.amount) {
+        throw new Error("Payment order is missing required fields.");
+      }
+
+      // ── 2. Open Razorpay Checkout ──
+      const Razorpay = await loadRazorpay();
+      const rzp = new Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency ?? "INR",
+        name: "Youth United Festival",
+        description: selectedEvent.title,
+        order_id: order.orderId,
+        prefill: {
+          name: `${firstName} ${lastName}`.trim(),
+          email: values.email.trim(),
+          contact: values.phone,
+        },
+        notes: { registrationId: order.registrationId, code: order.code },
+        theme: { color: "#6d28d9" },
+        modal: {
+          ondismiss: () => {
+            // User closed the modal without paying — let them retry. The
+            // reserved slot is released by the webhook when the payment is
+            // eventually cancelled/failed, or reused via the idempotency key.
+            setStatus("idle");
+            setPayError(
+              "Payment was not completed. Your spot is held briefly — you can try again.",
+            );
+          },
+        },
+        // ── 3. On success, verify the signature server-side ──
+        handler: (response: RazorpayHandlerResponse) => {
+          void confirmPayment(
+            response,
+            order.registrationId,
+            order.code,
+            firstName,
+            eventDate,
+            venue,
+          );
+        },
+      });
+
+      rzp.on("payment.failed", (resp) => {
+        console.error("Razorpay payment failed:", resp.error);
+        setStatus("idle");
+        setPayError(
+          resp.error?.description ||
+            "Your payment could not be processed. Please try again.",
+        );
+      });
+
+      rzp.open();
     } catch (err) {
       console.error("Registration failed:", err);
       setStatus("error");
     }
   }
 
+  /** Verify the checkout signature server-side, then show the success screen. */
+  async function confirmPayment(
+    response: RazorpayHandlerResponse,
+    registrationId: string,
+    code: string,
+    firstName: string,
+    eventDate: string,
+    venue: string,
+  ) {
+    setStatus("submitting");
+    try {
+      const res = await fetch("/api/payments/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          registrationId,
+        }),
+      });
+      if (!res.ok) throw new Error(`Verification failed (${res.status})`);
+
+      const { code: confirmedCode } = (await res.json()) as { code?: string };
+      sendConfirmationEmail(confirmedCode ?? code, firstName, eventDate, venue);
+      finishSuccess(confirmedCode ?? code);
+    } catch (err) {
+      // Payment went through but our fast-path verify failed. The webhook is
+      // authoritative and will still confirm the registration, so reassure the
+      // user rather than implying the payment was lost.
+      console.error("Payment verification failed:", err);
+      setStatus("idle");
+      setPayError(
+        "Your payment was received but we couldn't confirm it instantly. " +
+          "It will be confirmed shortly and you'll get an email — no need to pay again.",
+      );
+    }
+  }
+
+  /** Fire-and-forget confirmation email — never blocks or fails the success UI. */
+  function sendConfirmationEmail(
+    code: string,
+    firstName: string,
+    date: string,
+    venue: string,
+  ) {
+    void fetch("/api/registrations/email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: values.email.trim(),
+        firstName,
+        eventTitle: selectedEvent?.title,
+        date,
+        venue,
+        registrationCode: code,
+      }),
+    }).catch(() => {});
+  }
+
   function finishSuccess(code?: string) {
     setRegCode(code ?? "");
     setStatus("success");
+    // New submission after this one gets a fresh idempotency key.
+    idempotencyKeyRef.current = crypto.randomUUID();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -512,7 +608,7 @@ export function RegistrationForm({
               </Field>
             </div>
 
-            {/* School/college + location — side by side */}
+            {/* School/college + name — side by side */}
             <div className="grid gap-5 sm:grid-cols-2">
             {/* School / College dropdown */}
             <Field
@@ -530,7 +626,7 @@ export function RegistrationForm({
                       level: "",
                     }));
                     // Changing school/college changes which events are eligible,
-                    // so clear any category/event/location chosen.
+                    // so clear any category/event/venue chosen.
                     setCategory("");
                     setEventId("");
                     setLocationId("");
@@ -560,83 +656,40 @@ export function RegistrationForm({
               </>
             </Field>
 
-            {/* Your location */}
-            <Field
-              label="Location"
-              htmlFor="location"
-              required
-            >
-              <>
-                <Select
-                  value={values.location}
-                  onValueChange={(v) => {
-                    // Changing city changes which events are available,
-                    // so clear any category/event/location for the old city.
-                    setValues((prev) => ({ ...prev, location: v }));
-                    setCategory("");
-                    setEventId("");
-                    setLocationId("");
-                    setErrors((e) => ({
-                      ...e,
-                      location: undefined,
-                      category: undefined,
-                      event: undefined,
-                      eventLocation: undefined,
-                    }));
-                  }}
-                >
-                  <SelectTrigger
-                    id="location"
-                    data-field="location"
-                    aria-invalid={!!errors.location}
-                  >
-                    <SelectValue placeholder="Select location to participate" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <ErrorText>{errors.location}</ErrorText>
-              </>
-            </Field>
+            {/* School / college name — appears once a type is chosen */}
+            {values.institutionType && (
+              <Field
+                label={
+                  values.institutionType === "school"
+                    ? "School name"
+                    : "College name"
+                }
+                htmlFor="institutionName"
+                required
+              >
+                <>
+                  <Input
+                    id="institutionName"
+                    data-field="institutionName"
+                    value={values.institutionName}
+                    onChange={(e) => setField("institutionName", e.target.value)}
+                    onBlur={() => handleBlur("institutionName")}
+                    aria-invalid={!!errors.institutionName}
+                    placeholder={
+                      values.institutionType === "school"
+                        ? "Name of the school"
+                        : "Name of the college"
+                    }
+                  />
+                  <ErrorText>{errors.institutionName}</ErrorText>
+                </>
+              </Field>
+            )}
             </div>
 
-            {/* Conditional detail: name + standard (school) or year (college) */}
+            {/* Conditional detail: standard (school) or year (college) */}
             {values.institutionType && (
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field
-                  label={
-                    values.institutionType === "school"
-                      ? "School name"
-                      : "College name"
-                  }
-                  htmlFor="institutionName"
-                  required
-                >
-                  <>
-                    <Input
-                      id="institutionName"
-                      data-field="institutionName"
-                      value={values.institutionName}
-                      onChange={(e) =>
-                        setField("institutionName", e.target.value)
-                      }
-                      onBlur={() => handleBlur("institutionName")}
-                      aria-invalid={!!errors.institutionName}
-                      placeholder={
-                        values.institutionType === "school"
-                          ? "Name of the school"
-                          : "Name of the college"
-                      }
-                    />
-                    <ErrorText>{errors.institutionName}</ErrorText>
-                  </>
-                </Field>
-
                 <Field
                   label={
                     values.institutionType === "school"
@@ -715,9 +768,7 @@ export function RegistrationForm({
                         placeholder={
                           !values.institutionType
                             ? "Choose school or college first"
-                            : !values.location
-                              ? "Select your location first"
-                              : "Choose a category"
+                            : "Choose a category"
                         }
                       />
                     </SelectTrigger>
@@ -792,10 +843,10 @@ export function RegistrationForm({
               </Field>
             </div>
 
-            {/* Location picker — only when the chosen event runs in more than
-                one place in this city. Capacity is shown per location. */}
-            {locationsForSelection.length > 1 && (
-              <Field label="Location & date" htmlFor="event-location" required>
+            {/* Venue picker — shown once an event is chosen. Lists every
+                venue/date the event runs in, by address. Capacity per venue. */}
+            {selectedEvent && locationsForSelection.length > 0 && (
+              <Field label="Venue" htmlFor="event-location" required>
                 <>
                   <Select
                     value={effectiveLocationId}
@@ -809,7 +860,7 @@ export function RegistrationForm({
                       data-field="eventLocation"
                       aria-invalid={!!errors.eventLocation}
                     >
-                      <SelectValue placeholder="Choose a location" />
+                      <SelectValue placeholder="Select a venue" />
                     </SelectTrigger>
                     <SelectContent>
                       {locationsForSelection.map((loc) => {
@@ -818,7 +869,7 @@ export function RegistrationForm({
                         const label = locationLabel(loc);
                         return (
                           <SelectItem key={loc.id} value={loc.id} disabled={full}>
-                            {label || "Location"}
+                            {label || "Venue"}
                             {full
                               ? " — Full"
                               : left !== null && left <= 10
@@ -867,7 +918,7 @@ export function RegistrationForm({
                 {selectedEvent ? selectedEvent.title : "Not selected yet"}
               </Row>
 
-              <Row label="Location">
+              <Row label="Venue">
                 {selectedLocation
                   ? locationLabel(selectedLocation) || "—"
                   : "Not selected yet"}
@@ -912,13 +963,19 @@ export function RegistrationForm({
 
             <p className="flex items-start gap-2 text-xs text-text-muted">
               <ShieldCheck size={16} className="mt-0.5 shrink-0 text-success" />
-              No payment required now — your spot is reserved and our team will
-              share fee &amp; payment details later. Your details are kept private.
+              Payments are processed securely by Razorpay (UPI, cards, net
+              banking &amp; wallets). Your card details never touch our servers.
+              Registrations are non-refundable.
             </p>
 
+            {payError && (
+              <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
+                {payError}
+              </p>
+            )}
             {status === "error" && (
               <p className="rounded-lg bg-error/10 p-3 text-sm text-error">
-                Something went wrong saving your registration. Please try again
+                Something went wrong starting your payment. Please try again
                 or contact us.
               </p>
             )}
@@ -936,10 +993,12 @@ export function RegistrationForm({
             >
               <CheckCircle2 size={18} />
               {status === "submitting"
-                ? "Submitting…"
+                ? "Processing…"
                 : selectedFull
                   ? "Event Full"
-                  : "Complete Registration"}
+                  : invoice
+                    ? `Pay ${formatINR(invoice.total)} & Register`
+                    : "Complete Registration"}
             </Button>
 
             <p className="text-center text-xs text-text-muted">

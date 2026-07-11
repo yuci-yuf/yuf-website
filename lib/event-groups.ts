@@ -25,6 +25,30 @@ export function audienceLabel(audience: EventAudience | undefined): string | nul
 }
 
 /**
+ * Who a specific location is open to. Prefers the location's own `audience`,
+ * falling back to the event-level `audience` (legacy events), then "both".
+ */
+export function locationAudience(
+  event: EventItem,
+  location: EventLocation,
+): EventAudience {
+  return location.audience ?? event.audience ?? "both";
+}
+
+/**
+ * A single "open to" label for the whole event, derived from its locations:
+ * when every location shares the same specific audience, that label is shown;
+ * when they differ (or all "both"), returns null so no misleading badge appears.
+ */
+export function eventAudienceLabel(event: EventItem): string | null {
+  const distinct = new Set(
+    getEventLocations(event).map((l) => locationAudience(event, l)),
+  );
+  if (distinct.size === 1) return audienceLabel([...distinct][0]);
+  return null;
+}
+
+/**
  * The event's locations as a uniform array. When `locations` is set, it's
  * returned as-is. Otherwise a single implicit location is synthesized from the
  * legacy flat fields so old events keep working. Returns `[]` only when an

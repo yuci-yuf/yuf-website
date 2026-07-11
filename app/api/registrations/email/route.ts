@@ -9,8 +9,8 @@ const EMAIL_RE = /^\S+@\S+\.\S+$/;
 /**
  * Sends the registration confirmation email.
  *
- * The client calls this (fire-and-forget) right after the registration is
- * created via `/api/registrations/create`, passing the recipient + event
+ * The client calls this (fire-and-forget) right after payment is confirmed
+ * (the `/api/payments/verify` success handler), passing the recipient + event
  * details straight from the form so there's no need to read the doc back
  * here. Only `RESEND_API_KEY` is
  * required. The sender address and template live server-side in `lib/email`.
