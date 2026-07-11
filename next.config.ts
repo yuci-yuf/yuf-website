@@ -25,6 +25,43 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Baseline security headers applied to every response. These are the
+  // low-risk, no-config headers that don't depend on the page's resources.
+  // A full Content-Security-Policy is intentionally NOT set here yet: the site
+  // loads third-party scripts (Razorpay Checkout), talks to Firebase/Firestore,
+  // and self-hosts fonts, so a CSP needs per-source allow-listing and live
+  // testing before it can be enabled without breaking checkout or the admin
+  // panel. Track that as a follow-up.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // Stop browsers from MIME-sniffing a response into a different type.
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Clickjacking protection — the site is never meant to be framed.
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          // Don't leak full URLs (which may carry the ?loc/registration params)
+          // to third-party origins.
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          // Force HTTPS for two years (incl. subdomains) once seen over TLS.
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          // Deny sensor/geolocation access; allow camera to self so the admin
+          // check-in QR scanner keeps working.
+          {
+            key: "Permissions-Policy",
+            value: "camera=(self), microphone=(), geolocation=(), browsing-topics=()",
+          },
+        ],
+      },
+    ];
+  },
   // Legacy URLs from the old WordPress site that Google still has indexed.
   // Permanent (308) so search engines transfer ranking to the new path.
   async redirects() {

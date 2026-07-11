@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Plus_Jakarta_Sans, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/content";
+import { jsonLdScript } from "@/lib/json-ld";
 
 // Canonical origin for metadata, sitemap, and structured data. Update this if
 // the production domain changes (also mirrored in app/sitemap.ts + robots.ts).
@@ -140,7 +141,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-surface text-text">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(structuredData) }}
         />
         {children}
       </body>

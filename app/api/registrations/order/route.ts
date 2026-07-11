@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { FieldValue } from "firebase-admin/firestore";
 import {
   getAdminDb,
@@ -12,44 +13,42 @@ import { generateRegistrationCode } from "@/lib/registration-code";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-interface OrderBody {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  location: string;
-  institution: string;
-  institutionType?: "school" | "college" | "";
-  ageCategory: string;
-  eventId: string;
+// Server-side validation with hard length caps so a malicious client can't
+// stuff huge strings into Firestore or the email template. The server owns the
+// amount, status, code and event/location snapshots — only participant-identity
+// fields come from the request, and every one is bounded here.
+const trimmed = (max: number) => z.string().trim().max(max);
+const OrderSchema = z.object({
+  firstName: trimmed(80).min(1),
+  lastName: trimmed(80).default(""),
+  email: trimmed(254).min(1).regex(/^\S+@\S+\.\S+$/, "Invalid email."),
+  phone: z.string().trim().regex(/^\d{10}$/, "Phone must be 10 digits."),
+  location: trimmed(200).min(1),
+  institution: trimmed(200).min(1),
+  institutionType: z.enum(["school", "college", ""]).optional(),
+  ageCategory: trimmed(60).default(""),
+  eventId: trimmed(200).min(1),
   /** Which event location the participant is registering for. */
-  locationId?: string;
-  idempotencyKey: string;
-}
-
-function isValid(b: Partial<OrderBody>): b is OrderBody {
-  return Boolean(
-    b &&
-      b.firstName?.trim() &&
-      b.email?.trim() &&
-      /^\d{10}$/.test(b.phone ?? "") &&
-      b.location?.trim() &&
-      b.institution?.trim() &&
-      b.eventId?.trim() &&
-      b.idempotencyKey?.trim(),
-  );
-}
+  locationId: trimmed(200).optional(),
+  idempotencyKey: trimmed(200).min(1),
+});
+type OrderBody = z.infer<typeof OrderSchema>;
 
 export async function POST(req: Request) {
-  let body: Partial<OrderBody>;
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
-  if (!isValid(body)) {
-    return NextResponse.json({ error: "Missing or invalid fields." }, { status: 400 });
+  const parsed = OrderSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Missing or invalid fields." },
+      { status: 400 },
+    );
   }
+  const body: OrderBody = parsed.data;
 
   const adminDb = getAdminDb();
 
