@@ -14,15 +14,17 @@ import {
   signOut as fbSignOut,
   type User,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
 interface AuthState {
   user: User | null;
   /**
-   * Single-admin model: any signed-in Firebase Auth user is the admin. The
-   * admin account is created manually in the Firebase console, and email/
-   * password is the only sign-in method exposed, so no extra allowlist or
-   * `admins` collection is needed.
+   * A signed-in user is an admin only if a document exists at
+   * `admins/{their-uid}` (managed manually in the Firebase console). Merely
+   * being authenticated is NOT enough — this matches `isAdmin()` in
+   * firestore.rules and keeps any non-allowlisted account (e.g. from another
+   * enabled sign-in provider) out of the panel.
    */
   isAdmin: boolean;
   /** True while the initial auth check is resolving. */
@@ -39,13 +41,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (current) => {
+    let active = true;
+    const unsub = onAuthStateChanged(auth, async (current) => {
       setUser(current);
-      // Any signed-in user is the admin (single-admin model).
-      setIsAdmin(Boolean(current));
-      setLoading(false);
+      // Admin status is gated on an allowlist doc, not just being signed in.
+      if (!current) {
+        if (active) {
+          setIsAdmin(false);
+          setLoading(false);
+        }
+        return;
+      }
+      let allowed = false;
+      try {
+        const snap = await getDoc(doc(db, "admins", current.uid));
+        allowed = snap.exists();
+      } catch {
+        // A denied/failed read means "not an admin" — fail closed.
+        allowed = false;
+      }
+      if (active) {
+        setIsAdmin(allowed);
+        setLoading(false);
+      }
     });
-    return unsub;
+    return () => {
+      active = false;
+      unsub();
+    };
   }, []);
 
   const value = useMemo<AuthState>(

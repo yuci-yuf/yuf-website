@@ -127,7 +127,7 @@ export function AdminSidebar() {
       </header>
 
       {/* ── Desktop rail (hidden on mobile) ── */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-surface lg:flex">
         <SidebarBody />
       </aside>
 

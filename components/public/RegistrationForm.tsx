@@ -277,10 +277,6 @@ export function RegistrationForm({
     // Store just the raw name — the school/college type and standard/year are
     // persisted separately (institutionType / ageCategory), so no suffix here.
     const institution = values.institutionName.trim();
-    // For the confirmation email (sent after payment succeeds).
-    const venue =
-      selectedLocation.address ?? selectedLocation.city ?? "";
-    const eventDate = selectedLocation.date ?? "";
     // The participant's location is now taken from the venue they picked (the
     // standalone city field was removed) — prefer the address, fall back to city.
     const participantLocation =
@@ -332,7 +328,7 @@ export function RegistrationForm({
 
       // Free event → the server already confirmed it, no payment needed.
       if (order.free) {
-        sendConfirmationEmail(order.code, firstName, eventDate, venue);
+        sendConfirmationEmail(order.registrationId);
         finishSuccess(order.code);
         return;
       }
@@ -370,14 +366,7 @@ export function RegistrationForm({
         },
         // ── 3. On success, verify the signature server-side ──
         handler: (response: RazorpayHandlerResponse) => {
-          void confirmPayment(
-            response,
-            order.registrationId,
-            order.code,
-            firstName,
-            eventDate,
-            venue,
-          );
+          void confirmPayment(response, order.registrationId, order.code);
         },
       });
 
@@ -402,9 +391,6 @@ export function RegistrationForm({
     response: RazorpayHandlerResponse,
     registrationId: string,
     code: string,
-    firstName: string,
-    eventDate: string,
-    venue: string,
   ) {
     setStatus("submitting");
     try {
@@ -421,7 +407,7 @@ export function RegistrationForm({
       if (!res.ok) throw new Error(`Verification failed (${res.status})`);
 
       const { code: confirmedCode } = (await res.json()) as { code?: string };
-      sendConfirmationEmail(confirmedCode ?? code, firstName, eventDate, venue);
+      sendConfirmationEmail(registrationId);
       finishSuccess(confirmedCode ?? code);
     } catch (err) {
       // Payment went through but our fast-path verify failed. The webhook is
@@ -436,24 +422,16 @@ export function RegistrationForm({
     }
   }
 
-  /** Fire-and-forget confirmation email — never blocks or fails the success UI. */
-  function sendConfirmationEmail(
-    code: string,
-    firstName: string,
-    date: string,
-    venue: string,
-  ) {
+  /**
+   * Fire-and-forget confirmation email — never blocks or fails the success UI.
+   * Sends only the registration id; the server reads the recipient + details
+   * back from the confirmed record (no client-supplied email content).
+   */
+  function sendConfirmationEmail(registrationId: string) {
     void fetch("/api/registrations/email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: values.email.trim(),
-        firstName,
-        eventTitle: selectedEvent?.title,
-        date,
-        venue,
-        registrationCode: code,
-      }),
+      body: JSON.stringify({ registrationId }),
     }).catch(() => {});
   }
 

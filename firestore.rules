@@ -3,11 +3,23 @@ rules_version='2'
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Single-admin model: the admin account is the only one created in Firebase
-    // Auth (email/password only — no public sign-up), so any signed-in user is
-    // the admin. Matches the check in contexts/AuthContext.tsx.
+    // Admin allowlist: a signed-in user is an admin ONLY if there is a document
+    // at /admins/{their-uid}. Being authenticated is no longer sufficient — this
+    // closes the hole where any Firebase Auth account (e.g. via an enabled
+    // Google sign-in provider) would otherwise gain full admin access. Manage
+    // the allowlist by hand in the Firebase console; docs are never client-
+    // writable (see the /admins rule below). Mirrors contexts/AuthContext.tsx.
     function isAdmin() {
-      return request.auth != null;
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // The allowlist itself. A signed-in user may read only their OWN entry (so
+    // the client can tell whether it's an admin); nobody may write via a client
+    // — entries are added/removed manually in the Firebase console.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
     }
 
     // ── Public CMS content ──

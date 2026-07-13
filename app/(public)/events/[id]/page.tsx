@@ -15,6 +15,7 @@ import {
   locationAudience,
 } from "@/lib/event-groups";
 import { SITE_URL } from "@/app/layout";
+import { jsonLdScript } from "@/lib/json-ld";
 
 /** Best-effort conversion of a human date label ("2nd Sept 2026") to ISO. */
 function toIsoDate(label?: string): string | undefined {
@@ -139,7 +140,7 @@ export default async function EventDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(eventSchema) }}
       />
       {/* Header */}
       <section className="bg-festival-gradient relative overflow-hidden py-24 text-white lg:py-36">

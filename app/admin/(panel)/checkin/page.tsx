@@ -151,10 +151,15 @@ export default function CheckInPage() {
         }
       />
 
-      <div className="flex flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:p-8">
-        {/* ── Scanner ── */}
-        <div className="flex flex-1 flex-col gap-4">
-          <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-border bg-black/90 shadow-card">
+      <div className="mx-auto grid max-w-6xl gap-6 p-4 sm:p-6 lg:grid-cols-2 lg:items-start lg:p-8">
+        {/* ── Scanner + code entry (one card) ── */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card sm:p-6">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-text">
+            <Camera size={18} className="text-primary-600" />
+            Scan participant pass
+          </h2>
+
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-border bg-black/90">
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
@@ -162,7 +167,7 @@ export default function CheckInPage() {
               playsInline
             />
             {!scanning && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface text-text-muted">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-alt text-text-muted">
                 <CameraOff size={40} />
                 <p className="text-sm">Camera is off</p>
               </div>
@@ -191,17 +196,21 @@ export default function CheckInPage() {
             </p>
           )}
 
+          {/* Divider between scan + manual entry */}
+          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-text-muted">
+            <span className="h-px flex-1 bg-border" />
+            or enter code
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
           {/* ── Manual code fallback ── */}
-          <form
-            onSubmit={submitManual}
-            className="flex flex-col gap-2 rounded-2xl border border-dashed border-border bg-surface-alt p-4"
-          >
+          <form onSubmit={submitManual} className="flex flex-col gap-2">
             <label
               htmlFor="manual-code"
               className="flex items-center gap-2 text-sm font-semibold text-text"
             >
               <KeyRound size={16} className="text-primary-600" />
-              QR won&apos;t scan? Enter the code
+              QR won&apos;t scan? Type the pass code
             </label>
             <div className="flex gap-2">
               <Input
@@ -221,7 +230,7 @@ export default function CheckInPage() {
         </div>
 
         {/* ── Result — inline beside the scanner on desktop ── */}
-        <div className="hidden flex-1 items-start lg:flex">
+        <div className="hidden lg:block">
           <ResultCard
             busy={busy}
             view={view}
@@ -288,16 +297,20 @@ function ResultCard({
 }) {
   if (busy) {
     return (
-      <div className="flex w-full items-center justify-center rounded-2xl border border-border bg-surface p-12 shadow-card">
+      <div className="flex min-h-[420px] w-full items-center justify-center rounded-2xl border border-border bg-surface p-12 shadow-card lg:min-h-[520px]">
         <Loader2 className="animate-spin text-primary-600" size={32} />
       </div>
     );
   }
   if (!view) {
     return (
-      <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-surface p-12 text-center text-text-muted shadow-card">
-        <Camera size={32} className="opacity-50" />
-        <p>Scan a pass or enter a code to verify a participant.</p>
+      <div className="flex min-h-[420px] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-surface p-12 text-center text-text-muted shadow-card lg:min-h-[520px]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-alt">
+          <Camera size={26} className="opacity-60" />
+        </div>
+        <p className="max-w-xs text-sm">
+          Scan a pass or enter a code to verify a participant.
+        </p>
       </div>
     );
   }
