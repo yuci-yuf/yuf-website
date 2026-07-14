@@ -6,11 +6,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const IMAGES = [
   {
-    src: "/images/recognition/award_3.jpg",
+    src: "/images/recognition/award_4.jpg",
     alt: "Noble Appreciation from Raj Bhavan, Hyderabad — Sri Jishnu Dev Varma, Governor of Telangana",
   },
   {
-    src: "/images/recognition/award_4.jpg",
+    src: "/images/recognition/award_3.jpg",
     alt: "Noble Appreciation from Raj Bhavan, Puducherry — Shri K. Kailashnathan, Lieutenant Governor of Puducherry",
   },
 ];

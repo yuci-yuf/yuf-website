@@ -286,7 +286,7 @@ export const homeContent = {
   },
   recognition: {
     label: "Government Recognition",
-    title: "Appreciation From Ministry of Youth Affairs and Sports",
+    title: "Cooperation and Support From Ministry of Youth Affairs and Sports",
     subtitle:
       "The Youth United Council of India (YUCI) was honoured to meet Dr. Mansukh L. Mandaviya, Minister of Youth Affairs and Sports & Minister of Labour and Employment, Government of India, to strengthen youth-focused sports and employment initiatives across the nation.",
     details: [],
@@ -343,11 +343,11 @@ export const homeContent = {
       "Hear what governors, legislators, and global leaders have said about the Youth United Festival and the young changemakers it brings together.",
     items: [
       {
-        name: "Amb. Dunston P",
-        role: "The Private Office of His Royal Highness Sheikh Ahmed Bin Faisal Al Qassimi",
+        name: "Prof. Sukhee Lee",
+        role: "Advisor of International Affairs | Intercultural Communication | Korean Language & Culture",
         quote:
-          "A platform for young minds to come together, celebrate their talents, and ignite positive change! Let's unite, inspire, and create the future we all dream of. Your energy, your voice, your vision — together, we can achieve greatness!",
-        image: "/images/testimonials/dunston-p.png",
+          "The Youth United Festival creates meaningful opportunities for young people to connect across cultures, develop leadership skills, and inspire positive change. Together, we can empower the next generation of global changemakers.",
+        image: "/images/testimonials/sukhee-lee.jpeg",
       },
       {
         name: "Shri. Embalam R. Selvam",
@@ -357,11 +357,11 @@ export const homeContent = {
         image: "/images/testimonials/embalam-selvam.png",
       },
       {
-        name: "Prof. Sukhee Lee",
-        role: "Advisor of International Affairs | Intercultural Communication | Korean Language & Culture",
+        name: "Amb. Dunston P",
+        role: "The Private Office of His Royal Highness Sheikh Ahmed Bin Faisal Al Qassimi",
         quote:
-          "The Youth United Festival creates meaningful opportunities for young people to connect across cultures, develop leadership skills, and inspire positive change. Together, we can empower the next generation of global changemakers.",
-        image: "/images/testimonials/sukhee-lee.jpeg",
+          "A platform for young minds to come together, celebrate their talents, and ignite positive change! Let's unite, inspire, and create the future we all dream of. Your energy, your voice, your vision — together, we can achieve greatness!",
+        image: "/images/testimonials/dunston-p.png",
       },
     ] satisfies Testimonial[],
   },
