@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, Download, Loader2, Trash2, CheckCircle2, X } from "lucide-react";
+import { Search, Download, Loader2, CheckCircle2, X } from "lucide-react";
 import {
   PageHeader,
   StatusBadge,
@@ -17,12 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  getRegistrations,
-  institutionTypeLabel,
-  deleteAllRegistrations,
-} from "@/lib/admin-data";
-import { useDialog } from "@/components/ui/confirm-dialog";
+import { getRegistrations, institutionTypeLabel } from "@/lib/admin-data";
 import type { Registration } from "@/types";
 
 /**
@@ -38,7 +33,6 @@ function locationKey(r: Registration): string {
 }
 
 export default function RegistrationsPage() {
-  const { confirm, notify } = useDialog();
   const [rows, setRows] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +42,6 @@ export default function RegistrationsPage() {
   const [locationFilter, setLocationFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [checkinFilter, setCheckinFilter] = useState("all");
-  const [deletingAll, setDeletingAll] = useState(false);
 
   useEffect(() => {
     getRegistrations()
@@ -139,59 +132,16 @@ export default function RegistrationsPage() {
     URL.revokeObjectURL(url);
   }
 
-  // TEMPORARY: bulk-clear test registrations. Remove this action (and the
-  // deleteAllRegistrations helper) before launch.
-  async function handleDeleteAll() {
-    const ok = await confirm({
-      title: "Delete ALL registrations?",
-      description: `This permanently deletes all ${rows.length} registration${
-        rows.length === 1 ? "" : "s"
-      } and resets every event's spot counts to zero. This cannot be undone.`,
-      confirmLabel: "Delete all",
-      tone: "danger",
-    });
-    if (!ok) return;
-    setDeletingAll(true);
-    try {
-      await deleteAllRegistrations();
-      setRows([]);
-    } catch (e) {
-      console.error(e);
-      notify({
-        title: "Delete failed",
-        description: "We couldn't delete the registrations. Please try again.",
-      });
-    } finally {
-      setDeletingAll(false);
-    }
-  }
-
   return (
     <>
       <PageHeader
         title="Registrations"
         description={`${filtered.length} of ${rows.length} shown`}
         action={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={exportCsv}>
-              <Download size={16} />
-              Export CSV
-            </Button>
-            {/* TEMPORARY: clears test registrations — remove before launch. */}
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteAll}
-              disabled={rows.length === 0 || deletingAll}
-            >
-              {deletingAll ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Trash2 size={16} />
-              )}
-              Delete all
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" onClick={exportCsv}>
+            <Download size={16} />
+            Export CSV
+          </Button>
         }
       />
 

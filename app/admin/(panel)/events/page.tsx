@@ -415,7 +415,7 @@ export default function AdminEventsPage() {
                             totalLimit !== null && count >= totalLimit;
                           return (
                             <Link
-                              href="/admin/registrations"
+                              href={`/admin/events/${e.id}/registrations`}
                               className={cn(
                                 "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
                                 full

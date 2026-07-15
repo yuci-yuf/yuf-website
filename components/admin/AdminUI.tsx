@@ -59,6 +59,7 @@ export function StatusBadge({ status }: { status: string }) {
     pending: "bg-accent-50 text-accent-700",
     cancelled: "bg-error/10 text-error",
     failed: "bg-error/10 text-error",
+    expired: "bg-error/10 text-error",
   };
   return (
     <span

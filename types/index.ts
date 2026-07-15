@@ -268,8 +268,13 @@ export interface RegistrationSettings {
 
 // ── Submissions (stored in Firestore) ──
 
-export type PaymentStatus = "paid" | "pending" | "failed";
-export type RegistrationStatus = "confirmed" | "pending" | "cancelled";
+// "expired" = an abandoned pending hold reclaimed by the capacity sweep.
+export type PaymentStatus = "paid" | "pending" | "failed" | "expired";
+export type RegistrationStatus =
+  | "confirmed"
+  | "pending"
+  | "cancelled"
+  | "expired";
 
 export interface Registration {
   id: string;
