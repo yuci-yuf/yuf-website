@@ -9,6 +9,7 @@ import {
 import { getRazorpay } from "@/lib/razorpay";
 import { computeInvoice } from "@/lib/pricing";
 import { claimUniqueRegistrationCode } from "@/lib/registration-code";
+import { sendRegistrationEmailOnce } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
     const d = existing.docs[0];
     const data = d.data();
     if (data.orderId) {
+      // Fully-formed prior attempt — return it verbatim.
       return NextResponse.json({
         registrationId: d.id,
         code: data.registrationCode,
@@ -77,6 +79,41 @@ export async function POST(req: Request) {
         currency: "INR",
         keyId: process.env.RAZORPAY_KEY_ID,
       });
+    }
+    // The first attempt reserved the slot + claimed the code but died before
+    // writing `orderId` (e.g. the Razorpay call hung). RESUME that reg instead
+    // of falling through to a second reservation, which would double-count the
+    // slot. Free regs get confirmed on creation and never lack an orderId, so a
+    // pending paid reg here just needs its order (re)created.
+    const amountPaid = typeof data.amountPaid === "number" ? data.amountPaid : 0;
+    if (amountPaid > 0 && data.status === "pending") {
+      try {
+        const order = await getRazorpay().orders.create({
+          amount: Math.round(amountPaid * 100),
+          currency: "INR",
+          receipt: d.id,
+          notes: {
+            registrationId: d.id,
+            code: data.registrationCode,
+            eventId: body.eventId,
+          },
+        });
+        await d.ref.update({ orderId: order.id });
+        return NextResponse.json({
+          registrationId: d.id,
+          code: data.registrationCode,
+          orderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          keyId: process.env.RAZORPAY_KEY_ID,
+        });
+      } catch (err) {
+        console.error("order: resume (order create) failed", err);
+        return NextResponse.json(
+          { error: "Could not start payment. Please try again." },
+          { status: 502 },
+        );
+      }
     }
   }
 
@@ -207,6 +244,12 @@ export async function POST(req: Request) {
   // Free event → confirm immediately, no payment needed.
   if (invoice.total <= 0) {
     await regRef.update({ paymentStatus: "paid", status: "confirmed" });
+    // No Razorpay payment means NO webhook fires for free events — so the client
+    // is the only other trigger, and a page reload would lose the email. Send it
+    // server-side here (idempotent: the client's call will no-op if this wins).
+    await sendRegistrationEmailOnce(adminDb, regRef).catch((err) => {
+      console.error("order: free-event confirmation email failed", err);
+    });
     return NextResponse.json({ registrationId: regRef.id, code, free: true });
   }
 

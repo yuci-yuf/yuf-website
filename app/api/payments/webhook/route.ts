@@ -28,7 +28,11 @@ export async function POST(req: Request) {
 
   let event: {
     event?: string;
-    payload?: { payment?: { entity?: { id?: string; order_id?: string } } };
+    payload?: {
+      payment?: {
+        entity?: { id?: string; order_id?: string; amount?: number };
+      };
+    };
   };
   try {
     event = JSON.parse(raw);
@@ -49,6 +53,23 @@ export async function POST(req: Request) {
   const data = found.docs[0].data();
 
   if (event.event === "payment.captured" || event.event === "order.paid") {
+    // Defense-in-depth: confirm the captured amount matches what we billed
+    // (amountPaid is stored in rupees; Razorpay reports paise). The signature
+    // already proves the payload is authentic, so a mismatch means a
+    // partial/altered capture — flag it and don't auto-confirm.
+    const expectedPaise = Math.round((data.amountPaid ?? 0) * 100);
+    const capturedPaise =
+      typeof payment?.amount === "number" ? payment.amount : null;
+    if (capturedPaise !== null && capturedPaise < expectedPaise) {
+      console.error("webhook: underpaid capture", {
+        orderId,
+        expectedPaise,
+        capturedPaise,
+      });
+      await ref.update({ paymentStatus: "amount_mismatch" });
+      return NextResponse.json({ ok: true });
+    }
+
     if (data.status !== "confirmed") {
       await ref.update({
         paymentStatus: "paid",
