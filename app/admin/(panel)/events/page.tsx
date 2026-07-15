@@ -65,9 +65,14 @@ export default function AdminEventsPage() {
         setEvents(evs);
         setCategories(cats);
         setRegistrations(regs);
+        // Count only PAID registrations — the Total badge and the download
+        // button's enabled-state both reflect real (paid) registrations, not
+        // pending/failed payment attempts.
         const counts: Record<string, number> = {};
         for (const r of regs) {
-          if (r.eventId) counts[r.eventId] = (counts[r.eventId] ?? 0) + 1;
+          if (r.eventId && r.paymentStatus === "paid") {
+            counts[r.eventId] = (counts[r.eventId] ?? 0) + 1;
+          }
         }
         setRegCounts(counts);
         setError(null);
@@ -136,9 +141,23 @@ export default function AdminEventsPage() {
    * so you can pull "Kabaddi · Ponneri" separately from "Kabaddi · Coimbatore".
    */
   function exportEventCsv(ev: EventItem, loc?: EventLocation) {
+    // Only export PAID candidates — pending/failed attempts aren't real
+    // registrations and shouldn't appear in the exported list.
     const rows = registrations.filter(
-      (r) => r.eventId === ev.id && (!loc || r.locationId === loc.id),
+      (r) =>
+        r.eventId === ev.id &&
+        r.paymentStatus === "paid" &&
+        (!loc || r.locationId === loc.id),
     );
+    if (rows.length === 0) {
+      notify({
+        title: "No paid registrations",
+        description: loc
+          ? `No paid registrations for ${ev.title} at this location yet.`
+          : `No paid registrations for ${ev.title} yet.`,
+      });
+      return;
+    }
     const headers = [
       "Name", "Email", "Phone", "City", "Institution",
       "Type", "Category", "Event", "Loc. Venue", "Loc. Date",
@@ -172,10 +191,13 @@ export default function AdminEventsPage() {
     URL.revokeObjectURL(url);
   }
 
-  /** Registrations for a given location of an event. */
+  /** PAID registrations for a given location — matches what the CSV exports. */
   function locationRegCount(ev: EventItem, loc: EventLocation): number {
     return registrations.filter(
-      (r) => r.eventId === ev.id && r.locationId === loc.id,
+      (r) =>
+        r.eventId === ev.id &&
+        r.locationId === loc.id &&
+        r.paymentStatus === "paid",
     ).length;
   }
 
@@ -194,7 +216,9 @@ export default function AdminEventsPage() {
   }
 
   async function handleDelete(ev: EventItem) {
-    const regCount = regCounts[ev.id] ?? 0;
+    // Count ALL registrations here (not just paid) — deletion removes every
+    // registration for the event, so the warning must reflect the true total.
+    const regCount = registrations.filter((r) => r.eventId === ev.id).length;
     const ok = await confirm({
       title: "Delete event?",
       description:
@@ -516,39 +540,13 @@ export default function AdminEventsPage() {
               Download registrations
             </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm leading-relaxed text-text-muted">
-              {downloadEvent?.title} runs in multiple locations. Choose which
-              registrations to download.
+              {downloadEvent?.title} runs in multiple locations. Pick a location
+              to download its paid registrations as a separate list.
             </Dialog.Description>
 
             {downloadEvent && (
               <div className="mt-5 flex flex-col gap-2">
-                {/* All locations */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    exportEventCsv(downloadEvent);
-                    setDownloadEvent(null);
-                  }}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-alt/50 px-4 py-3 text-left transition-colors hover:border-primary-500 hover:bg-primary-50"
-                >
-                  <span className="flex items-center gap-2.5">
-                    <Download size={16} className="text-primary-600" />
-                    <span className="font-medium text-text">All locations</span>
-                  </span>
-                  <span className="text-xs font-semibold text-text-muted">
-                    {regCounts[downloadEvent.id] ?? 0}
-                  </span>
-                </button>
-
-                <div className="my-1 flex items-center gap-3">
-                  <span className="h-px flex-1 bg-border" />
-                  <span className="text-xs uppercase tracking-wide text-text-muted">
-                    Or a single location
-                  </span>
-                  <span className="h-px flex-1 bg-border" />
-                </div>
-
-                {/* Per-location */}
+                {/* Per-location — each downloads its OWN list, never combined. */}
                 {getEventLocations(downloadEvent).map((loc) => {
                   const count = locationRegCount(downloadEvent, loc);
                   const place = loc.city || loc.address || "Location";

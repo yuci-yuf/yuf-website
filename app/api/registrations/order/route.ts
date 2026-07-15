@@ -5,6 +5,7 @@ import {
   getAdminDb,
   getRegistrationSettings,
   releaseLocationSlot,
+  reclaimStalePendingHolds,
 } from "@/lib/firebase-admin";
 import { getRazorpay } from "@/lib/razorpay";
 import { computeInvoice } from "@/lib/pricing";
@@ -119,6 +120,12 @@ export async function POST(req: Request) {
 
   const eventRef = adminDb.collection("events").doc(body.eventId);
   const regRef = regs.doc();
+
+  // Reclaim abandoned pending holds for this event/location BEFORE the FULL
+  // check below, so ghosts (checkout opened but never paid, no payment.failed
+  // webhook) don't wedge the event at capacity. Best-effort — never blocks the
+  // sign-up if the sweep fails.
+  await reclaimStalePendingHolds(adminDb, body.eventId, body.locationId);
 
   // ── Reserve a slot + create the pending registration atomically ──
   let base = 0;
