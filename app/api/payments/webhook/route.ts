@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb, releaseLocationSlot } from "@/lib/firebase-admin";
 import { verifyWebhookSignature } from "@/lib/razorpay";
+import { sendRegistrationEmailOnce } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,6 +57,14 @@ export async function POST(req: Request) {
         paidAt: FieldValue.serverTimestamp(),
       });
     }
+    // Send the confirmation email server-side. This is the RELIABLE path: it
+    // fires even if the browser reloaded / closed / redirected before the
+    // client's fast-path email call could run. Idempotent — if the client
+    // already sent it, this no-ops. Never let an email failure fail the webhook
+    // (Razorpay would retry the whole event), so we swallow errors here.
+    await sendRegistrationEmailOnce(adminDb, ref).catch((err) => {
+      console.error("webhook: confirmation email failed", err);
+    });
   } else if (event.event === "payment.failed") {
     // Only release a still-pending hold (never touch a confirmed reg).
     if (data.status === "pending") {

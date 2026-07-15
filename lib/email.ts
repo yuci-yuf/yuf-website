@@ -8,6 +8,11 @@
  */
 import { Resend } from "resend";
 import QRCode from "qrcode";
+import {
+  FieldValue,
+  type DocumentReference,
+  type Firestore,
+} from "firebase-admin/firestore";
 
 const FROM = "Youth United Festival <registration@youthunitedfestival.com>";
 const SITE_URL = (
@@ -70,6 +75,77 @@ export async function sendRegistrationEmail(data: RegistrationEmailData) {
         ]
       : undefined,
   });
+}
+
+/**
+ * Send the confirmation email AT MOST ONCE for a registration, regardless of how
+ * many callers race to trigger it (client fast-path + Razorpay webhook both do).
+ *
+ * Atomicity: a Firestore transaction claims the `emailSentAt` marker only if it
+ * isn't already set. Whoever wins the claim sends; everyone else no-ops. This is
+ * why a page reload can't lose the email (the webhook still fires it) AND why the
+ * user never gets a duplicate (the marker is claimed before the send).
+ *
+ * The registration must already be `confirmed`. Returns a small status object so
+ * callers can log/branch, but never throws for the "already sent" case.
+ */
+export async function sendRegistrationEmailOnce(
+  db: Firestore,
+  ref: DocumentReference,
+): Promise<{ sent: boolean; reason?: string }> {
+  // 1. Atomically claim the send. If the marker already exists, bail out.
+  let reg: FirebaseFirestore.DocumentData;
+  try {
+    const claimed = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) return null;
+      const data = snap.data()!;
+      if (data.status !== "confirmed") return null; // only email confirmed regs
+      if (data.emailSentAt) return null; // already sent (or claimed) — no-op
+      tx.update(ref, { emailSentAt: FieldValue.serverTimestamp() });
+      return data;
+    });
+    if (!claimed) return { sent: false, reason: "already-sent-or-not-confirmed" };
+    reg = claimed;
+  } catch (err) {
+    console.error("sendRegistrationEmailOnce: claim failed", err);
+    return { sent: false, reason: "claim-failed" };
+  }
+
+  const to = typeof reg.email === "string" ? reg.email.trim() : "";
+  const eventTitle = typeof reg.eventTitle === "string" ? reg.eventTitle : "";
+  if (!to || !eventTitle) {
+    // Nothing to send to — release the claim so a later fix can retry.
+    await ref.update({ emailSentAt: FieldValue.delete() }).catch(() => {});
+    return { sent: false, reason: "missing-recipient-or-event" };
+  }
+
+  // 2. Send. If Resend fails, release the claim so the other path (or a retry)
+  //    can attempt again instead of the email being silently lost forever.
+  try {
+    const { error } = await sendRegistrationEmail({
+      to,
+      firstName:
+        (typeof reg.firstName === "string" && reg.firstName.trim()) || "there",
+      eventTitle,
+      date: typeof reg.locationDate === "string" ? reg.locationDate : undefined,
+      venue: typeof reg.locationVenue === "string" ? reg.locationVenue : undefined,
+      registrationCode:
+        typeof reg.registrationCode === "string"
+          ? reg.registrationCode
+          : undefined,
+    });
+    if (error) {
+      console.error("Resend error:", error);
+      await ref.update({ emailSentAt: FieldValue.delete() }).catch(() => {});
+      return { sent: false, reason: "resend-error" };
+    }
+    return { sent: true };
+  } catch (err) {
+    console.error("sendRegistrationEmailOnce: send threw", err);
+    await ref.update({ emailSentAt: FieldValue.delete() }).catch(() => {});
+    return { sent: false, reason: "send-threw" };
+  }
 }
 
 /* ── Plain-text fallback (for clients that block HTML) ── */

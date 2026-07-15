@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { sendRegistrationEmail } from "@/lib/email";
+import { sendRegistrationEmailOnce } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,60 +36,26 @@ export async function POST(req: Request) {
     );
   }
 
-  let reg: FirebaseFirestore.DocumentData;
+  const db = getAdminDb();
+  const ref = db.collection("registrations").doc(registrationId);
+  let exists: boolean;
   try {
-    const snap = await getAdminDb()
-      .collection("registrations")
-      .doc(registrationId)
-      .get();
-    if (!snap.exists) {
-      return NextResponse.json(
-        { error: "Registration not found." },
-        { status: 404 },
-      );
-    }
-    reg = snap.data()!;
+    exists = (await ref.get()).exists;
   } catch (err) {
     console.error("Registration email: lookup failed", err);
     return NextResponse.json({ error: "Lookup failed." }, { status: 500 });
   }
-
-  // Only ever email a confirmed registration, and only to the stored address.
-  if (reg.status !== "confirmed") {
+  if (!exists) {
     return NextResponse.json(
-      { error: "Registration is not confirmed." },
-      { status: 409 },
-    );
-  }
-  const to = typeof reg.email === "string" ? reg.email.trim() : "";
-  const eventTitle = typeof reg.eventTitle === "string" ? reg.eventTitle : "";
-  if (!to || !eventTitle) {
-    return NextResponse.json(
-      { error: "Registration is missing email or event." },
-      { status: 422 },
+      { error: "Registration not found." },
+      { status: 404 },
     );
   }
 
-  try {
-    const { error } = await sendRegistrationEmail({
-      to,
-      firstName:
-        (typeof reg.firstName === "string" && reg.firstName.trim()) || "there",
-      eventTitle,
-      date: typeof reg.locationDate === "string" ? reg.locationDate : undefined,
-      venue: typeof reg.locationVenue === "string" ? reg.locationVenue : undefined,
-      registrationCode:
-        typeof reg.registrationCode === "string"
-          ? reg.registrationCode
-          : undefined,
-    });
-    if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json({ error: error.message }, { status: 502 });
-    }
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Registration email failed:", err);
-    return NextResponse.json({ error: "Email send failed." }, { status: 500 });
-  }
+  // Delegate to the shared idempotent sender: it re-checks `confirmed`, claims
+  // the `emailSentAt` marker atomically, and reads the recipient/details from
+  // the stored record. If the webhook already sent this, it no-ops — the client
+  // treats that as success (the user got their email either way).
+  const result = await sendRegistrationEmailOnce(db, ref);
+  return NextResponse.json({ ok: true, ...result });
 }
