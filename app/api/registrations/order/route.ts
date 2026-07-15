@@ -8,7 +8,7 @@ import {
 } from "@/lib/firebase-admin";
 import { getRazorpay } from "@/lib/razorpay";
 import { computeInvoice } from "@/lib/pricing";
-import { generateRegistrationCode } from "@/lib/registration-code";
+import { claimUniqueRegistrationCode } from "@/lib/registration-code";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -82,18 +82,23 @@ export async function POST(req: Request) {
 
   const eventRef = adminDb.collection("events").doc(body.eventId);
   const regRef = regs.doc();
-  const code = generateRegistrationCode();
 
   // ── Reserve a slot + create the pending registration atomically ──
   let base = 0;
   let category = "";
   let title = "";
+  let code = "";
   try {
     await adminDb.runTransaction(async (tx) => {
       const snap = await tx.get(eventRef);
       if (!snap.exists) throw new Error("EVENT_NOT_FOUND");
       const ev = snap.data()!;
       if (ev.registrationOpen === false) throw new Error("CLOSED");
+
+      // Claim a guaranteed-unique code. Must run before any tx write below —
+      // Firestore requires all reads (this does a tx.get per candidate) to
+      // precede writes within a transaction.
+      code = await claimUniqueRegistrationCode(tx, adminDb, regRef.id);
 
       base = typeof ev.registrationFee === "number" ? ev.registrationFee : 0;
       category = (ev.category as string) ?? "";
@@ -186,6 +191,13 @@ export async function POST(req: Request) {
         { error: "Selected location not found." },
         { status: 404 },
       );
+    if (msg === "CODE_ALLOCATION_FAILED") {
+      console.error("order: could not allocate a unique registration code", err);
+      return NextResponse.json(
+        { error: "Could not generate a registration code. Please try again." },
+        { status: 503 },
+      );
+    }
     console.error("order: reservation failed", err);
     return NextResponse.json({ error: "Could not reserve a spot." }, { status: 500 });
   }
@@ -217,8 +229,10 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error("order: razorpay create failed", err);
-    // Release the slot we reserved so it isn't stuck, then drop the pending reg.
+    // Release the slot we reserved so it isn't stuck, then drop the pending reg
+    // and free its claimed code so the code space stays clean.
     await releaseLocationSlot(adminDb, eventRef, body.locationId);
+    await adminDb.collection("registrationCodes").doc(code).delete().catch(() => {});
     await regRef.delete();
     return NextResponse.json(
       { error: "Could not start payment. Please try again." },
