@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Keep the admin panel and API routes out of search results.
-      disallow: ["/admin", "/api"],
+      disallow: ["/admin", "/event-desk", "/api"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

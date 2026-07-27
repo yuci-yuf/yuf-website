@@ -319,6 +319,43 @@ export interface Registration {
   checkedInBy?: string;
 }
 
+// ── Private event-desk links ──
+
+/** Admin-facing metadata for one private event-location access link. */
+export interface EventDeskLink {
+  token: string;
+  eventId: string;
+  locationId: string;
+  active: boolean;
+  createdAt: string | null;
+}
+
+/** Registration fields exposed through a scoped event-desk link. */
+export interface EventDeskRegistration {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  institution: string;
+  institutionType?: "school" | "college" | "";
+  ageCategory: string;
+  registrationCode: string;
+  checkedIn: boolean;
+  checkedInAt: string | null;
+  createdAt: string | null;
+}
+
+export interface EventDeskData {
+  event: {
+    id: string;
+    title: string;
+    category: string;
+  };
+  location: EventLocation;
+  registrations: EventDeskRegistration[];
+}
+
 export interface ContactMessage {
   id: string;
   firstName: string;

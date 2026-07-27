@@ -61,6 +61,12 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Private bearer links are created and resolved only by server routes using
+    // the Admin SDK. Never expose their tokens through the client SDK.
+    match /eventAccessLinks/{id} {
+      allow read, write: if false;
+    }
+
     // Everything else is denied by default.
   }
 }
