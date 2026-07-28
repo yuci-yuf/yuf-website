@@ -8,6 +8,7 @@ import {
   safeDeskRegistration,
 } from "@/lib/event-desk-server";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(

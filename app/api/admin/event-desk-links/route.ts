@@ -8,6 +8,7 @@ import {
 } from "@/lib/event-desk-server";
 import type { EventDeskLink } from "@/types";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function iso(value: unknown): string | null {
