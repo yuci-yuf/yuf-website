@@ -16,6 +16,7 @@ import {
   type App,
   type ServiceAccount,
 } from "firebase-admin/app";
+import { getAuth, type Auth } from "firebase-admin/auth";
 import {
   FieldValue,
   Timestamp,
@@ -49,6 +50,13 @@ function loadServiceAccount(): ServiceAccount {
 }
 
 let db: Firestore | null = null;
+let adminAuth: Auth | null = null;
+
+function getAdminApp(): App {
+  return (
+    getApps()[0] ?? initializeApp({ credential: cert(loadServiceAccount()) })
+  );
+}
 
 /**
  * Lazily initialize + return the Admin Firestore instance. Lazy so importing a
@@ -57,10 +65,15 @@ let db: Firestore | null = null;
  */
 export function getAdminDb(): Firestore {
   if (db) return db;
-  const app: App =
-    getApps()[0] ?? initializeApp({ credential: cert(loadServiceAccount()) });
-  db = getFirestore(app);
+  db = getFirestore(getAdminApp());
   return db;
+}
+
+/** Firebase Admin Auth used by protected server routes to verify admin tokens. */
+export function getAdminAuth(): Auth {
+  if (adminAuth) return adminAuth;
+  adminAuth = getAuth(getAdminApp());
+  return adminAuth;
 }
 
 /**

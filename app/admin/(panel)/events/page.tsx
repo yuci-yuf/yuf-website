@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Download,
   Loader2,
+  Link2,
   MapPin,
   Pencil,
   Plus,
@@ -36,6 +37,7 @@ import type {
 } from "@/types";
 import { getEventLocations } from "@/lib/event-groups";
 import { useDialog } from "@/components/ui/confirm-dialog";
+import { EventDeskLinksDialog } from "@/components/admin/EventDeskLinksDialog";
 
 const ALL = "All";
 const PAGE_SIZE = 10;
@@ -54,6 +56,7 @@ export default function AdminEventsPage() {
   const [page, setPage] = useState(1);
   // Event whose location-picker download dialog is open (multi-location events).
   const [downloadEvent, setDownloadEvent] = useState<EventItem | null>(null);
+  const [deskEvent, setDeskEvent] = useState<EventItem | null>(null);
 
   function load() {
     return Promise.all([
@@ -129,11 +132,6 @@ export default function AdminEventsPage() {
     () => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
     [filtered, currentPage],
   );
-
-  // Reset to the first page whenever the filters change.
-  useEffect(() => {
-    setPage(1);
-  }, [search, activeCategory]);
 
   /**
    * Download an event's registrations as CSV. When `loc` is given, only that
@@ -293,7 +291,10 @@ export default function AdminEventsPage() {
             <input
               type="search"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               placeholder="Search events..."
               className="w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-3 text-sm text-text outline-none transition-colors placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
             />
@@ -301,10 +302,13 @@ export default function AdminEventsPage() {
 
           <div className="flex flex-wrap items-center gap-1 rounded-xl border border-border bg-surface p-1">
             {[ALL, ...categoryNames].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActiveCategory(cat)}
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setActiveCategory(cat);
+                      setPage(1);
+                    }}
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
                   activeCategory === cat
@@ -441,6 +445,15 @@ export default function AdminEventsPage() {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
+                            onClick={() => setDeskEvent(e)}
+                            className="rounded-lg p-2 text-text-muted transition-colors hover:bg-primary-50 hover:text-primary-700"
+                            aria-label={`Private event-desk links for ${e.title}`}
+                            title="Private event-desk links"
+                          >
+                            <Link2 size={16} />
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleDownload(e)}
                             disabled={(regCounts[e.id] ?? 0) === 0}
                             className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-alt hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-muted"
@@ -523,6 +536,13 @@ export default function AdminEventsPage() {
           eventCounts={categoryEventCounts}
           onClose={() => setManagingCats(false)}
           onChanged={load}
+        />
+      )}
+
+      {deskEvent && (
+        <EventDeskLinksDialog
+          event={deskEvent}
+          onClose={() => setDeskEvent(null)}
         />
       )}
 
