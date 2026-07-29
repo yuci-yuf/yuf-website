@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Users, Map, MapPin } from "lucide-react";
+import { ArrowRight, Star, Users, Map, MapPin, Calendar, MoveRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { AnimatedStat } from "./AnimatedStat";
 
@@ -285,6 +285,47 @@ export function HeroSection({
           >
             {subtitle}
           </motion.p>
+
+          {/* Ticket Pass Date Range Widget */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.5 }}
+            className="my-3 inline-flex items-center rounded-[28px] border border-white/35 bg-white/10 shadow-2xl backdrop-blur-md select-none overflow-hidden"
+          >
+            {/* Left Stub: SEP 01 */}
+            <div className="flex flex-col items-center justify-center px-5 py-3 sm:px-7 sm:py-4">
+              <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
+              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">01</span>
+            </div>
+
+            {/* Center Stub: Vertical "TO" with dashed borders & notch cutouts */}
+            <div className="relative self-stretch flex items-center justify-center border-x border-dashed border-white/35 px-3 sm:px-4">
+              {/* Top notch cutout */}
+              <div className="absolute -top-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[#0b1d47] border border-white/20" />
+
+              {/* Vertical TO text */}
+              <span className="font-extrabold text-xs uppercase tracking-widest text-amber-400 rotate-90 sm:text-sm">
+                TO
+              </span>
+
+              {/* Bottom notch cutout */}
+              <div className="absolute -bottom-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[#0b1d47] border border-white/20" />
+            </div>
+
+            {/* Right Stub: SEP 17 + 17 days of events */}
+            <div className="flex items-center gap-6 px-5 py-3 sm:gap-8 sm:px-7 sm:py-4">
+              <div className="flex flex-col items-center justify-center">
+                <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
+                <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">17</span>
+              </div>
+
+              <div className="flex flex-col text-left">
+                <span className="font-extrabold text-lg leading-tight text-white sm:text-xl lg:text-2xl">17 days</span>
+                <span className="text-xs font-medium text-white/75 sm:text-sm">of events</span>
+              </div>
+            </div>
+          </motion.div>
 
           {/* CTAs */}
           <motion.div
