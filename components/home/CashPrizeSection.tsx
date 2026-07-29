@@ -43,7 +43,7 @@ export function CashPrizeSection() {
                 {/* Left: Info */}
                 <div className="flex flex-col gap-5">
                   <h3 className="font-display text-3xl font-black text-heading sm:text-4xl lg:text-5xl leading-tight">
-                    National Level Youth Hackathon
+                    National Youth Hackathon
                   </h3>
 
                   <div className="inline-flex w-fit items-center gap-2.5 rounded-full border border-primary-300/80 bg-white/85 px-4 py-2 text-sm sm:text-base font-semibold text-primary-950 shadow-xs backdrop-blur-sm">
