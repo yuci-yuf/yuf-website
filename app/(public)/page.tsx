@@ -14,6 +14,7 @@ import { Container } from "@/components/ui/Container";
 import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
 import { FestiveEyebrow, ConfettiDots, FestiveGlows } from "@/components/home/FestiveAccents";
 import { CategoryEventRows, type CategoryGroup } from "@/components/home/CategoryEventRows";
+import { CashPrizeSection } from "@/components/home/CashPrizeSection";
 import {
   homeContent,
   partners,
@@ -180,6 +181,9 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      {/* ── Grand Cash Prize Spotlight ── */}
+      <CashPrizeSection />
 
       <StepsTimeline steps={registrationSteps} />
 
