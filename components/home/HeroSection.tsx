@@ -300,7 +300,7 @@ export function HeroSection({
             </div>
 
             {/* Center Stub: Vertical "TO" with dashed borders & notch cutouts */}
-            <div className="relative self-stretch flex items-center justify-center border-x border-dashed border-white/35 px-3 sm:px-4">
+            <div className="relative self-stretch flex items-center justify-center border-x border-dashed border-white/35 px-3.5 sm:px-4.5">
               {/* Top notch cutout */}
               <div className="absolute -top-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[#0b1d47] border border-white/20" />
 
@@ -313,17 +313,10 @@ export function HeroSection({
               <div className="absolute -bottom-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[#0b1d47] border border-white/20" />
             </div>
 
-            {/* Right Stub: SEP 17 + 17 days of events */}
-            <div className="flex items-center gap-6 px-5 py-3 sm:gap-8 sm:px-7 sm:py-4">
-              <div className="flex flex-col items-center justify-center">
-                <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
-                <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">17</span>
-              </div>
-
-              <div className="flex flex-col text-left">
-                <span className="font-extrabold text-lg leading-tight text-white sm:text-xl lg:text-2xl">17 days</span>
-                <span className="text-xs font-medium text-white/75 sm:text-sm">of events</span>
-              </div>
+            {/* Right Stub: SEP 17 */}
+            <div className="flex flex-col items-center justify-center px-5 py-3 sm:px-7 sm:py-4">
+              <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
+              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">17</span>
             </div>
           </motion.div>
 
