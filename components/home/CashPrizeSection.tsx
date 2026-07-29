@@ -51,7 +51,7 @@ export function CashPrizeSection() {
                     <span>Easwari Engineering College, Ramapuram</span>
                   </div>
 
-                  <p className="mt-1 text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
+                  <p className="mt-1 hidden sm:block text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
                     Build futuristic tech solutions, solve real-world challenges, and pitch your innovation to industry experts!
                   </p>
                 </div>
@@ -63,13 +63,13 @@ export function CashPrizeSection() {
                   </div>
 
                   <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-xs font-black uppercase tracking-widest text-primary-950/80">
+                    <span className="text-base sm:text-lg font-black uppercase tracking-wider text-primary-950">
                       Winner Cash Prize
                     </span>
                     <span className="font-display text-5xl sm:text-6xl font-black text-highlight-600 drop-shadow-xs">
                       ₹5,000
                     </span>
-                    <span className="text-xs font-bold text-primary-950">
+                    <span className="text-base sm:text-xl font-black text-primary-950">
                       Awarded to 1st Place Winner
                     </span>
                   </div>
@@ -107,13 +107,13 @@ export function CashPrizeSection() {
                   </div>
 
                   <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-xs font-black uppercase tracking-widest text-primary-950/80">
+                    <span className="text-base sm:text-lg font-black uppercase tracking-wider text-primary-950">
                       Winner Cash Prize
                     </span>
                     <span className="font-display text-5xl sm:text-6xl font-black text-highlight-600 drop-shadow-xs">
                       ₹5,000
                     </span>
-                    <span className="text-xs font-bold text-primary-950">
+                    <span className="text-base sm:text-xl font-black text-primary-950">
                       Awarded to 1st Place Winner
                     </span>
                   </div>
@@ -141,7 +141,7 @@ export function CashPrizeSection() {
                     <span>Easwari Engineering College, Ramapuram</span>
                   </div>
 
-                  <p className="mt-1 text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
+                  <p className="mt-1 hidden sm:block text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
                     Unleash your scientific curiosity, present groundbreaking research, and inspire the next generation of innovators!
                   </p>
                 </div>
