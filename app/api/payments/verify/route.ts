@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { verifyPaymentSignature } from "@/lib/razorpay";
+import { safeTriggerGSheetsSync } from "@/lib/google-sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
       paymentId: razorpay_payment_id,
       paidAt: FieldValue.serverTimestamp(),
     });
+    safeTriggerGSheetsSync();
   }
 
   return NextResponse.json({ ok: true, code: snap.data()?.registrationCode });

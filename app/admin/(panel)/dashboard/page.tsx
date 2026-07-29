@@ -38,6 +38,7 @@ import {
 } from "@/lib/admin-data";
 import type { ContactMessage, EventItem, Registration } from "@/types";
 import { RegistrationToggle } from "@/components/admin/RegistrationToggle";
+import { GSheetsSyncCard } from "@/components/admin/GSheetsSyncCard";
 
 const chartConfig = {
   count: { label: "Registrations", color: "#1fa8d7" },
@@ -123,7 +124,12 @@ export default function DashboardPage() {
       />
 
       <div className="flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
-        <RegistrationToggle />
+        <div className="grid gap-5 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <RegistrationToggle />
+          </div>
+          <GSheetsSyncCard />
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-20">

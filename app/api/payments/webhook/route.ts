@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb, releaseLocationSlot } from "@/lib/firebase-admin";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import { sendRegistrationEmailOnce } from "@/lib/email";
+import { safeTriggerGSheetsSync } from "@/lib/google-sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -86,6 +87,7 @@ export async function POST(req: Request) {
     await sendRegistrationEmailOnce(adminDb, ref).catch((err) => {
       console.error("webhook: confirmation email failed", err);
     });
+    safeTriggerGSheetsSync();
   } else if (event.event === "payment.failed") {
     // Only release a still-pending hold (never touch a confirmed reg).
     if (data.status === "pending") {
