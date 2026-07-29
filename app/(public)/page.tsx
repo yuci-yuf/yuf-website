@@ -150,6 +150,9 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      {/* ── Grand Cash Prize Spotlight ── */}
+      <CashPrizeSection />
+
       {/* ── Event Categories — horizontal strips per category ── */}
       {categoryGroups.length > 0 && (
         <section className="bg-hero-gradient relative overflow-hidden py-12 sm:py-16">
@@ -181,9 +184,6 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
-
-      {/* ── Grand Cash Prize Spotlight ── */}
-      <CashPrizeSection />
 
       <StepsTimeline steps={registrationSteps} />
 
