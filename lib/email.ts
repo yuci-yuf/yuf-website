@@ -18,7 +18,28 @@ const FROM = "Youth United Festival <registration@youthunitedfestival.com>";
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://youthunitedfestival.com"
 ).replace(/\/$/, "");
-const REPORTING_TIME = "9:00 AM";
+const DEFAULT_REPORTING_TIME = "8:00 AM";
+
+/**
+ * Reporting time depends on the venue the participant is attending. Matched by
+ * keyword against the venue address + city so it works regardless of the exact
+ * address formatting. Falls back to the default when nothing matches.
+ *
+ *   Easwari Engineering College → 8:00 AM
+ *   Ponneri venue              → 9:30 AM
+ *   Coimbatore venue           → 9:00 AM
+ *   Pondicherry venue          → 8:00 AM
+ *   Thoraipakkam venue         → 8:30 AM
+ */
+function reportingTimeFor(venue?: string, location?: string): string {
+  const hay = `${venue ?? ""} ${location ?? ""}`.toLowerCase();
+  if (hay.includes("easwari")) return "8:00 AM";
+  if (hay.includes("ponneri")) return "9:30 AM";
+  if (hay.includes("coimbatore")) return "9:00 AM";
+  if (hay.includes("pondicherry") || hay.includes("puducherry")) return "8:00 AM";
+  if (hay.includes("thoraipakkam")) return "8:30 AM";
+  return DEFAULT_REPORTING_TIME;
+}
 
 let client: Resend | null = null;
 function getResend(): Resend {
@@ -34,6 +55,8 @@ export interface RegistrationEmailData {
   eventTitle: string;
   date?: string;
   venue?: string;
+  /** Participant's city — used (with venue) to pick the reporting time. */
+  location?: string;
   registrationCode?: string;
 }
 
@@ -130,6 +153,7 @@ export async function sendRegistrationEmailOnce(
       eventTitle,
       date: typeof reg.locationDate === "string" ? reg.locationDate : undefined,
       venue: typeof reg.locationVenue === "string" ? reg.locationVenue : undefined,
+      location: typeof reg.location === "string" ? reg.location : undefined,
       registrationCode:
         typeof reg.registrationCode === "string"
           ? reg.registrationCode
@@ -151,6 +175,7 @@ export async function sendRegistrationEmailOnce(
 /* ── Plain-text fallback (for clients that block HTML) ── */
 function registrationEmailText(d: RegistrationEmailData): string {
   const termsUrl = `${SITE_URL}/terms-and-conditions`;
+  const reportingTime = reportingTimeFor(d.venue, d.location);
   return [
     `Hi ${d.firstName},`,
     ``,
@@ -160,7 +185,7 @@ function registrationEmailText(d: RegistrationEmailData): string {
     `Event: ${d.eventTitle}`,
     d.date ? `Date: ${d.date}` : ``,
     d.venue ? `Venue: ${d.venue}` : ``,
-    `Reporting time: ${REPORTING_TIME}`,
+    `Reporting time: ${reportingTime} — please report to the venue on or before this time.`,
     d.registrationCode ? `Registration code: ${d.registrationCode}` : ``,
     ``,
     `Important: Students must bring their valid school or college ID card for check-in.`,
@@ -179,6 +204,7 @@ function registrationEmailHtml(
   hasQr: boolean,
 ): string {
   const termsUrl = `${SITE_URL}/terms-and-conditions`;
+  const reportingTime = reportingTimeFor(d.venue, d.location);
   const row = (label: string, value: string) => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #eef2f6;font:600 13px/1.4 Arial,Helvetica,sans-serif;color:#6b7f92;text-transform:uppercase;letter-spacing:.06em;width:130px;vertical-align:top;">${label}</td>
@@ -189,7 +215,7 @@ function registrationEmailHtml(
     row("Event", escapeHtml(d.eventTitle)),
     d.date ? row("Date", escapeHtml(d.date)) : "",
     d.venue ? row("Venue", escapeHtml(d.venue)) : "",
-    row("Reporting time", REPORTING_TIME),
+    row("Reporting time", reportingTime),
     d.registrationCode
       ? row(
           "Registration code",
@@ -233,7 +259,7 @@ function registrationEmailHtml(
                 ${entryPass(d, hasQr)}
 
                 <p style="margin:22px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
-                  Please arrive by the reporting time of <strong style="color:#102330;">${REPORTING_TIME}</strong>, and
+                  Please report to the venue on or before <strong style="color:#102330;">${reportingTime}</strong>, and
                   <strong style="color:#102330;">bring your valid school or college ID card</strong> for check-in.
                 </p>
 
