@@ -254,7 +254,14 @@ export async function triggerGSheetsSync(): Promise<{
 
   try {
     const participants = await fetchAllParticipantsData();
-    const rows = participants.map((p) => [
+    // Only paid + confirmed participants belong in the sheet. Pending, failed,
+    // expired, and cancelled registrations must never appear. Because the sync
+    // clears + rewrites the whole sheet, filtering here also removes any such
+    // rows that were written before (e.g. a pending row from the order step).
+    const paidParticipants = participants.filter(
+      (p) => p.status === "confirmed" && p.paymentStatus === "paid",
+    );
+    const rows = paidParticipants.map((p) => [
       p.registrationCode,
       p.createdAt,
       p.fullName,
