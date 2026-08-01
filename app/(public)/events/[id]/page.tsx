@@ -48,9 +48,22 @@ function ruleBookDownloadUrl(url: string): string {
   return url.replace("/upload/", "/upload/fl_attachment:YUF-Rule-Book/");
 }
 
-// Read fresh CMS data on every request so admin edits (including fee changes)
-// show after a reload, and events created post-build resolve without a rebuild.
-export const dynamic = "force-dynamic";
+// Cache each event page for 60s. Admin edits (including fee changes) show within
+// a minute. The register page stays dynamic, so live capacity is never stale.
+export const revalidate = 60;
+
+/**
+ * Prerender the known event pages at build time so they are served from cache
+ * instead of re-reading Firestore per request. Without this the route stays
+ * fully dynamic and `revalidate` has nothing to cache.
+ *
+ * Events created AFTER a build are still reachable: `dynamicParams` defaults to
+ * true, so an unknown id renders on demand and is then cached like the rest.
+ */
+export async function generateStaticParams() {
+  const events = await getEvents();
+  return events.map((event) => ({ id: event.id }));
+}
 
 export async function generateMetadata({
   params,
@@ -77,22 +90,22 @@ export async function generateMetadata({
 
 export default async function EventDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ loc?: string }>;
 }) {
   const { id } = await params;
-  const { loc } = await searchParams;
   const allEvents = await getEvents();
   const event = allEvents.find((e) => e.id === id);
   if (!event) notFound();
 
   const locations = getEventLocations(event);
   const multi = locations.length > 1;
-  // The location picked from the listing (?loc=), else the first one.
-  const selectedLocation =
-    locations.find((l) => l.id === loc) ?? locations[0];
+  // Every `selectedLocation` use below is guarded by `!multi`, i.e. it only
+  // renders when the event has exactly one location — so this is always that
+  // single location. Deliberately NOT read from a `?loc=` search param: doing so
+  // opts the whole route out of static rendering (killing `revalidate`, and with
+  // it ~40 Firestore reads per view) while changing nothing on screen.
+  const selectedLocation = locations[0];
 
   const body = event.details ?? [event.description];
   const related = allEvents

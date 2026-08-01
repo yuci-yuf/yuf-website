@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "./layout";
 import { getEvents } from "@/lib/cms-data";
 
-export const dynamic = "force-dynamic";
+// Crawlers hit this regularly; cache for an hour so it doesn't re-read the whole
+// events collection on every request.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

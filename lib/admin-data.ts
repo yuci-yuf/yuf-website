@@ -12,9 +12,12 @@ import {
   deleteDoc,
   deleteField,
   doc,
+  getAggregateFromServer,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
+  sum,
   orderBy,
   query,
   runTransaction,
@@ -89,10 +92,135 @@ function mapRegistration(id: string, data: DocumentData): Registration {
   } satisfies Registration;
 }
 
-export async function getRegistrations(): Promise<Registration[]> {
-  const q = query(collection(db, "registrations"), orderBy("createdAt", "desc"));
+/**
+ * Default cap on how many registration documents an admin screen pulls.
+ *
+ * Every read here is a billed Firestore read, and these screens are refreshed
+ * constantly during an event — an uncapped fetch of N registrations costs N
+ * reads EVERY refresh, which is by far the largest read source in the app. The
+ * admin tables show newest-first and are filtered/searched in the browser, so a
+ * bounded recent window is what they actually need; totals that must cover the
+ * whole collection come from `countRegistrations()` (a server-side aggregation
+ * billed at ~1 read) rather than by downloading every document.
+ */
+export const REGISTRATIONS_PAGE_SIZE = 500;
+
+/**
+ * Most-recent registrations, newest first, capped at `max`.
+ *
+ * NOT the whole collection by default — see REGISTRATIONS_PAGE_SIZE. Callers
+ * that need an exact total or sum across ALL registrations must use the
+ * aggregation helpers below instead of `.length` on this result.
+ */
+export async function getRegistrations(
+  max: number = REGISTRATIONS_PAGE_SIZE,
+): Promise<Registration[]> {
+  const q = query(
+    collection(db, "registrations"),
+    orderBy("createdAt", "desc"),
+    limit(max),
+  );
   const snap = await getDocs(q);
   return snap.docs.map((d) => mapRegistration(d.id, d.data()));
+}
+
+/**
+ * Exact number of registrations, optionally filtered by payment status, using a
+ * server-side count aggregation. Billed at roughly one read regardless of how
+ * many documents match, so this stays cheap as the collection grows.
+ */
+export async function countRegistrations(
+  paymentStatus?: Registration["paymentStatus"],
+): Promise<number> {
+  const base = collection(db, "registrations");
+  const q = paymentStatus
+    ? query(base, where("paymentStatus", "==", paymentStatus))
+    : query(base);
+  const snap = await getCountFromServer(q);
+  return snap.data().count;
+}
+
+/**
+ * Whole-collection registration totals: exact counts and revenue sums across
+ * EVERY registration, computed by server-side aggregations rather than by
+ * downloading the collection. Billed at roughly one read per aggregation, so
+ * the dashboard costs the same whether there are 50 registrations or 50,000.
+ */
+export async function getRegistrationTotals(): Promise<{
+  total: number;
+  paidRevenue: number;
+  pendingRevenue: number;
+}> {
+  const regs = collection(db, "registrations");
+  const paidQ = query(regs, where("paymentStatus", "==", "paid"));
+  // The filtered sum needs the composite index declared in
+  // firestore.indexes.json. If that index has not been deployed yet the call
+  // fails with FAILED_PRECONDITION — degrade the revenue figures to 0 rather
+  // than rejecting, so the rest of the dashboard (counts, chart) still renders.
+  const [totalSnap, paidSumSnap, allSumSnap] = await Promise.all([
+    getCountFromServer(regs),
+    getAggregateFromServer(paidQ, { revenue: sum("amountPaid") }).catch((e) => {
+      console.error("getRegistrationTotals: paid revenue sum failed", e);
+      return null;
+    }),
+    getAggregateFromServer(regs, { revenue: sum("amountPaid") }).catch((e) => {
+      console.error("getRegistrationTotals: total revenue sum failed", e);
+      return null;
+    }),
+  ]);
+  const paidRevenue = paidSumSnap?.data().revenue ?? 0;
+  const allRevenue = allSumSnap?.data().revenue ?? 0;
+  return {
+    total: totalSnap.data().count,
+    paidRevenue,
+    // Everything not yet paid — mirrors the previous `paymentStatus !== "paid"`
+    // filter without needing a second (unsupported) inequality aggregation.
+    // Clamped at 0 so a partially-failed sum can never render a negative figure.
+    pendingRevenue: Math.max(0, allRevenue - paidRevenue),
+  };
+}
+
+/**
+ * Exact number of registrations for one event, ALL payment statuses included.
+ * Used for the delete-event warning, which must reflect every record that will
+ * be destroyed. Server-side aggregation, so ~1 read regardless of event size.
+ */
+export async function countRegistrationsForEvent(
+  eventId: string,
+): Promise<number> {
+  const snap = await getCountFromServer(
+    query(collection(db, "registrations"), where("eventId", "==", eventId)),
+  );
+  return snap.data().count;
+}
+
+/**
+ * Per-event PAID registration counts, one count aggregation per event instead
+ * of downloading every registration to tally them client-side. Events are
+ * counted concurrently; a failed count falls back to 0 rather than rejecting
+ * the whole dashboard.
+ */
+export async function countPaidByEvent(
+  eventIds: string[],
+): Promise<Record<string, number>> {
+  const entries = await Promise.all(
+    eventIds.map(async (eventId) => {
+      try {
+        const snap = await getCountFromServer(
+          query(
+            collection(db, "registrations"),
+            where("eventId", "==", eventId),
+            where("paymentStatus", "==", "paid"),
+          ),
+        );
+        return [eventId, snap.data().count] as const;
+      } catch (e) {
+        console.error(`countPaidByEvent failed for ${eventId}`, e);
+        return [eventId, 0] as const;
+      }
+    }),
+  );
+  return Object.fromEntries(entries);
 }
 
 /**

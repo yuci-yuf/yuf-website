@@ -17,7 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { getRegistrations, institutionTypeLabel } from "@/lib/admin-data";
+import {
+  getRegistrations,
+  countRegistrations,
+  institutionTypeLabel,
+} from "@/lib/admin-data";
 import type { Registration } from "@/types";
 
 /**
@@ -43,9 +47,19 @@ export default function RegistrationsPage() {
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [checkinFilter, setCheckinFilter] = useState("all");
 
+  // The table loads a bounded window of the most recent registrations (search
+  // and filtering both run in the browser over what is loaded). `total` is the
+  // exact collection-wide count, so the header can say plainly when older
+  // registrations exist beyond the loaded window rather than implying the
+  // capped number is everything.
+  const [total, setTotal] = useState<number | null>(null);
+
   useEffect(() => {
-    getRegistrations()
-      .then(setRows)
+    Promise.all([getRegistrations(), countRegistrations()])
+      .then(([regs, count]) => {
+        setRows(regs);
+        setTotal(count);
+      })
       .catch((e) => {
         console.error(e);
         setError("Failed to load registrations.");
@@ -136,7 +150,11 @@ export default function RegistrationsPage() {
     <>
       <PageHeader
         title="Registrations"
-        description={`${filtered.length} of ${rows.length} shown`}
+        description={
+          total != null && total > rows.length
+            ? `${filtered.length} of ${rows.length} shown · ${total} total (showing the ${rows.length} most recent)`
+            : `${filtered.length} of ${rows.length} shown`
+        }
         action={
           <Button variant="outline" size="sm" onClick={exportCsv}>
             <Download size={16} />

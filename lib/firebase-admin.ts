@@ -140,8 +140,20 @@ export async function releaseLocationSlot(
  * when given) so a sweep only ever touches the location a new sign-up contends
  * for. Failures are swallowed; the subsequent FULL check still holds the line.
  *
+ * HARD-BOUNDED because this sits on the critical path of every sign-up. Each
+ * reclaim costs two sequential transactions (expire the reg, release the slot),
+ * so an unbounded sweep grows with the number of abandoned checkouts — on a busy
+ * event that is hundreds of round-trips, which blows the serverless function
+ * timeout. A timeout here is not merely slow: it can land AFTER the caller
+ * reserved a slot but BEFORE its Razorpay order exists, so the caller's rollback
+ * never runs and the slot is leaked permanently. Capping the batch keeps this
+ * O(1)-ish; leftovers are simply reclaimed by subsequent sign-ups.
+ *
  * @returns how many holds were reclaimed (0 if none / on any error).
  */
+/** Max holds reclaimed per request — bounds critical-path latency (see above). */
+const MAX_RECLAIMS_PER_SWEEP = 5;
+
 export async function reclaimStalePendingHolds(
   adminDb: Firestore,
   eventId: string,
@@ -165,12 +177,21 @@ export async function reclaimStalePendingHolds(
 
     // Keep only holds older than the TTL. A missing/odd createdAt is treated as
     // NOT stale (leave it alone) — better to under-reclaim than free a fresh one.
-    const stale = pending.docs.filter((d) => {
-      const created = d.data().createdAt;
-      const ms =
-        created instanceof Timestamp ? created.toMillis() : null;
-      return ms !== null && ms < cutoffMs;
-    });
+    // Oldest first, so the most-abandoned holds are freed when the cap truncates.
+    const stale = pending.docs
+      .map((d) => {
+        const created = d.data().createdAt;
+        return {
+          doc: d,
+          ms: created instanceof Timestamp ? created.toMillis() : null,
+        };
+      })
+      .filter((e): e is { doc: (typeof pending.docs)[number]; ms: number } =>
+        e.ms !== null && e.ms < cutoffMs,
+      )
+      .sort((a, b) => a.ms - b.ms)
+      .slice(0, MAX_RECLAIMS_PER_SWEEP)
+      .map((e) => e.doc);
     if (stale.length === 0) return 0;
 
     const eventRef = adminDb.collection("events").doc(eventId);

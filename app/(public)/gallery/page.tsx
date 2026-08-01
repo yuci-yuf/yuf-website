@@ -11,8 +11,9 @@ export const metadata: Metadata = {
     "Photos, videos, and highlights from the Youth United Festival — celebrating youth talent, innovation, and unity across India.",
 };
 
-// Read fresh gallery data on every request so admin additions show after a reload.
-export const dynamic = "force-dynamic";
+// Cache for 60s instead of reading the gallery collection per request. Admin
+// additions show within a minute.
+export const revalidate = 60;
 
 export default async function GalleryPage() {
   const photos = await getGalleryPhotos();

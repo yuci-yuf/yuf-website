@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/chart";
 import {
   getRegistrations,
+  getRegistrationTotals,
   getContactMessages,
   getAdminEvents,
 } from "@/lib/admin-data";
@@ -67,16 +68,31 @@ function monthlySeries(registrations: Registration[]) {
 }
 
 export default function DashboardPage() {
+  // A bounded window of recent registrations — enough to drive the 6-month
+  // chart and the month-over-month tiles. Collection-wide figures (total count,
+  // revenue) come from `totals` instead, so they stay exact without downloading
+  // every document on each refresh.
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [totals, setTotals] = useState<{
+    total: number;
+    paidRevenue: number;
+    pendingRevenue: number;
+  } | null>(null);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getRegistrations(), getContactMessages(), getAdminEvents()])
-      .then(([regs, msgs, evs]) => {
+    Promise.all([
+      getRegistrations(),
+      getRegistrationTotals(),
+      getContactMessages(),
+      getAdminEvents(),
+    ])
+      .then(([regs, tot, msgs, evs]) => {
         setRegistrations(regs);
+        setTotals(tot);
         setContacts(msgs);
         setEvents(evs);
       })
@@ -104,12 +120,11 @@ export default function DashboardPage() {
         ? 100
         : null
       : Math.round(((thisMonth - lastMonth) / lastMonth) * 100);
-  const revenue = registrations
-    .filter((r) => r.paymentStatus === "paid")
-    .reduce((sum, r) => sum + (r.amountPaid || 0), 0);
-  const pendingRevenue = registrations
-    .filter((r) => r.paymentStatus !== "paid")
-    .reduce((sum, r) => sum + (r.amountPaid || 0), 0);
+  // Collection-wide sums (server-side aggregations), not sums over the loaded
+  // window — otherwise revenue would silently under-report once registrations
+  // exceed the fetch cap.
+  const revenue = totals?.paidRevenue ?? 0;
+  const pendingRevenue = totals?.pendingRevenue ?? 0;
   const activeEvents = events.filter((e) => e.isActive).length;
   const totalEvents = events.length;
   const unreadMessages = contacts.filter((c) => !c.isRead).length;
@@ -142,7 +157,7 @@ export default function DashboardPage() {
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <StatTile
                 label="Total Registrations"
-                value={registrations.length}
+                value={totals?.total ?? 0}
                 trendPct={momPct}
                 footerTitle={
                   momPct != null && momPct >= 0

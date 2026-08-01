@@ -46,6 +46,24 @@
   //     ]
   //   },
   // ]
-  "indexes": [],
+  // Required by getRegistrationTotals() in lib/admin-data.ts: a sum()
+  // aggregation combined with an equality filter needs a composite index over
+  // the filter field and the summed field. Without it the admin dashboard's
+  // revenue tiles fail with FAILED_PRECONDITION.
+  //
+  // Plain count() aggregations need NO index — including the two-equality
+  // countPaidByEvent(eventId + paymentStatus) — so they are deliberately absent.
+  //
+  // Deploy with: firebase deploy --only firestore:indexes
+  "indexes": [
+    {
+      "collectionGroup": "registrations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "paymentStatus", "order": "ASCENDING" },
+        { "fieldPath": "amountPaid", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

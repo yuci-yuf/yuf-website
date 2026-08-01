@@ -32,7 +32,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export const dynamic = "force-dynamic";
+// Cache the rendered page for 60s instead of reading Firestore on every request.
+// CMS content is admin-published and doesn't need per-request freshness; this
+// cuts Firestore reads by ~99% under traffic. Admin edits appear within a minute.
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [events, galleryPhotos, categoryOrder] = await Promise.all([

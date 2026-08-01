@@ -25,7 +25,9 @@ import { cn } from "@/lib/utils";
 import {
   getAdminEvents,
   getAdminCategories,
-  getRegistrations,
+  getRegistrationsForEvent,
+  countPaidByEvent,
+  countRegistrationsForEvent,
   deleteEvent,
   institutionTypeLabel,
 } from "@/lib/admin-data";
@@ -47,7 +49,10 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [categories, setCategories] = useState<EventCategoryDoc[]>([]);
   const [regCounts, setRegCounts] = useState<Record<string, number>>({});
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  // Registrations for the event whose multi-location download dialog is open.
+  // Scoped to that one event and loaded on demand — the page deliberately does
+  // NOT keep every registration in memory (that was the biggest read cost here).
+  const [downloadEventRegs, setDownloadEventRegs] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [managingCats, setManagingCats] = useState(false);
@@ -59,25 +64,16 @@ export default function AdminEventsPage() {
   const [deskEvent, setDeskEvent] = useState<EventItem | null>(null);
 
   function load() {
-    return Promise.all([
-      getAdminEvents(),
-      getAdminCategories(),
-      getRegistrations(),
-    ])
-      .then(([evs, cats, regs]) => {
+    return Promise.all([getAdminEvents(), getAdminCategories()])
+      .then(async ([evs, cats]) => {
         setEvents(evs);
         setCategories(cats);
-        setRegistrations(regs);
         // Count only PAID registrations — the Total badge and the download
         // button's enabled-state both reflect real (paid) registrations, not
-        // pending/failed payment attempts.
-        const counts: Record<string, number> = {};
-        for (const r of regs) {
-          if (r.eventId && r.paymentStatus === "paid") {
-            counts[r.eventId] = (counts[r.eventId] ?? 0) + 1;
-          }
-        }
-        setRegCounts(counts);
+        // pending/failed payment attempts. These are server-side count
+        // aggregations (~1 read each) rather than downloading every
+        // registration just to tally it in the browser.
+        setRegCounts(await countPaidByEvent(evs.map((e) => e.id)));
         setError(null);
       })
       .catch((e) => {
@@ -89,6 +85,24 @@ export default function AdminEventsPage() {
   useEffect(() => {
     load().finally(() => setLoading(false));
   }, []);
+
+  // Load registrations for the event whose location-picker dialog is open, so
+  // the per-location counts have data. The cleanup both cancels a stale response
+  // (so a slow fetch can't overwrite a newer selection) and drops the previous
+  // event's rows when the dialog closes or switches events.
+  useEffect(() => {
+    if (!downloadEvent) return;
+    let cancelled = false;
+    getRegistrationsForEvent(downloadEvent.id)
+      .then((regs) => {
+        if (!cancelled) setDownloadEventRegs(regs);
+      })
+      .catch((e) => console.error(e));
+    return () => {
+      cancelled = true;
+      setDownloadEventRegs([]);
+    };
+  }, [downloadEvent]);
 
   // Category names: prefer the managed list, but include any categories that
   // existing events use so nothing is unselectable.
@@ -138,14 +152,26 @@ export default function AdminEventsPage() {
    * location's registrations are exported and the filename is scoped to it —
    * so you can pull "Kabaddi · Ponneri" separately from "Kabaddi · Coimbatore".
    */
-  function exportEventCsv(ev: EventItem, loc?: EventLocation) {
+  async function exportEventCsv(ev: EventItem, loc?: EventLocation) {
+    // Fetch this event's registrations on demand rather than filtering a
+    // preloaded list: the page no longer holds every registration in memory, and
+    // an export must contain EVERY matching row (a capped list would silently
+    // produce a short CSV, which is worse than a slow one).
+    let eventRegs: Registration[];
+    try {
+      eventRegs = await getRegistrationsForEvent(ev.id);
+    } catch (e) {
+      console.error(e);
+      notify({
+        title: "Download failed",
+        description: "Could not load registrations for this event.",
+      });
+      return;
+    }
     // Only export PAID candidates — pending/failed attempts aren't real
     // registrations and shouldn't appear in the exported list.
-    const rows = registrations.filter(
-      (r) =>
-        r.eventId === ev.id &&
-        r.paymentStatus === "paid" &&
-        (!loc || r.locationId === loc.id),
+    const rows = eventRegs.filter(
+      (r) => r.paymentStatus === "paid" && (!loc || r.locationId === loc.id),
     );
     if (rows.length === 0) {
       notify({
@@ -189,9 +215,14 @@ export default function AdminEventsPage() {
     URL.revokeObjectURL(url);
   }
 
-  /** PAID registrations for a given location — matches what the CSV exports. */
+  /**
+   * PAID registrations for a given location — matches what the CSV exports.
+   * Reads `downloadEventRegs`, which is loaded only while the multi-location
+   * download dialog is open (see the effect above), so the page never holds the
+   * whole registrations collection just to render these counts.
+   */
   function locationRegCount(ev: EventItem, loc: EventLocation): number {
-    return registrations.filter(
+    return downloadEventRegs.filter(
       (r) =>
         r.eventId === ev.id &&
         r.locationId === loc.id &&
@@ -216,7 +247,14 @@ export default function AdminEventsPage() {
   async function handleDelete(ev: EventItem) {
     // Count ALL registrations here (not just paid) — deletion removes every
     // registration for the event, so the warning must reflect the true total.
-    const regCount = registrations.filter((r) => r.eventId === ev.id).length;
+    // Counted server-side; on failure fall back to the generic wording below
+    // rather than understating the number of records about to be destroyed.
+    let regCount = 0;
+    try {
+      regCount = await countRegistrationsForEvent(ev.id);
+    } catch (e) {
+      console.error(e);
+    }
     const ok = await confirm({
       title: "Delete event?",
       description:
@@ -232,9 +270,6 @@ export default function AdminEventsPage() {
     try {
       await deleteEvent(ev.id);
       setEvents((prev) => prev.filter((e) => e.id !== ev.id));
-      // Drop the removed event's registrations from local state so counts and
-      // the "N shown" totals stay accurate without a reload.
-      setRegistrations((prev) => prev.filter((r) => r.eventId !== ev.id));
       setRegCounts((prev) => {
         const next = { ...prev };
         delete next[ev.id];
