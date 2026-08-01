@@ -1,0 +1,10 @@
+# pnpm blocks dependency build scripts by default (supply-chain protection) and
+# requires each to be approved explicitly. These four are expected for this
+# stack: sharp compiles the image binaries Next.js uses for <Image>,
+# unrs-resolver builds the native resolver used by ESLint, and protobufjs /
+# @firebase/util are Firebase transitive deps.
+allowBuilds:
+  '@firebase/util': true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
