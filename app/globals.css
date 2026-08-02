@@ -71,6 +71,10 @@
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #1fa8d7;
+  /* Readable on the light surfaces: the base --color-success is a fill/icon
+     colour and drops to ~2:1 against them, below the 4.5:1 text minimum. */
+  --color-success-dark: #146c34;
+  --color-warning-dark: #8f4e08;
 
   /* ── shadcn/ui token aliases ──
      shadcn components ship with class names like `bg-primary`,
