@@ -190,6 +190,8 @@ function registrationEmailText(d: RegistrationEmailData): string {
     ``,
     `Important: Students must bring their valid school or college ID card for check-in.`,
     ``,
+    `Please note: event schedules, timings and formats may be changed on the spot at the organizers' discretion. Participants are expected to be prepared for such changes and to follow the organizers' decisions without argument.`,
+    ``,
     `Please review our Terms & Conditions before the event: ${termsUrl}`,
     ``,
     `— Team YUF, Youth United Council of India`,
@@ -261,6 +263,12 @@ function registrationEmailHtml(
                 <p style="margin:22px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
                   Please report to the venue on or before <strong style="color:#102330;">${reportingTime}</strong>, and
                   <strong style="color:#102330;">bring your valid school or college ID card</strong> for check-in.
+                </p>
+
+                <p style="margin:14px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
+                  <strong style="color:#102330;">Please note:</strong> event schedules, timings and formats may be
+                  changed on the spot at the organizers' discretion. Participants are expected to be prepared for such
+                  changes and to follow the organizers' decisions without argument.
                 </p>
 
                 <p style="margin:20px 0 6px;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
