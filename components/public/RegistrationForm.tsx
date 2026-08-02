@@ -106,7 +106,12 @@ const EMPTY: FormValues = {
   level: "",
 };
 
-type ErrorKey = keyof FormValues | "category" | "event" | "eventLocation";
+type ErrorKey =
+  | keyof FormValues
+  | "category"
+  | "event"
+  | "eventLocation"
+  | "acceptedTerms";
 type Errors = Partial<Record<ErrorKey, string>>;
 
 export function RegistrationForm({
@@ -134,6 +139,7 @@ export function RegistrationForm({
   const [locationId, setLocationId] = useState<string>(
     explicitLocation?.id ?? "",
   );
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error" | "full"
@@ -241,6 +247,9 @@ export function RegistrationForm({
     // A venue must be chosen whenever the event runs in more than one place.
     if (eventId && locationsForSelection.length > 1 && !selectedLocation)
       e.eventLocation = "Please select a venue.";
+    if (!acceptedTerms)
+      e.acceptedTerms =
+        "Please accept the Terms & Conditions and Privacy Policy to continue.";
     return e;
   }
 
@@ -963,6 +972,45 @@ export function RegistrationForm({
               </p>
             )}
 
+            <div data-field="acceptedTerms">
+              <label className="flex cursor-pointer items-start gap-2.5 text-xs text-text-muted">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(ev) => {
+                    setAcceptedTerms(ev.target.checked);
+                    setErrors((e) => ({ ...e, acceptedTerms: undefined }));
+                  }}
+                  aria-invalid={!!errors.acceptedTerms}
+                  className="mt-0.5 size-4 shrink-0 cursor-pointer accent-primary-700"
+                />
+                <span>
+                  I have read and agree to the{" "}
+                  <Link
+                    href="/terms-and-conditions"
+                    target="_blank"
+                    className="text-primary-700 underline"
+                  >
+                    Terms &amp; Conditions
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy-policy"
+                    target="_blank"
+                    className="text-primary-700 underline"
+                  >
+                    Privacy Policy
+                  </Link>
+                  , and understand that registration fees are non-refundable.
+                </span>
+              </label>
+              {errors.acceptedTerms && (
+                <p className="mt-2 pl-6.5 text-xs font-medium text-error">
+                  {errors.acceptedTerms}
+                </p>
+              )}
+            </div>
+
             <Button
               type="submit"
               size="lg"
@@ -978,21 +1026,6 @@ export function RegistrationForm({
                     ? `Pay ${formatINR(invoice.total)} & Register`
                     : "Complete Registration"}
             </Button>
-
-            <p className="text-center text-xs text-text-muted">
-              By registering you agree to our{" "}
-              <Link
-                href="/terms-and-conditions"
-                className="text-primary-700 underline"
-              >
-                Terms &amp; Conditions
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy-policy" className="text-primary-700 underline">
-                Privacy Policy
-              </Link>
-              .
-            </p>
         </FormSection>
         </div>
       </div>
