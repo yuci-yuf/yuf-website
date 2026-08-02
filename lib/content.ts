@@ -744,6 +744,12 @@ export const termsAndConditions: LegalPage = {
         "Students must bring their valid school or college ID card to the event, and produce it during check-in and whenever requested by the organizers.",
       ],
     },
+    {
+      heading: "12. Certificates",
+      blocks: [
+        "The YUF 2025 logo will be used on all certificates issued for this event.",
+      ],
+    },
   ],
 };
 
