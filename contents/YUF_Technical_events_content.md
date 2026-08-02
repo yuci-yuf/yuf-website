@@ -13,6 +13,7 @@ The Quiz Competition is designed to test participants' knowledge, analytical thi
 - Electronic gadgets or study materials are not permitted unless specified.
 - Maintain silence throughout the competition.
 - Respect the quiz master, judges, and fellow participants.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants or teams are eligible to compete.
@@ -21,7 +22,6 @@ The Quiz Competition is designed to test participants' knowledge, analytical thi
 - Any form of malpractice or unfair means will result in immediate disqualification.
 - The quiz master's and judges' decisions shall be final.
 - The organizing committee reserves the right to modify the quiz format or schedule if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -37,6 +37,7 @@ The Debate Competition provides participants with an opportunity to express thei
 - Maintain professionalism and respect opposing viewpoints.
 - Follow the instructions provided by the moderators and event officials.
 - Ensure that all arguments remain respectful and relevant to the topic.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is strictly an individual event unless otherwise announced.
@@ -45,7 +46,6 @@ The Debate Competition provides participants with an opportunity to express thei
 - Exceeding the allotted speaking time may attract penalties.
 - Judges' decisions regarding scoring and results shall be final.
 - The organizing committee reserves the right to modify the event format if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -61,6 +61,7 @@ The Indian Youth Parliament is an interactive platform that encourages participa
 - Dress in formal or appropriate attire suitable for the event.
 - Maintain decorum and parliamentary etiquette throughout the session.
 - Follow all instructions provided by the moderators and organizers.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must perform only the role assigned by the organizing committee.
@@ -69,7 +70,6 @@ The Indian Youth Parliament is an interactive platform that encourages participa
 - Speaking time limits must be strictly followed.
 - Moderators' and judges' decisions shall be final.
 - The organizing committee reserves the right to modify the session format if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -85,6 +85,7 @@ India's Young Scientist is an innovation-driven competition that encourages part
 - Ensure presentations are well-prepared and within the allotted time.
 - Follow the instructions of judges and event coordinators.
 - Maintain professionalism throughout the evaluation process.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only original projects or research work will be accepted.
@@ -93,4 +94,3 @@ India's Young Scientist is an innovation-driven competition that encourages part
 - Presentations must remain within the specified time limit.
 - Judges' decisions regarding evaluation and awards shall be final.
 - The organizing committee reserves the right to modify the event schedule if required.
-- Registration fees are non-refundable.

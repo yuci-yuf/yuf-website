@@ -13,6 +13,7 @@ Treasure Hunt is an exciting team-based adventure that combines problem-solving,
 - Follow the instructions provided by the event coordinators.
 - Respect the venue, volunteers, and fellow participants.
 - Maintain fair play and complete all challenges honestly.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered team members are allowed to participate.
@@ -22,7 +23,6 @@ Treasure Hunt is an exciting team-based adventure that combines problem-solving,
 - Team members must remain together throughout the event unless specified otherwise.
 - The first team to successfully complete all tasks and reach the final destination with all requirements fulfilled will be declared the winner.
 - The organizers' decisions regarding the event shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -38,6 +38,7 @@ Guess the Song is an entertaining musical challenge that tests participants' lis
 - Maintain silence while audio clips are being played.
 - Respect fellow participants, judges, and event coordinators.
 - Mobile phones or electronic devices must not be used during the competition.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants or teams are eligible to compete.
@@ -47,4 +48,3 @@ Guess the Song is an entertaining musical challenge that tests participants' lis
 - Any misconduct or unfair practices may result in immediate disqualification.
 - Judges' and organizers' decisions shall be final and binding.
 - The organizing committee reserves the right to modify the event format if necessary.
-- Registration fees are non-refundable.

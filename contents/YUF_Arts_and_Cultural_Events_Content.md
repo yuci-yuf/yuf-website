@@ -13,6 +13,7 @@ Battle of Bands is a high-energy musical competition that brings together talent
 - Participants should bring personal instruments if required.
 - Follow the instructions of the event coordinators and technical team.
 - Maintain professionalism and respect fellow performers.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered band members are permitted to perform.
@@ -21,7 +22,6 @@ Battle of Bands is a high-energy musical competition that brings together talent
 - Sound checks must be completed within the assigned schedule.
 - Judges' decisions shall be final.
 - The organizing committee reserves the right to modify the event schedule if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -37,6 +37,7 @@ Solo Singing provides aspiring vocalists with an opportunity to showcase their t
 - Maintain discipline backstage and during performances.
 - Follow the instructions of the event coordinators.
 - Ensure the song selection complies with event guidelines.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is strictly an individual event.
@@ -45,7 +46,6 @@ Solo Singing provides aspiring vocalists with an opportunity to showcase their t
 - Live or recorded accompaniment must follow the event guidelines.
 - Judges' decisions shall be final.
 - Any misconduct may result in disqualification.
-- Registration fees are non-refundable.
 
 ---
 
@@ -61,6 +61,7 @@ The Acoustics/Instrumental event celebrates musical talent through captivating i
 - Ensure instruments are tuned and performance-ready.
 - Follow stage management instructions.
 - Maintain discipline throughout the event.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is an individual performance unless otherwise specified.
@@ -68,7 +69,6 @@ The Acoustics/Instrumental event celebrates musical talent through captivating i
 - Only acoustic or approved instruments may be used.
 - Pre-recorded instrument tracks are not permitted unless announced.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -84,6 +84,7 @@ Solo Dance provides participants with an exciting platform to express their crea
 - Wear appropriate costumes suitable for the performance.
 - Follow backstage instructions provided by organizers.
 - Maintain discipline throughout the event.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is strictly an individual competition.
@@ -91,7 +92,6 @@ Solo Dance provides participants with an exciting platform to express their crea
 - Dangerous props or unsafe acts are prohibited.
 - Vulgar or offensive performances are not permitted.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -107,6 +107,7 @@ Group Dance celebrates teamwork, creativity, synchronization, and stage performa
 - Wear coordinated costumes suitable for the routine.
 - Follow all stage and safety instructions.
 - Maintain discipline backstage.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered team members are allowed to perform.
@@ -114,7 +115,6 @@ Group Dance celebrates teamwork, creativity, synchronization, and stage performa
 - Dangerous stunts without prior approval are prohibited.
 - Teams must use appropriate music and costumes.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -130,6 +130,7 @@ Poetry provides participants with an opportunity to express their creativity, em
 - Respect fellow participants and judges.
 - Follow event coordinator instructions.
 - Ensure your content follows event guidelines.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is strictly an individual event.
@@ -137,7 +138,6 @@ Poetry provides participants with an opportunity to express their creativity, em
 - Offensive or inappropriate content is prohibited.
 - Participants must perform within the allotted time.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -153,6 +153,7 @@ Face Painting encourages participants to showcase their creativity, imagination,
 - Maintain cleanliness throughout the event.
 - Follow the assigned theme and instructions.
 - Respect fellow participants.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants may compete.
@@ -160,7 +161,6 @@ Face Painting encourages participants to showcase their creativity, imagination,
 - Safe and skin-friendly materials must be used.
 - Offensive themes or designs are prohibited.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -176,13 +176,13 @@ Pencil Sketching provides artists with an opportunity to demonstrate creativity,
 - Follow the announced theme carefully.
 - Maintain discipline throughout the competition.
 - Keep your workspace clean.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only pencil-based artwork is permitted unless otherwise specified.
 - Artwork must be completed within the allotted time.
 - Reference materials are not allowed unless permitted.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -198,13 +198,13 @@ Painting provides participants with a platform to express their imagination, cre
 - Follow the announced theme.
 - Maintain cleanliness throughout the event.
 - Respect fellow participants and organizers.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must complete their artwork within the allotted time.
 - Only original artwork is permitted.
 - Offensive or inappropriate content is prohibited.
 - Judges' decisions shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -220,6 +220,7 @@ Youth Talent Icon is a flagship talent showcase that celebrates creativity, orig
 - Follow stage management instructions.
 - Respect fellow participants and judges.
 - Ensure performances are suitable for a public audience.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This is an individual talent competition unless otherwise specified.
@@ -227,4 +228,3 @@ Youth Talent Icon is a flagship talent showcase that celebrates creativity, orig
 - Dangerous acts or inappropriate content are prohibited.
 - Judges' decisions shall be final.
 - The organizing committee reserves the right to modify the event schedule if required.
-- Registration fees are non-refundable.

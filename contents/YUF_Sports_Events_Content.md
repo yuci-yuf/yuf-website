@@ -13,6 +13,7 @@ Step onto the field and experience the excitement of competitive cricket at the 
 - Follow the instructions of match officials and organizers at all times.
 - Maintain discipline and respect fellow participants, umpires, and volunteers.
 - Teams should complete their warm-up before the scheduled start time.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered players are permitted to participate.
@@ -21,7 +22,6 @@ Step onto the field and experience the excitement of competitive cricket at the 
 - Any form of unfair play or misconduct may result in disqualification.
 - Umpires' and organizers' decisions shall be final.
 - The organizing committee reserves the right to modify fixtures if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -37,6 +37,7 @@ Throwball is a fast-paced team sport that emphasizes coordination, communication
 - Respect officials, opponents, and fellow participants.
 - Follow all venue safety instructions.
 - Be present during team verification before the match begins.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Teams must report on time or risk forfeiting the match.
@@ -45,7 +46,6 @@ Throwball is a fast-paced team sport that emphasizes coordination, communication
 - Unsportsmanlike conduct or abusive language will not be tolerated.
 - Referees' decisions shall be final.
 - The organizing committee may revise the schedule if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -61,6 +61,7 @@ Showcase your teamwork, coordination, and athletic ability in the Volleyball Cha
 - Respect match officials and opponents throughout the competition.
 - Warm up only in designated areas.
 - Follow all instructions provided by the organizing committee.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Official volleyball rules shall govern the competition.
@@ -69,7 +70,6 @@ Showcase your teamwork, coordination, and athletic ability in the Volleyball Cha
 - Misconduct or repeated rule violations may result in disqualification.
 - Referees' decisions are final and binding.
 - Fixtures may be adjusted due to unforeseen circumstances.
-- Registration fees are non-refundable.
 
 ---
 
@@ -85,6 +85,7 @@ Experience the thrill of Kabaddi, a dynamic sport that combines strength, agilit
 - Follow safety instructions and maintain discipline.
 - Respect referees, organizers, and fellow participants.
 - Attend team verification before the match.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Matches will be conducted according to the tournament format.
@@ -93,7 +94,6 @@ Experience the thrill of Kabaddi, a dynamic sport that combines strength, agilit
 - Match timings must be strictly followed.
 - Referees' decisions shall be considered final.
 - The organizing committee reserves the right to revise schedules if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -109,6 +109,7 @@ Compete alongside your partner in an exciting badminton doubles tournament that 
 - Respect officials, opponents, and fellow participants.
 - Follow court allocation and match schedules.
 - Warm up before entering the court.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered doubles pairs are permitted to compete.
@@ -117,7 +118,6 @@ Compete alongside your partner in an exciting badminton doubles tournament that 
 - Unsportsmanlike behaviour may result in disqualification.
 - Umpires' decisions are final.
 - The organizing committee may modify the fixture schedule if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -133,6 +133,7 @@ Test your speed, precision, and endurance in the Badminton Singles competition a
 - Respect officials and fellow participants.
 - Follow all venue rules and match schedules.
 - Complete your warm-up before the match begins.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants may compete.
@@ -141,7 +142,6 @@ Test your speed, precision, and endurance in the Badminton Singles competition a
 - Any misconduct may lead to disqualification.
 - Umpires' decisions are final.
 - The organizing committee reserves the right to revise the schedule.
-- Registration fees are non-refundable.
 
 ---
 
@@ -157,6 +157,7 @@ Challenge your strategic thinking and decision-making skills in the Chess Champi
 - Respect opponents, arbiters, and organizers.
 - Electronic devices must remain switched off during play.
 - Report promptly for all scheduled rounds.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - The competition will follow standard chess tournament rules unless otherwise specified.
@@ -165,7 +166,6 @@ Challenge your strategic thinking and decision-making skills in the Chess Champi
 - Any disturbance or unfair conduct may result in disqualification.
 - The arbiter's decision shall be final.
 - The organizing committee reserves the right to modify the schedule if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -181,6 +181,7 @@ The Shot Put event celebrates strength, precision, and athletic excellence by ch
 - Warm up only in designated areas.
 - Follow officials' instructions throughout the competition.
 - Handle equipment responsibly.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants are eligible to compete.
@@ -189,7 +190,6 @@ The Shot Put event celebrates strength, precision, and athletic excellence by ch
 - Fouls will be recorded according to official rules.
 - The best valid throw will determine the final ranking.
 - Judges' decisions are final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -205,6 +205,7 @@ The Long Jump event is designed to test an athlete's speed, strength, coordinati
 - Follow officials' instructions during the competition.
 - Use designated warm-up areas only.
 - Maintain discipline throughout the event.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must jump from behind the take-off board.
@@ -213,7 +214,6 @@ The Long Jump event is designed to test an athlete's speed, strength, coordinati
 - Only registered participants may compete.
 - Judges' decisions shall be final.
 - The organizing committee may revise the event schedule if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -229,6 +229,7 @@ The High Jump event challenges participants to combine speed, agility, balance, 
 - Follow officials' instructions throughout the event.
 - Warm up before the event begins.
 - Maintain discipline and sportsmanship.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must follow the announced jumping order.
@@ -237,7 +238,6 @@ The High Jump event challenges participants to combine speed, agility, balance, 
 - Only registered participants are eligible.
 - Judges' decisions shall be final.
 - Schedule changes may be made by the organizers if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -253,6 +253,7 @@ The Yoga competition celebrates physical fitness, mental focus, flexibility, and
 - Bring your own yoga mat if required.
 - Follow all instructions provided by event officials.
 - Maintain silence during performances.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must perform only within the allotted time.
@@ -261,7 +262,6 @@ The Yoga competition celebrates physical fitness, mental focus, flexibility, and
 - Judges will evaluate based on technique, accuracy, and presentation.
 - Judges' decisions shall be final.
 - The organizing committee reserves the right to modify the event schedule.
-- Registration fees are non-refundable.
 
 ---
 
@@ -277,6 +277,7 @@ Silambam is one of India's oldest traditional martial arts, renowned for its emp
 - Wear appropriate performance attire.
 - Respect judges, organizers, and fellow participants.
 - Follow all safety instructions.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - This event is conducted as an individual performance.
@@ -301,6 +302,7 @@ Dive into an exciting swimming competition that showcases speed, endurance, tech
 - Follow all pool safety instructions.
 - Warm up only when permitted.
 - Report to the assigned lane before the race begins.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Participants must swim only in their assigned lanes.
@@ -309,7 +311,6 @@ Dive into an exciting swimming competition that showcases speed, endurance, tech
 - Unsportsmanlike conduct will not be tolerated.
 - Officials' decisions shall be final.
 - Schedule changes may be made if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -325,6 +326,7 @@ The Table Tennis Singles event provides participants with an opportunity to demo
 - Wear suitable sports attire.
 - Respect officials and opponents.
 - Follow the announced match schedule.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Standard table tennis rules shall apply.
@@ -333,7 +335,6 @@ The Table Tennis Singles event provides participants with an opportunity to demo
 - Unsportsmanlike behaviour may lead to disqualification.
 - Umpires' decisions shall be final.
 - The organizing committee may modify fixtures if required.
-- Registration fees are non-refundable.
 
 ---
 
@@ -349,6 +350,7 @@ Kho-Kho is a traditional Indian team sport that combines speed, agility, teamwor
 - Follow the instructions of referees and organizers.
 - Maintain discipline throughout the event.
 - Attend team verification before the match.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered team members are eligible to participate.
@@ -357,4 +359,3 @@ Kho-Kho is a traditional Indian team sport that combines speed, agility, teamwor
 - Any form of misconduct may result in disqualification.
 - Referees' decisions shall be final.
 - The organizing committee reserves the right to revise schedules if required.
-- Registration fees are non-refundable.

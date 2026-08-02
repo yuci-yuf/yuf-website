@@ -13,6 +13,7 @@ The 100 Metres is the ultimate test of speed, explosive power, and athletic perf
 - Complete your warm-up before reporting to the starting area.
 - Follow all instructions given by the track officials.
 - Maintain discipline and respect fellow participants throughout the competition.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants are permitted to compete.
@@ -21,7 +22,6 @@ The 100 Metres is the ultimate test of speed, explosive power, and athletic perf
 - The race will begin only upon the official starter's signal.
 - Interfering with another participant during the race is strictly prohibited.
 - Officials' decisions regarding timings and results shall be final.
-- Registration fees are non-refundable.
 
 ---
 
@@ -37,6 +37,7 @@ The 200 Metres event combines speed, endurance, and technical excellence as athl
 - Warm up in the designated practice area before the race.
 - Follow the instructions of track officials and volunteers.
 - Maintain discipline and sportsmanship throughout the competition.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered participants are eligible to compete.
@@ -45,7 +46,6 @@ The 200 Metres event combines speed, endurance, and technical excellence as athl
 - Any obstruction or interference with another athlete may result in disqualification.
 - Official race timings and judges' decisions shall be final.
 - The organizing committee reserves the right to revise the event schedule if necessary.
-- Registration fees are non-refundable.
 
 ---
 
@@ -61,6 +61,7 @@ The 4×100 Metres Relay is an exciting team event that combines speed, coordinat
 - Ensure all team members attend the pre-race briefing.
 - Warm up before entering the competition area.
 - Follow all instructions provided by event officials and volunteers.
+- Registration fees are non-refundable.
 
 ### Rules & Regulations
 - Only registered team members are permitted to participate.
@@ -69,4 +70,3 @@ The 4×100 Metres Relay is an exciting team event that combines speed, coordinat
 - Dropping the baton must be handled according to official relay regulations.
 - Unsportsmanlike conduct or rule violations may result in disqualification.
 - Judges' decisions regarding the race and results shall be final.
-- Registration fees are non-refundable.
