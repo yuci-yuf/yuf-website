@@ -25,6 +25,16 @@ export function audienceLabel(audience: EventAudience | undefined): string | nul
 }
 
 /**
+ * Like `audienceLabel`, but always returns a label — "both" becomes an explicit
+ * "School & College" rather than nothing. Used where every row in a list needs a
+ * badge, so a location open to everyone reads as deliberate rather than as a
+ * missing value sitting next to its "School only" siblings.
+ */
+export function audienceLabelAlways(audience: EventAudience | undefined): string {
+  return audienceLabel(audience) ?? "School & College";
+}
+
+/**
  * Who a specific location is open to. Prefers the location's own `audience`,
  * falling back to the event-level `audience` (legacy events), then "both".
  */
