@@ -43,8 +43,10 @@ export default function PendingEmailsPage() {
   // The scan is bounded; true when it hit the ceiling and older confirmed
   // registrations went unchecked, so the list is never silently partial.
   const [truncated, setTruncated] = useState(false);
-  // Rows marked done in this session, kept only so they can be undone.
-  const [justMarked, setJustMarked] = useState<PendingEmailRegistration[]>([]);
+  // Ids marked done in this session. The rows STAY in the table (greyed, with
+  // an Undo) rather than vanishing, so a misclick is visible and recoverable
+  // in place. They're gone on the next load, by which point they're handled.
+  const [markedIds, setMarkedIds] = useState<string[]>([]);
   const [copy, setCopy] = useState<EmailCopy | null>(null);
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [copied, setCopied] = useState<"html" | "text" | null>(null);
@@ -110,9 +112,8 @@ export default function PendingEmailsPage() {
   }
 
   /**
-   * Record that this one was emailed by hand, so it stops appearing here.
-   * The row is kept in `justMarked` (not dropped) so an accidental click can
-   * be undone without a page reload.
+   * Record that this one was emailed by hand. The row stays put, marked, so
+   * the change is visible where it happened and can be undone in place.
    */
   async function markDone(row: PendingEmailRegistration) {
     setBusyId(row.id);
@@ -121,8 +122,7 @@ export default function PendingEmailsPage() {
         method: "PATCH",
         body: JSON.stringify({ registrationId: row.id }),
       });
-      setRows((prev) => prev.filter((r) => r.id !== row.id));
-      setJustMarked((prev) => [...prev, row]);
+      setMarkedIds((prev) => [...prev, row.id]);
     } catch (e) {
       notify({
         title: "Could not mark as done",
@@ -140,8 +140,7 @@ export default function PendingEmailsPage() {
         method: "PATCH",
         body: JSON.stringify({ registrationId: row.id, undo: true }),
       });
-      setJustMarked((prev) => prev.filter((r) => r.id !== row.id));
-      setRows((prev) => [row, ...prev]);
+      setMarkedIds((prev) => prev.filter((id) => id !== row.id));
     } catch (e) {
       notify({
         title: "Could not undo",
@@ -182,8 +181,9 @@ export default function PendingEmailsPage() {
   }
 
   async function resendAll() {
+    const pending = rows.filter((r) => !markedIds.includes(r.id)).length;
     const ok = await confirm({
-      title: `Send ${rows.length} confirmation email${rows.length === 1 ? "" : "s"}?`,
+      title: `Send ${pending} confirmation email${pending === 1 ? "" : "s"}?`,
       description:
         "Each one is sent through Resend. Anyone already emailed is skipped automatically. If the daily limit is reached, the rest stay listed here.",
       confirmLabel: "Send all",
@@ -238,6 +238,10 @@ export default function PendingEmailsPage() {
     setTimeout(() => setCopied(null), 2000);
   }
 
+  // Rows still needing action — marked ones are already handled, so counting
+  // them would overstate what's left (and the server skips them regardless).
+  const unmarkedCount = rows.filter((r) => !markedIds.includes(r.id)).length;
+
   return (
     <div>
       <PageHeader
@@ -256,44 +260,12 @@ export default function PendingEmailsPage() {
                 ) : (
                   <Send size={16} />
                 )}
-                Send all ({rows.length})
+                Send all ({unmarkedCount})
               </Button>
             </div>
           ) : undefined
         }
       />
-
-      {/* Marked done in this session — offered back for a moment in case the
-          click was a mistake, since nothing else would reveal it. */}
-      {justMarked.length > 0 && (
-        <div className="mx-4 mt-4 rounded-xl border border-border bg-surface-alt px-4 py-3 sm:mx-6 lg:mx-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-            Marked as sent by hand
-          </p>
-          <ul className="mt-2 flex flex-col gap-1.5">
-            {justMarked.map((r) => (
-              <li
-                key={r.id}
-                className="flex flex-wrap items-center justify-between gap-2 text-sm"
-              >
-                <span className="text-text">
-                  {[r.firstName, r.lastName].filter(Boolean).join(" ")}
-                  <span className="text-text-muted"> · {r.email}</span>
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => undoMark(r)}
-                  disabled={busyId === r.id}
-                >
-                  <Undo2 size={14} />
-                  Undo
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-text-muted">
@@ -314,77 +286,117 @@ export default function PendingEmailsPage() {
           <table className="w-full text-sm">
             <thead className="bg-surface-alt text-left text-xs uppercase tracking-wide text-text-muted">
               <tr>
-                <th className="px-4 py-3 font-semibold">Participant</th>
-                <th className="px-4 py-3 font-semibold">Event</th>
-                <th className="px-4 py-3 font-semibold">Code</th>
-                <th className="px-4 py-3 font-semibold">Registered</th>
-                <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                <th className="px-5 py-3.5 font-semibold">Participant</th>
+                <th className="px-5 py-3.5 font-semibold">Event</th>
+                <th className="px-5 py-3.5 font-semibold">Code</th>
+                <th className="px-5 py-3.5 font-semibold">Registered</th>
+                <th className="px-5 py-3.5 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-border align-top">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-text">
-                      {[r.firstName, r.lastName].filter(Boolean).join(" ")}
-                    </div>
-                    <div className="text-xs text-text-muted">{r.email}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="text-text">{r.eventTitle}</div>
-                    <div className="text-xs text-text-muted">
-                      {[r.locationVenue, r.locationDate]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-text">
-                    {r.registrationCode || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-text-muted">
-                    {r.createdAt ? formatDate(r.createdAt) : "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openCopy(r)}
-                        disabled={copyingId === r.id}
+              {rows.map((r) => {
+                // Marked rows stay in place, dimmed, until the next load —
+                // the click is visible where it happened and undoable there.
+                const marked = markedIds.includes(r.id);
+                return (
+                  <tr
+                    key={r.id}
+                    className={`border-t border-border align-top ${
+                      marked ? "bg-surface-alt/60" : ""
+                    }`}
+                  >
+                    <td className="px-5 py-4">
+                      <div
+                        className={`font-medium ${
+                          marked ? "text-text-muted line-through" : "text-text"
+                        }`}
                       >
-                        {copyingId === r.id ? (
-                          <Loader2 size={14} className="animate-spin" />
+                        {[r.firstName, r.lastName].filter(Boolean).join(" ")}
+                      </div>
+                      <div className="text-xs text-text-muted">{r.email}</div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className={marked ? "text-text-muted" : "text-text"}>
+                        {r.eventTitle}
+                      </div>
+                      <div className="text-xs text-text-muted">
+                        {[r.locationVenue, r.locationDate]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 font-mono text-xs text-text-muted">
+                      {r.registrationCode || "—"}
+                    </td>
+                    <td className="px-5 py-4 text-xs text-text-muted">
+                      {r.createdAt ? formatDate(r.createdAt) : "—"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {marked ? (
+                          <>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-text-muted ring-1 ring-border">
+                              <Check size={13} />
+                              Sent by hand
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => undoMark(r)}
+                              disabled={busyId === r.id}
+                            >
+                              {busyId === r.id ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <Undo2 size={14} />
+                              )}
+                              Undo
+                            </Button>
+                          </>
                         ) : (
-                          <Copy size={14} />
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openCopy(r)}
+                              disabled={copyingId === r.id}
+                            >
+                              {copyingId === r.id ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <Copy size={14} />
+                              )}
+                              Copy email
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => markDone(r)}
+                              disabled={busyId === r.id}
+                              title="I've already emailed this participant by hand"
+                            >
+                              <Check size={14} />
+                              Mark done
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => resendOne(r)}
+                              disabled={busyId === r.id}
+                            >
+                              {busyId === r.id ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <Send size={14} />
+                              )}
+                              Resend
+                            </Button>
+                          </>
                         )}
-                        Copy email
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => markDone(r)}
-                        disabled={busyId === r.id}
-                        title="I've already emailed this participant by hand"
-                      >
-                        <Check size={14} />
-                        Mark done
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => resendOne(r)}
-                        disabled={busyId === r.id}
-                      >
-                        {busyId === r.id ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Send size={14} />
-                        )}
-                        Resend
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
