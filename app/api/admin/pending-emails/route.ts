@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase-admin/firestore";
 import {
   eventDeskErrorResponse,
   EventDeskError,
@@ -178,6 +179,64 @@ export async function POST(request: Request) {
     }
     const result = await sendRegistrationEmailOnce(db, ref);
     return Response.json(result);
+  } catch (error) {
+    return eventDeskErrorResponse(error);
+  }
+}
+
+/**
+ * Mark a registration as emailed by hand — or undo that.
+ *
+ * Sending the copied HTML from a personal mail client leaves no trace in
+ * Firestore, so the row would sit in this list forever. Marking it done writes
+ * the same `emailSentAt` a real send would, which is the honest record: the
+ * participant HAS their confirmation, just not via Resend. `emailSentManually`
+ * and `emailSentBy` keep the two distinguishable afterwards.
+ *
+ * Undo only ever clears a marker that was set by hand — never one written by an
+ * actual send, which would wrongly re-list someone who really was emailed.
+ */
+export async function PATCH(request: Request) {
+  try {
+    const adminUid = await requireFullAdmin(request);
+    const body = await request.json();
+    const id =
+      typeof body.registrationId === "string" ? body.registrationId.trim() : "";
+    if (!id) throw new EventDeskError(400, "A registration is required.");
+
+    const ref = getAdminDb().collection("registrations").doc(id);
+    const snapshot = await ref.get();
+    if (!snapshot.exists) {
+      throw new EventDeskError(404, "Registration not found.");
+    }
+    const data = snapshot.data()!;
+
+    if (body.undo === true) {
+      if (!data.emailSentManually) {
+        throw new EventDeskError(
+          400,
+          "This confirmation was sent by Resend, so it can't be un-marked.",
+        );
+      }
+      await ref.update({
+        emailSentAt: FieldValue.delete(),
+        emailSentManually: FieldValue.delete(),
+        emailSentBy: FieldValue.delete(),
+      });
+      return Response.json({ ok: true, marked: false });
+    }
+
+    if (data.emailSentAt) {
+      // Already emailed (by either path) — nothing to do, and overwriting the
+      // timestamp would lose when it actually went out.
+      return Response.json({ ok: true, marked: true, alreadySent: true });
+    }
+    await ref.update({
+      emailSentAt: FieldValue.serverTimestamp(),
+      emailSentManually: true,
+      emailSentBy: adminUid,
+    });
+    return Response.json({ ok: true, marked: true });
   } catch (error) {
     return eventDeskErrorResponse(error);
   }

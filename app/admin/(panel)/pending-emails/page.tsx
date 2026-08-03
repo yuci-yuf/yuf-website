@@ -1,7 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, RefreshCw, Send, Copy, Check, X } from "lucide-react";
+import {
+  Loader2,
+  RefreshCw,
+  Send,
+  Copy,
+  Check,
+  Undo2,
+  X,
+} from "lucide-react";
 import { PageHeader, EmptyState, formatDate } from "@/components/admin/AdminUI";
 import { Button } from "@/components/ui/button";
 import { useDialog } from "@/components/ui/confirm-dialog";
@@ -35,6 +43,8 @@ export default function PendingEmailsPage() {
   // The scan is bounded; true when it hit the ceiling and older confirmed
   // registrations went unchecked, so the list is never silently partial.
   const [truncated, setTruncated] = useState(false);
+  // Rows marked done in this session, kept only so they can be undone.
+  const [justMarked, setJustMarked] = useState<PendingEmailRegistration[]>([]);
   const [copy, setCopy] = useState<EmailCopy | null>(null);
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [copied, setCopied] = useState<"html" | "text" | null>(null);
@@ -97,6 +107,49 @@ export default function PendingEmailsPage() {
         setError(e instanceof Error ? e.message : "Failed to load."),
       )
       .finally(() => setLoading(false));
+  }
+
+  /**
+   * Record that this one was emailed by hand, so it stops appearing here.
+   * The row is kept in `justMarked` (not dropped) so an accidental click can
+   * be undone without a page reload.
+   */
+  async function markDone(row: PendingEmailRegistration) {
+    setBusyId(row.id);
+    try {
+      await api("", {
+        method: "PATCH",
+        body: JSON.stringify({ registrationId: row.id }),
+      });
+      setRows((prev) => prev.filter((r) => r.id !== row.id));
+      setJustMarked((prev) => [...prev, row]);
+    } catch (e) {
+      notify({
+        title: "Could not mark as done",
+        description: e instanceof Error ? e.message : "Request failed.",
+      });
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function undoMark(row: PendingEmailRegistration) {
+    setBusyId(row.id);
+    try {
+      await api("", {
+        method: "PATCH",
+        body: JSON.stringify({ registrationId: row.id, undo: true }),
+      });
+      setJustMarked((prev) => prev.filter((r) => r.id !== row.id));
+      setRows((prev) => [row, ...prev]);
+    } catch (e) {
+      notify({
+        title: "Could not undo",
+        description: e instanceof Error ? e.message : "Request failed.",
+      });
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function resendOne(row: PendingEmailRegistration) {
@@ -210,6 +263,38 @@ export default function PendingEmailsPage() {
         }
       />
 
+      {/* Marked done in this session — offered back for a moment in case the
+          click was a mistake, since nothing else would reveal it. */}
+      {justMarked.length > 0 && (
+        <div className="mx-4 mt-4 rounded-xl border border-border bg-surface-alt px-4 py-3 sm:mx-6 lg:mx-8">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            Marked as sent by hand
+          </p>
+          <ul className="mt-2 flex flex-col gap-1.5">
+            {justMarked.map((r) => (
+              <li
+                key={r.id}
+                className="flex flex-wrap items-center justify-between gap-2 text-sm"
+              >
+                <span className="text-text">
+                  {[r.firstName, r.lastName].filter(Boolean).join(" ")}
+                  <span className="text-text-muted"> · {r.email}</span>
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => undoMark(r)}
+                  disabled={busyId === r.id}
+                >
+                  <Undo2 size={14} />
+                  Undo
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-20 text-text-muted">
           <Loader2 size={22} className="animate-spin" />
@@ -273,6 +358,16 @@ export default function PendingEmailsPage() {
                           <Copy size={14} />
                         )}
                         Copy email
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => markDone(r)}
+                        disabled={busyId === r.id}
+                        title="I've already emailed this participant by hand"
+                      >
+                        <Check size={14} />
+                        Mark done
                       </Button>
                       <Button
                         size="sm"
