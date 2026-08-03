@@ -778,8 +778,16 @@ export function RegistrationForm({
                     onValueChange={(v) => {
                       setEventId(v);
                       setLocationId("");
+                      // Picking from "Other events" would otherwise leave the
+                      // category box contradicting the event next to it (e.g.
+                      // "Arts & Culturals" beside "100 Metres"), so follow the
+                      // event's own category. Only the event id is submitted,
+                      // so this corrects the display, not the registration.
+                      const picked = events.find((e) => e.id === v);
+                      if (picked) setCategory(picked.category);
                       setErrors((e) => ({
                         ...e,
+                        category: undefined,
                         event: undefined,
                         eventLocation: undefined,
                       }));
