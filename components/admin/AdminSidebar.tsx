@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Images,
   ScanLine,
+  MailWarning,
   Menu,
   X,
 } from "lucide-react";
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils";
 const nav = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Registrations", href: "/admin/registrations", icon: ClipboardList },
+  { label: "Pending emails", href: "/admin/pending-emails", icon: MailWarning },
   { label: "Check-in", href: "/admin/checkin", icon: ScanLine },
   { label: "Contacts", href: "/admin/contacts", icon: Mail },
   { label: "Events", href: "/admin/events", icon: CalendarDays },

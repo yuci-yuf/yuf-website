@@ -60,6 +60,51 @@ export interface RegistrationEmailData {
   registrationCode?: string;
 }
 
+/** QR PNG for the entry pass, or null when there's no code / rendering fails. */
+async function renderQrBuffer(
+  registrationCode?: string,
+): Promise<Buffer | null> {
+  if (!registrationCode) return null;
+  try {
+    return await QRCode.toBuffer(registrationCode, {
+      errorCorrectionLevel: "M",
+      margin: 2,
+      width: 320,
+    });
+  } catch (err) {
+    console.error("QR render failed:", err);
+    return null;
+  }
+}
+
+/**
+ * The confirmation email as SELF-CONTAINED html, for sending by hand (Gmail,
+ * Outlook, …) when Resend can't deliver — e.g. the free tier's daily cap.
+ *
+ * The sent email references the QR as `cid:qrcode`, which only resolves inside
+ * a real MIME message; pasted into a mail client it renders as a broken image.
+ * So here the QR is inlined as a base64 `data:` URI instead, making the markup
+ * safe to copy anywhere. Returns the plain-text body too, for clients that
+ * can't paste HTML.
+ */
+export async function buildRegistrationEmailCopy(
+  data: RegistrationEmailData,
+): Promise<{ subject: string; html: string; text: string }> {
+  const qrBuffer = await renderQrBuffer(data.registrationCode);
+  const qrDataUri = qrBuffer
+    ? `data:image/png;base64,${qrBuffer.toString("base64")}`
+    : undefined;
+  return {
+    subject: registrationEmailSubject(data),
+    html: registrationEmailHtml(data, qrDataUri != null, qrDataUri),
+    text: registrationEmailText(data),
+  };
+}
+
+function registrationEmailSubject(d: RegistrationEmailData): string {
+  return `You're registered — ${d.eventTitle} · Youth United Festival 2026`;
+}
+
 export async function sendRegistrationEmail(data: RegistrationEmailData) {
   const resend = getResend();
 
@@ -67,23 +112,12 @@ export async function sendRegistrationEmail(data: RegistrationEmailData) {
   // scanned at the gate. If the code is missing or QR rendering fails we simply
   // send the email without it — the code is always printed as text, which is the
   // supported manual fallback at the entry desk.
-  let qrBuffer: Buffer | null = null;
-  if (data.registrationCode) {
-    try {
-      qrBuffer = await QRCode.toBuffer(data.registrationCode, {
-        errorCorrectionLevel: "M",
-        margin: 2,
-        width: 320,
-      });
-    } catch (err) {
-      console.error("QR render failed:", err);
-    }
-  }
+  const qrBuffer = await renderQrBuffer(data.registrationCode);
 
   return resend.emails.send({
     from: FROM,
     to: data.to,
-    subject: `You're registered — ${data.eventTitle} · Youth United Festival 2026`,
+    subject: registrationEmailSubject(data),
     html: registrationEmailHtml(data, qrBuffer != null),
     text: registrationEmailText(data),
     attachments: qrBuffer
@@ -204,6 +238,8 @@ function registrationEmailText(d: RegistrationEmailData): string {
 function registrationEmailHtml(
   d: RegistrationEmailData,
   hasQr: boolean,
+  /** When set, the QR is inlined as a data URI instead of `cid:qrcode`. */
+  qrSrc?: string,
 ): string {
   const termsUrl = `${SITE_URL}/terms-and-conditions`;
   const reportingTime = reportingTimeFor(d.venue, d.location);
@@ -258,7 +294,7 @@ function registrationEmailHtml(
                   ${details}
                 </table>
 
-                ${entryPass(d, hasQr)}
+                ${entryPass(d, hasQr, qrSrc)}
 
                 <p style="margin:22px 0 0;font:400 14px/1.6 Arial,Helvetica,sans-serif;color:#6b7f92;">
                   Please report to the venue on or before <strong style="color:#102330;">${reportingTime}</strong>, and
@@ -296,11 +332,15 @@ function registrationEmailHtml(
 }
 
 /* ── Entry pass block: scannable QR (cid) + the code as the manual fallback ── */
-function entryPass(d: RegistrationEmailData, hasQr: boolean): string {
+function entryPass(
+  d: RegistrationEmailData,
+  hasQr: boolean,
+  qrSrc?: string,
+): string {
   if (!d.registrationCode) return "";
   const code = escapeHtml(d.registrationCode);
   const qrImg = hasQr
-    ? `<img src="cid:qrcode" alt="Entry QR code" width="180" height="180" style="display:block;margin:0 auto 14px;width:180px;height:180px;border-radius:8px;" />`
+    ? `<img src="${qrSrc ?? "cid:qrcode"}" alt="Entry QR code" width="180" height="180" style="display:block;margin:0 auto 14px;width:180px;height:180px;border-radius:8px;" />`
     : "";
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;background:#ffffff;border:1px solid #e3eef4;border-radius:12px;">
@@ -308,7 +348,7 @@ function entryPass(d: RegistrationEmailData, hasQr: boolean): string {
         <td style="padding:24px;text-align:center;">
           <div style="font:700 12px/1 Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#1787b3;margin-bottom:14px;">Your entry pass</div>
           ${qrImg}
-          <div style="font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#6b7f92;">Show this QR at the entry desk${hasQr ? " (also attached to this email)" : ""}.</div>
+          <div style="font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#6b7f92;">Show this QR at the entry desk${hasQr && !qrSrc ? " (also attached to this email)" : ""}.</div>
           <div style="margin-top:16px;padding-top:16px;border-top:1px dashed #d8e6ee;">
             <div style="font:600 12px/1 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b7f92;margin-bottom:6px;">If the QR won't scan, give this code</div>
             <div style="font:700 22px/1.3 'Courier New',monospace;letter-spacing:.08em;color:#102330;">${code}</div>

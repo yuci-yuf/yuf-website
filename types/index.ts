@@ -319,6 +319,24 @@ export interface Registration {
   checkedInBy?: string;
 }
 
+/**
+ * A confirmed registration whose confirmation email never went out (no
+ * `emailSentAt`). Surfaced in the admin so a failed send — typically Resend's
+ * free-tier daily cap — can be retried or sent by hand.
+ */
+export interface PendingEmailRegistration {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  eventTitle: string;
+  locationVenue: string;
+  locationDate: string;
+  registrationCode: string;
+  createdAt: string | null;
+}
+
 // ── Private event-desk links ──
 
 /** Admin-facing metadata for one private event-location access link. */
