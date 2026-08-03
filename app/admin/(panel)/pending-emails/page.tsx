@@ -267,140 +267,150 @@ export default function PendingEmailsPage() {
         }
       />
 
-      {loading ? (
-        <div className="flex items-center justify-center py-20 text-text-muted">
-          <Loader2 size={22} className="animate-spin" />
-        </div>
-      ) : error ? (
-        <EmptyState message={error} />
-      ) : rows.length === 0 ? (
-        <EmptyState message="Everyone has their email — every confirmed registration has had its confirmation sent." />
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-surface">
-          {truncated && (
-            <p className="border-b border-border bg-surface-alt px-4 py-2.5 text-xs text-text-muted">
-              Showing the first {rows.length} found — older confirmed
-              registrations were not checked, so there may be more.
-            </p>
-          )}
-          <table className="w-full text-sm">
-            <thead className="bg-surface-alt text-left text-xs uppercase tracking-wide text-text-muted">
-              <tr>
-                <th className="px-5 py-3.5 font-semibold">Participant</th>
-                <th className="px-5 py-3.5 font-semibold">Event</th>
-                <th className="px-5 py-3.5 font-semibold">Code</th>
-                <th className="px-5 py-3.5 font-semibold">Registered</th>
-                <th className="px-5 py-3.5 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                // Marked rows stay in place, dimmed, until the next load —
-                // the click is visible where it happened and undoable there.
-                const marked = markedIds.includes(r.id);
-                return (
-                  <tr
-                    key={r.id}
-                    className={`border-t border-border align-top ${
-                      marked ? "bg-surface-alt/60" : ""
-                    }`}
-                  >
-                    <td className="px-5 py-4">
-                      <div
-                        className={`font-medium ${
-                          marked ? "text-text-muted line-through" : "text-text"
-                        }`}
-                      >
-                        {[r.firstName, r.lastName].filter(Boolean).join(" ")}
-                      </div>
-                      <div className="text-xs text-text-muted">{r.email}</div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className={marked ? "text-text-muted" : "text-text"}>
-                        {r.eventTitle}
-                      </div>
-                      <div className="text-xs text-text-muted">
-                        {[r.locationVenue, r.locationDate]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 font-mono text-xs text-text-muted">
-                      {r.registrationCode || "—"}
-                    </td>
-                    <td className="px-5 py-4 text-xs text-text-muted">
-                      {r.createdAt ? formatDate(r.createdAt) : "—"}
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex flex-wrap justify-end gap-2">
-                        {marked ? (
-                          <>
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-text-muted ring-1 ring-border">
-                              <Check size={13} />
-                              Sent by hand
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => undoMark(r)}
-                              disabled={busyId === r.id}
-                            >
-                              {busyId === r.id ? (
-                                <Loader2 size={14} className="animate-spin" />
-                              ) : (
-                                <Undo2 size={14} />
-                              )}
-                              Undo
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openCopy(r)}
-                              disabled={copyingId === r.id}
-                            >
-                              {copyingId === r.id ? (
-                                <Loader2 size={14} className="animate-spin" />
-                              ) : (
-                                <Copy size={14} />
-                              )}
-                              Copy email
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => markDone(r)}
-                              disabled={busyId === r.id}
-                              title="I've already emailed this participant by hand"
-                            >
-                              <Check size={14} />
-                              Mark done
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => resendOne(r)}
-                              disabled={busyId === r.id}
-                            >
-                              {busyId === r.id ? (
-                                <Loader2 size={14} className="animate-spin" />
-                              ) : (
-                                <Send size={14} />
-                              )}
-                              Resend
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Same inset as the other admin pages, so the table doesn't run to the
+          viewport edges while the header above it stays indented. */}
+      <div className="p-4 sm:p-6 lg:p-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-20 text-text-muted">
+            <Loader2 size={22} className="animate-spin" />
+          </div>
+        ) : error ? (
+          <EmptyState message={error} />
+        ) : rows.length === 0 ? (
+          <EmptyState message="Everyone has their email — every confirmed registration has had its confirmation sent." />
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-card">
+            {truncated && (
+              <p className="border-b border-border bg-surface-alt px-5 py-2.5 text-xs text-text-muted">
+                Showing the first {rows.length} found — older confirmed
+                registrations were not checked, so there may be more.
+              </p>
+            )}
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border bg-surface-alt text-xs uppercase tracking-wide text-text-muted">
+                <tr>
+                  <th className="px-5 py-3.5 font-semibold">Participant</th>
+                  <th className="px-5 py-3.5 font-semibold">Event</th>
+                  <th className="px-5 py-3.5 font-semibold">Code</th>
+                  <th className="px-5 py-3.5 font-semibold">Registered</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {rows.map((r) => {
+                  // Marked rows stay in place, dimmed, until the next load —
+                  // the click is visible where it happened and undoable there.
+                  const marked = markedIds.includes(r.id);
+                  return (
+                    <tr
+                      key={r.id}
+                      className={`align-top ${
+                        marked ? "bg-surface-alt/60" : "hover:bg-surface-alt/40"
+                      }`}
+                    >
+                      <td className="px-5 py-4">
+                        <div
+                          className={`font-medium ${
+                            marked
+                              ? "text-text-muted line-through"
+                              : "text-text"
+                          }`}
+                        >
+                          {[r.firstName, r.lastName].filter(Boolean).join(" ")}
+                        </div>
+                        <div className="text-xs text-text-muted">{r.email}</div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div
+                          className={marked ? "text-text-muted" : "text-text"}
+                        >
+                          {r.eventTitle}
+                        </div>
+                        <div className="text-xs text-text-muted">
+                          {[r.locationVenue, r.locationDate]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 font-mono text-xs text-text-muted">
+                        {r.registrationCode || "—"}
+                      </td>
+                      <td className="px-5 py-4 text-xs text-text-muted">
+                        {r.createdAt ? formatDate(r.createdAt) : "—"}
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {marked ? (
+                            <>
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-text-muted ring-1 ring-border">
+                                <Check size={13} />
+                                Sent by hand
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => undoMark(r)}
+                                disabled={busyId === r.id}
+                              >
+                                {busyId === r.id ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                  <Undo2 size={14} />
+                                )}
+                                Undo
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openCopy(r)}
+                                disabled={copyingId === r.id}
+                              >
+                                {copyingId === r.id ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                  <Copy size={14} />
+                                )}
+                                Copy email
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => markDone(r)}
+                                disabled={busyId === r.id}
+                                title="I've already emailed this participant by hand"
+                              >
+                                <Check size={14} />
+                                Mark done
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => resendOne(r)}
+                                disabled={busyId === r.id}
+                              >
+                                {busyId === r.id ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                  <Send size={14} />
+                                )}
+                                Resend
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* Copy panel — the full email, QR inlined as a data URI so it survives
           a paste into Gmail/Outlook (the sent version uses a cid: attachment,
