@@ -742,9 +742,11 @@ export function EventDesk({ token }: { token: string }) {
                       spellCheck={false}
                       className="font-mono uppercase"
                     />
+                    {/* Pulls up the participant; the check-in itself is
+                        confirmed on the details panel that follows. */}
                     <Button type="submit" disabled={!manualCode.trim()}>
-                      <Search size={16} />
-                      Find
+                      <UserCheck size={16} />
+                      Check-in
                     </Button>
                   </div>
                 </form>
