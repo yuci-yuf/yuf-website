@@ -46,6 +46,33 @@ function formatDate(iso: string | null): string {
   });
 }
 
+/**
+ * Why the camera wouldn't start. getUserMedia reports genuinely different
+ * causes and the fix differs for each, so a blanket "allow permission" is
+ * wrong (and unhelpful) for most of them — the desk needs to know whether to
+ * grant access, plug in a camera, close another app, or just type the code.
+ */
+function cameraErrorMessage(error: unknown): string {
+  const name = error instanceof Error ? error.name : "";
+  switch (name) {
+    case "NotAllowedError":
+    case "SecurityError":
+      return "Camera permission was blocked. Allow camera access for this site in your browser, then try again — or enter the code below.";
+    case "NotFoundError":
+    case "OverconstrainedError":
+      return "No camera was found on this device. Enter the code below instead.";
+    case "NotReadableError":
+      return "The camera is already in use by another app. Close it and try again — or enter the code below.";
+    default:
+      // Includes the common case of a non-HTTPS origin, where getUserMedia is
+      // simply undefined and the failure has no useful error name.
+      return typeof window !== "undefined" &&
+        !window.isSecureContext
+        ? "The camera needs a secure (https) connection. Open this page over https, or enter the code below."
+        : "Could not start the camera. Enter the code below instead.";
+  }
+}
+
 export function EventDesk({ token }: { token: string }) {
   const { confirm, notify } = useDialog();
   const [data, setData] = useState<EventDeskData | null>(null);
@@ -59,8 +86,15 @@ export function EventDesk({ token }: { token: string }) {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerActive, setScannerActive] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
+  // Whether the error is about the camera or the scanned code — they need
+  // different headings ("Camera unavailable" vs "QR not accepted").
+  const [scannerErrorKind, setScannerErrorKind] = useState<"camera" | "code">(
+    "code",
+  );
   const [scannedRegistration, setScannedRegistration] =
     useState<EventDeskRegistration | null>(null);
+  // Typed-in registration code — the fallback when the camera can't be used.
+  const [manualCode, setManualCode] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerControlsRef = useRef<IScannerControls | null>(null);
   const scanLockRef = useRef(false);
@@ -210,8 +244,9 @@ export function EventDesk({ token }: { token: string }) {
       );
       if (!registration) {
         setScannedRegistration(null);
+        setScannerErrorKind("code");
         setScannerError(
-          "No confirmed participant with this QR belongs to this event and location.",
+          `No confirmed participant with the code ${code} belongs to this event and location.`,
         );
         return;
       }
@@ -221,6 +256,21 @@ export function EventDesk({ token }: { token: string }) {
     },
     [data],
   );
+
+  /**
+   * Look up a hand-typed code. Reuses the scan path so a typed code and a
+   * scanned one behave identically. The scan lock is cleared first: it's set
+   * after every match to stop the camera re-firing, and would otherwise make
+   * the second manual lookup a no-op.
+   */
+  function submitManualCode() {
+    const code = manualCode.trim();
+    if (!code) return;
+    stopScanner();
+    scanLockRef.current = false;
+    handleScan(code);
+    setManualCode("");
+  }
 
   const startScanner = useCallback(async () => {
     scannerControlsRef.current?.stop();
@@ -243,9 +293,8 @@ export function EventDesk({ token }: { token: string }) {
       setScannerActive(true);
     } catch (cameraError) {
       console.error("event desk camera start failed", cameraError);
-      setScannerError(
-        "Could not access the camera. Allow camera permission and try again.",
-      );
+      setScannerErrorKind("camera");
+      setScannerError(cameraErrorMessage(cameraError));
       setScannerActive(false);
     }
   }, [handleScan]);
@@ -665,6 +714,40 @@ export function EventDesk({ token }: { token: string }) {
                     </Button>
                   )}
                 </div>
+
+                {/* Manual fallback — the code is printed on every pass for
+                    exactly this case (no camera permission, broken lens, a
+                    scuffed QR). Runs the same lookup as a scan. */}
+                <form
+                  className="mt-4 border-t border-border pt-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitManualCode();
+                  }}
+                >
+                  <label
+                    htmlFor="desk-manual-code"
+                    className="text-xs font-semibold uppercase tracking-wide text-text-muted"
+                  >
+                    Or enter the code
+                  </label>
+                  <div className="mt-1.5 flex gap-2">
+                    <Input
+                      id="desk-manual-code"
+                      value={manualCode}
+                      onChange={(e) => setManualCode(e.target.value)}
+                      placeholder="YUF26-XXXXXX"
+                      autoComplete="off"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                      className="font-mono uppercase"
+                    />
+                    <Button type="submit" disabled={!manualCode.trim()}>
+                      <Search size={16} />
+                      Find
+                    </Button>
+                  </div>
+                </form>
               </div>
 
               <div className="flex min-h-72">
@@ -738,7 +821,9 @@ export function EventDesk({ token }: { token: string }) {
                   <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-error/30 bg-error/5 p-6 text-center">
                     <AlertTriangle size={42} className="text-error" />
                     <h3 className="mt-3 font-heading text-lg font-bold text-text">
-                      QR not accepted
+                      {scannerErrorKind === "camera"
+                        ? "Camera unavailable"
+                        : "QR not accepted"}
                     </h3>
                     <p className="mt-2 max-w-sm text-sm leading-relaxed text-text-muted">
                       {scannerError}
@@ -749,7 +834,7 @@ export function EventDesk({ token }: { token: string }) {
                     <ScanLine size={42} className="opacity-60" />
                     <p className="mt-3 max-w-xs text-sm leading-relaxed">
                       Hold the participant&apos;s QR code inside the camera
-                      frame.
+                      frame, or enter their registration code.
                     </p>
                   </div>
                 )}
