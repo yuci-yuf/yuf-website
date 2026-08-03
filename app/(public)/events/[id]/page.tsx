@@ -10,7 +10,7 @@ import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
 import {
   getEventLocations,
-  audienceLabel,
+  audienceLabelAlways,
   eventAudienceLabel,
   locationAudience,
 } from "@/lib/event-groups";
@@ -108,8 +108,10 @@ export default async function EventDetailPage({
   const selectedLocation = locations[0];
 
   const body = event.details ?? [event.description];
+  // `getEvents` returns hidden events too (the admin panel needs them), so the
+  // `isActive` filter is this page's job — same as every other public surface.
   const related = allEvents
-    .filter((e) => e.category === event.category && e.id !== event.id)
+    .filter((e) => e.isActive && e.category === event.category && e.id !== event.id)
     .slice(0, 3);
 
   // Event structured data — makes the page eligible for rich event results.
@@ -222,7 +224,11 @@ export default async function EventDetailPage({
                 </>
               ) : (
                 locations.map((loc) => {
-                  const locAudience = audienceLabel(locationAudience(event, loc));
+                  const audience = locationAudience(event, loc);
+                  // Every row gets a badge so an open location reads as
+                  // deliberate next to its "School only" siblings; the tint is
+                  // reserved for the restricted ones.
+                  const restricted = audience !== "both";
                   return (
                     <span
                       key={loc.id}
@@ -235,11 +241,13 @@ export default async function EventDetailPage({
                           · {loc.date}
                         </span>
                       )}
-                      {locAudience && (
-                        <span className="rounded-full bg-highlight-400/25 px-2 py-0.5 text-xs font-semibold text-white">
-                          {locAudience}
-                        </span>
-                      )}
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold text-white ${
+                          restricted ? "bg-highlight-400/25" : "bg-white/15"
+                        }`}
+                      >
+                        {audienceLabelAlways(audience)}
+                      </span>
                     </span>
                   );
                 })
