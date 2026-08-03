@@ -32,6 +32,9 @@ export default function PendingEmailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
+  // The scan is bounded; true when it hit the ceiling and older confirmed
+  // registrations went unchecked, so the list is never silently partial.
+  const [truncated, setTruncated] = useState(false);
   const [copy, setCopy] = useState<EmailCopy | null>(null);
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [copied, setCopied] = useState<"html" | "text" | null>(null);
@@ -57,7 +60,11 @@ export default function PendingEmailsPage() {
   );
 
   const fetchPending = useCallback(
-    () => api<{ registrations: PendingEmailRegistration[] }>(""),
+    () =>
+      api<{
+        registrations: PendingEmailRegistration[];
+        truncated: boolean;
+      }>(""),
     [api],
   );
 
@@ -68,6 +75,7 @@ export default function PendingEmailsPage() {
     fetchPending()
       .then((d) => {
         setRows(d.registrations);
+        setTruncated(d.truncated);
         setError(null);
       })
       .catch((e) =>
@@ -82,6 +90,7 @@ export default function PendingEmailsPage() {
     fetchPending()
       .then((d) => {
         setRows(d.registrations);
+        setTruncated(d.truncated);
         setError(null);
       })
       .catch((e) =>
@@ -211,6 +220,12 @@ export default function PendingEmailsPage() {
         <EmptyState message="Everyone has their email — every confirmed registration has had its confirmation sent." />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+          {truncated && (
+            <p className="border-b border-border bg-surface-alt px-4 py-2.5 text-xs text-text-muted">
+              Showing the first {rows.length} found — older confirmed
+              registrations were not checked, so there may be more.
+            </p>
+          )}
           <table className="w-full text-sm">
             <thead className="bg-surface-alt text-left text-xs uppercase tracking-wide text-text-muted">
               <tr>

@@ -56,17 +56,38 @@ function emailDataFrom(
  * Confirmed registrations with no `emailSentAt`, newest first.
  *
  * Firestore cannot query for a missing field, so this filters on `confirmed`
- * (an indexed equality) and drops the ones that already have the marker in
- * memory. Bounded so a large collection can't blow up the response.
+ * (a single-field equality, which needs no composite index) and drops the ones
+ * that already have the marker in memory.
+ *
+ * The sort is deliberately in memory too: adding `.orderBy("createdAt")` to the
+ * equality filter would require a composite index, and this is a recovery tool
+ * — it must work the moment it's needed, not after a `firebase deploy` finishes
+ * building an index.
+ *
+ * Because the cap applies BEFORE the in-memory filter, it bounds how many
+ * confirmed registrations are scanned, not how many are returned. It is set
+ * high enough to cover the whole collection at this event's scale; `scanned`
+ * comes back so the caller can say plainly when it hit the ceiling and the
+ * list may be incomplete.
  */
-async function pendingDocs(limit = 500) {
+const SCAN_LIMIT = 3000;
+
+async function pendingDocs(limit = SCAN_LIMIT) {
   const snapshot = await getAdminDb()
     .collection("registrations")
     .where("status", "==", "confirmed")
-    .orderBy("createdAt", "desc")
     .limit(limit)
     .get();
-  return snapshot.docs.filter((d) => !d.data().emailSentAt);
+  const docs = snapshot.docs
+    .filter((d) => !d.data().emailSentAt)
+    .sort((a, b) => {
+      const ms = (v: FirebaseFirestore.DocumentData) =>
+        v.createdAt && typeof v.createdAt.toMillis === "function"
+          ? v.createdAt.toMillis()
+          : 0;
+      return ms(b.data()) - ms(a.data());
+    });
+  return { docs, truncated: snapshot.size === limit };
 }
 
 export async function GET(request: Request) {
@@ -92,7 +113,7 @@ export async function GET(request: Request) {
       return Response.json({ to: emailData.to, ...copy });
     }
 
-    const docs = await pendingDocs();
+    const { docs, truncated } = await pendingDocs();
     const registrations: PendingEmailRegistration[] = docs.map((d) => {
       const data = d.data();
       const createdAt = data.createdAt;
@@ -114,7 +135,7 @@ export async function GET(request: Request) {
             : null,
       };
     });
-    return Response.json({ registrations });
+    return Response.json({ registrations, truncated });
   } catch (error) {
     return eventDeskErrorResponse(error);
   }
@@ -130,19 +151,20 @@ export async function POST(request: Request) {
     // Sequential, not parallel: Resend also rate-limits per second, so firing
     // 50 sends at once would trip that on top of whatever daily quota remains.
     if (body.all === true) {
-      const docs = (await pendingDocs()).slice(0, BULK_LIMIT);
+      const all = (await pendingDocs()).docs;
+      const batch = all.slice(0, BULK_LIMIT);
       let sent = 0;
-      const failed: string[] = [];
-      for (const doc of docs) {
+      let failed = 0;
+      for (const doc of batch) {
         const result = await sendRegistrationEmailOnce(db, doc.ref);
         if (result.sent) sent += 1;
-        else failed.push(doc.id);
+        else failed += 1;
       }
       return Response.json({
         sent,
-        failed: failed.length,
-        // True when the cap trimmed the batch — the caller can re-run to continue.
-        truncated: (await pendingDocs()).length > 0 && docs.length === BULK_LIMIT,
+        failed,
+        // True when the cap trimmed the batch — re-run to continue where it left off.
+        truncated: all.length > batch.length,
       });
     }
 
