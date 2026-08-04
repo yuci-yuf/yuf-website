@@ -183,6 +183,7 @@ export const partners: Partner[] = [
   { name: "Velammal Engineering College", logoUrl: "/images/partners/velammal.png", prominent: true },
   { name: "Jain (JGI)", logoUrl: "/images/partners/jain.png", prominent: true },
   { name: "V Vision", logoUrl: "/images/partners/v-vision-Logo.png" },
+  { name: "Study in Wales", logoUrl: "/images/partners/study-in-wales.jpg" },
 ];
 
 // ── Study Abroad page content ──
