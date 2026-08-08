@@ -30,6 +30,7 @@ export const siteConfig: SiteConfig = {
     { label: "Events", path: "/events" },
     { label: "YUF 2025", path: "/yuf-2025" },
     { label: "Gallery", path: "/gallery" },
+    { label: "Partner", path: "/partner" },
     { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
