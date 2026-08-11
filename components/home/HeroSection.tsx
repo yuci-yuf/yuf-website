@@ -293,10 +293,10 @@ export function HeroSection({
             transition={{ delay: 0.45, duration: 0.5 }}
             className="my-3 inline-flex items-center rounded-[28px] border border-white/35 bg-white/10 shadow-2xl backdrop-blur-md select-none overflow-hidden"
           >
-            {/* Left Stub: SEP 01 */}
+            {/* Left Stub: SEP 07 */}
             <div className="flex flex-col items-center justify-center px-5 py-3 sm:px-7 sm:py-4">
               <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
-              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">01</span>
+              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">07</span>
             </div>
 
             {/* Center Stub: Vertical "TO" with dashed borders & notch cutouts */}
@@ -313,10 +313,10 @@ export function HeroSection({
               <div className="absolute -bottom-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[#0b1d47] border border-white/20" />
             </div>
 
-            {/* Right Stub: SEP 17 */}
+            {/* Right Stub: SEP 18 */}
             <div className="flex flex-col items-center justify-center px-5 py-3 sm:px-7 sm:py-4">
               <span className="font-extrabold text-[11px] uppercase tracking-widest text-white/80 sm:text-xs">SEP</span>
-              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">17</span>
+              <span className="font-extrabold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">18</span>
             </div>
           </motion.div>
 
