@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     "Photos, videos, and highlights from the Youth United Festival — celebrating youth talent, innovation, and unity across India.",
 };
 
-// Cache for 60s instead of reading the gallery collection per request. Admin
-// additions show within a minute.
-export const revalidate = 60;
+// Read the CMS on every request so admin edits are live immediately. No ISR
+// cache to regenerate, at the cost of a Firestore read per view.
+export const dynamic = "force-dynamic";
 
 export default async function GalleryPage() {
   const photos = await getGalleryPhotos();

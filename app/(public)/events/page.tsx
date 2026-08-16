@@ -13,10 +13,9 @@ export const metadata: Metadata = {
     "Explore all YUF 2026 events — Arts & Culturals, Sports & Games, Indian Youth Parliament, India's Young Scientists, Youth Talent Icon, and more.",
 };
 
-// Cache for 60s rather than hitting Firestore per request — this page reads the
-// whole events collection, so uncached it is the single biggest source of reads.
-// Admin edits show within a minute.
-export const revalidate = 60;
+// Read the CMS on every request so admin edits are live immediately. No ISR
+// cache to regenerate, at the cost of a Firestore read per view.
+export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
   const [events, categoryOrder] = await Promise.all([

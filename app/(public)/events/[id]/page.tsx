@@ -48,23 +48,6 @@ function ruleBookDownloadUrl(url: string): string {
   return url.replace("/upload/", "/upload/fl_attachment:YUF-Rule-Book/");
 }
 
-// Cache each event page for 60s. Admin edits (including fee changes) show within
-// a minute. The register page stays dynamic, so live capacity is never stale.
-export const revalidate = 60;
-
-/**
- * Prerender the known event pages at build time so they are served from cache
- * instead of re-reading Firestore per request. Without this the route stays
- * fully dynamic and `revalidate` has nothing to cache.
- *
- * Events created AFTER a build are still reachable: `dynamicParams` defaults to
- * true, so an unknown id renders on demand and is then cached like the rest.
- */
-export async function generateStaticParams() {
-  const events = await getEvents();
-  return events.map((event) => ({ id: event.id }));
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -102,9 +85,7 @@ export default async function EventDetailPage({
   const multi = locations.length > 1;
   // Every `selectedLocation` use below is guarded by `!multi`, i.e. it only
   // renders when the event has exactly one location — so this is always that
-  // single location. Deliberately NOT read from a `?loc=` search param: doing so
-  // opts the whole route out of static rendering (killing `revalidate`, and with
-  // it ~40 Firestore reads per view) while changing nothing on screen.
+  // single location.
   const selectedLocation = locations[0];
 
   const body = event.details ?? [event.description];

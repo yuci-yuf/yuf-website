@@ -17,7 +17,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }[] = [
     { path: "/", priority: 1, changeFrequency: "daily" },
     { path: "/events", priority: 0.9, changeFrequency: "daily" },
-    { path: "/register", priority: 0.9, changeFrequency: "weekly" },
+    // /register is intentionally absent: robots.ts disallows it, so listing it
+    // here would invite a crawl the same config refuses.
     { path: "/about", priority: 0.7, changeFrequency: "monthly" },
     { path: "/gallery", priority: 0.6, changeFrequency: "weekly" },
     { path: "/yuf-2025", priority: 0.5, changeFrequency: "monthly" },
