@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { SocialIcon } from "./SocialIcon";
@@ -79,6 +79,17 @@ export function Footer() {
                   {siteConfig.contact.address}
                 </span>
               </li>
+              {siteConfig.contact.phone && (
+                <li className="flex items-center gap-2.5">
+                  <Phone size={16} className="shrink-0 text-highlight-400" />
+                  <a
+                    href={`tel:${siteConfig.contact.phone.replace(/[^\d+]/g, "")}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {siteConfig.contact.phone}
+                  </a>
+                </li>
+              )}
               <li className="flex items-center gap-2.5">
                 <Mail size={16} className="shrink-0 text-highlight-400" />
                 <a
