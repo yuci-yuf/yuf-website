@@ -101,8 +101,10 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     images: ["/images/hero/group-2025.jpg"],
   },
-  // Add your Google Search Console token here to verify the property:
-  // verification: { google: "<token>" },
+  // Google Search Console property verification.
+  verification: {
+    google: "vXlVUvAZtHjak4FgveWmzEFQk157n5EfqjyvuSgQegc",
+  },
 };
 
 // Organization + WebSite structured data (JSON-LD) — helps Google build a
