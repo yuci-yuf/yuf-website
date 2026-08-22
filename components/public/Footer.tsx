@@ -90,6 +90,17 @@ export function Footer() {
                   </a>
                 </li>
               )}
+              {siteConfig.contact.phone2 && (
+                <li className="flex items-center gap-2.5">
+                  <Phone size={16} className="shrink-0 text-highlight-400" />
+                  <a
+                    href={`tel:${siteConfig.contact.phone2.replace(/[^\d+]/g, "")}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {siteConfig.contact.phone2}
+                  </a>
+                </li>
+              )}
               <li className="flex items-center gap-2.5">
                 <Mail size={16} className="shrink-0 text-highlight-400" />
                 <a

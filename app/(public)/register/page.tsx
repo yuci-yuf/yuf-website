@@ -71,6 +71,17 @@ export default async function RegisterPage() {
             >
               {siteConfig.contact.phone}
             </a>
+            {siteConfig.contact.phone2 && (
+              <>
+                or
+                <a
+                  href={`tel:${siteConfig.contact.phone2.replace(/[^\d+]/g, "")}`}
+                  className="font-semibold text-primary-600 underline-offset-2 hover:underline"
+                >
+                  {siteConfig.contact.phone2}
+                </a>
+              </>
+            )}
           </p>
         )}
       </Section>

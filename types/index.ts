@@ -72,6 +72,8 @@ export interface RegistrationStep {
 
 export interface ContactInfo {
   phone: string;
+  /** Optional second contact number, shown alongside `phone`. */
+  phone2?: string;
   email: string;
   address: string;
 }
