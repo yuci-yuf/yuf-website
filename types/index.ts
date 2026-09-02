@@ -145,6 +145,12 @@ export interface EventLocation {
   /** Running count of registrations for this location. Defaults to 0. */
   registrationCount?: number;
   /**
+   * Whether THIS location currently accepts registrations. Independent of the
+   * event-level `registrationOpen` and of capacity — lets an admin close one
+   * city/date while others stay open. Treated as open unless explicitly `false`.
+   */
+  registrationOpen?: boolean;
+  /**
    * Who THIS location is open to — school, college, or both. Lets one event run
    * a school-only date in one city and a college-only date in another. Defaults
    * to "both" (falling back to the event-level `audience` for legacy events).

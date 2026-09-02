@@ -56,6 +56,8 @@ interface LocationDraft {
   originalDateLabel: string;
   limit: string;
   count: number;
+  /** Whether this specific location accepts registrations. */
+  registrationOpen: boolean;
   /** Who this specific location is open to (school / college / both). */
   audience: EventAudience;
 }
@@ -76,6 +78,7 @@ function emptyLocation(): LocationDraft {
     originalDateLabel: "",
     limit: "",
     count: 0,
+    registrationOpen: true,
     audience: "both",
   };
 }
@@ -215,6 +218,7 @@ export function EventForm({
       originalDateLabel: loc.date ?? "",
       limit: loc.registrationLimit != null ? String(loc.registrationLimit) : "",
       count: loc.registrationCount ?? 0,
+      registrationOpen: loc.registrationOpen !== false,
       // Fall back to the legacy event-level audience for old events.
       audience: loc.audience ?? event?.audience ?? "both",
     }));
@@ -291,6 +295,7 @@ export function EventForm({
           date,
           registrationLimit: l.limit.trim() ? Number(l.limit) : undefined,
           registrationCount: l.count,
+          registrationOpen: l.registrationOpen,
           audience: l.audience,
         };
       });
@@ -590,6 +595,26 @@ export function EventForm({
                     </SelectContent>
                   </Select>
                 </Field>
+                <label
+                  htmlFor={`loc-reg-open-${loc.key}`}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2 sm:col-span-2 lg:col-span-1"
+                >
+                  <span className="flex flex-col">
+                    <span className="text-sm font-medium text-text">
+                      Registration open
+                    </span>
+                    <span className="text-xs text-text-muted">
+                      Accepts sign-ups for this location
+                    </span>
+                  </span>
+                  <Switch
+                    id={`loc-reg-open-${loc.key}`}
+                    checked={loc.registrationOpen}
+                    onCheckedChange={(v) =>
+                      updateLocation(loc.key, { registrationOpen: v })
+                    }
+                  />
+                </label>
               </div>
             </div>
           ))}

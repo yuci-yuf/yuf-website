@@ -439,6 +439,9 @@ function prepareLocationsForWrite(
     if (loc.date) out.date = loc.date;
     if (typeof loc.registrationLimit === "number")
       out.registrationLimit = loc.registrationLimit;
+    // Persist the closed state explicitly; open is the default so it's only
+    // written when false (keeps existing docs clean and read defaults to open).
+    if (loc.registrationOpen === false) out.registrationOpen = false;
     if (loc.audience) out.audience = loc.audience;
     return out;
   });

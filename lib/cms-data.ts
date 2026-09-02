@@ -55,6 +55,7 @@ export function normalizeLocations(raw: unknown): EventLocation[] | undefined {
         typeof l.registrationLimit === "number" ? l.registrationLimit : undefined,
       registrationCount:
         typeof l.registrationCount === "number" ? l.registrationCount : 0,
+      registrationOpen: l.registrationOpen !== false,
       audience:
         l.audience === "school" || l.audience === "college" || l.audience === "both"
           ? (l.audience as EventLocation["audience"])
