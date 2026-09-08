@@ -21,6 +21,7 @@ import {
   getRegistrations,
   countRegistrations,
   institutionTypeLabel,
+  REGISTRATIONS_PAGE_SIZE,
 } from "@/lib/admin-data";
 import type { Registration } from "@/types";
 
@@ -53,6 +54,12 @@ export default function RegistrationsPage() {
   // registrations exist beyond the loaded window rather than implying the
   // capped number is everything.
   const [total, setTotal] = useState<number | null>(null);
+  // How many registrations are currently loaded into the window. "Load more"
+  // grows this by REGISTRATIONS_PAGE_SIZE and re-fetches, so older records
+  // beyond the initial window can be pulled in on demand (keeps the default
+  // read cost low while still allowing full access when needed).
+  const [loadedMax, setLoadedMax] = useState(REGISTRATIONS_PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     Promise.all([getRegistrations(), countRegistrations()])
@@ -66,6 +73,24 @@ export default function RegistrationsPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Whether more registrations exist beyond what's currently loaded.
+  const hasMore = total !== null && rows.length < total;
+
+  async function loadMore() {
+    const nextMax = loadedMax + REGISTRATIONS_PAGE_SIZE;
+    setLoadingMore(true);
+    try {
+      const regs = await getRegistrations(nextMax);
+      setRows(regs);
+      setLoadedMax(nextMax);
+    } catch (e) {
+      console.error(e);
+      setError("Failed to load more registrations.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   // Filter option lists, derived from the loaded data so only values that
   // actually occur are offered (no empty "Coimbatore" when nobody picked it).
@@ -304,6 +329,23 @@ export default function RegistrationsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Load older registrations beyond the current window. The table shows
+            newest-first, so "more" always means older records. */}
+        {!loading && hasMore && (
+          <div className="flex flex-col items-center gap-1.5 border-t border-border px-4 py-5">
+            <Button
+              variant="outline"
+              onClick={loadMore}
+              disabled={loadingMore}
+            >
+              {loadingMore ? "Loading…" : "Load older registrations"}
+            </Button>
+            <span className="text-xs text-text-muted">
+              Showing {rows.length} of {total} — load {Math.min(REGISTRATIONS_PAGE_SIZE, (total ?? rows.length) - rows.length)} more
+            </span>
           </div>
         )}
       </div>

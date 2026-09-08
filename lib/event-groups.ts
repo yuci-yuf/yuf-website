@@ -8,6 +8,7 @@
  * the rest of the app reads one consistent structure.
  */
 import type { EventAudience, EventItem, EventLocation } from "@/types";
+import { isEventDatePast } from "@/lib/utils";
 
 /**
  * Short label for who an event is open to. Returns null for "both" (the
@@ -87,14 +88,33 @@ export function getEventLocations(event: EventItem): EventLocation[] {
 
 /**
  * Whether a specific location currently accepts registrations. A location is
- * open unless it (or the event as a whole) is explicitly closed — closing the
- * event closes every location, while a location can also be closed on its own.
+ * open unless it (or the event as a whole) is explicitly closed, OR its event
+ * day has arrived — registration auto-closes at 00:00 IST on the location's
+ * date (an event on the 10th is closed from the start of the 10th). Closing the
+ * event closes every location; a location can also be closed on its own; and a
+ * past-dated location is always closed regardless of the flags.
  */
 export function locationRegistrationOpen(
   event: EventItem,
   location: EventLocation,
 ): boolean {
+  if (isEventDatePast(location.date)) return false;
   return event.registrationOpen !== false && location.registrationOpen !== false;
+}
+
+/**
+ * Whether an event should still be shown/registrable at all: it must be active
+ * and have at least one location that's still open (not explicitly closed and
+ * not past its date). An event whose every location's date has passed drops off
+ * the register page and /events listing.
+ */
+export function eventHasOpenLocation(event: EventItem): boolean {
+  if (event.isActive === false) return false;
+  const locs = getEventLocations(event);
+  // No scheduled location yet → fall back to the event-level open flag so a
+  // freshly-created event without dates still shows.
+  if (locs.length === 0) return event.registrationOpen !== false;
+  return locs.some((l) => locationRegistrationOpen(event, l));
 }
 
 /**

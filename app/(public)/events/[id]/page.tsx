@@ -14,6 +14,7 @@ import {
   eventAudienceLabel,
   locationAudience,
   locationRegistrationOpen,
+  eventHasOpenLocation,
 } from "@/lib/event-groups";
 import { SITE_URL } from "@/app/layout";
 import { jsonLdScript } from "@/lib/json-ld";
@@ -307,7 +308,7 @@ export default async function EventDetailPage({
             )}
 
             <div className="p-6">
-            {event.registrationOpen !== false ? (
+            {eventHasOpenLocation(event) ? (
               <>
                 <h3 className="font-heading text-lg font-bold text-heading">
                   Ready to participate?
