@@ -12,7 +12,6 @@ import { computeInvoice } from "@/lib/pricing";
 import { claimUniqueRegistrationCode } from "@/lib/registration-code";
 import { sendRegistrationEmailOnce } from "@/lib/email";
 import { safeTriggerGSheetsSync } from "@/lib/google-sheets";
-import { isEventDatePast } from "@/lib/utils";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -140,13 +139,6 @@ export async function POST(req: Request) {
       if (!snap.exists) throw new Error("EVENT_NOT_FOUND");
       const ev = snap.data()!;
       if (ev.registrationOpen === false) throw new Error("CLOSED");
-      // Legacy single-date events (no `locations` array): auto-close once the
-      // event day has begun. Multi-location events are checked per-venue below.
-      if (
-        !Array.isArray(ev.locations) &&
-        isEventDatePast(typeof ev.date === "string" ? ev.date : undefined)
-      )
-        throw new Error("CLOSED");
 
       // Claim a guaranteed-unique code. Must run before any tx write below —
       // Firestore requires all reads (this does a tx.get per candidate) to
@@ -180,10 +172,6 @@ export async function POST(req: Request) {
         const loc = locations[idx];
         // Per-location close switch — reject even if the client bypasses the UI.
         if (loc.registrationOpen === false) throw new Error("CLOSED");
-        // Auto-close: reject once the event day has begun (00:00 IST on the
-        // location's date). Server-side so a bypassed UI can't sneak through.
-        if (isEventDatePast(typeof loc.date === "string" ? loc.date : undefined))
-          throw new Error("CLOSED");
         const limit =
           typeof loc.registrationLimit === "number" ? loc.registrationLimit : null;
         const count =

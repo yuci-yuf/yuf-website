@@ -5,7 +5,6 @@ import { CTABanner } from "@/components/public/CTABanner";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { eventsContent } from "@/lib/content";
 import { getEvents, getCategoryOrder } from "@/lib/cms-data";
-import { eventHasOpenLocation } from "@/lib/event-groups";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -23,9 +22,7 @@ export default async function EventsPage() {
     getEvents(),
     getCategoryOrder(),
   ]);
-  // Hide events that are inactive or whose every venue date has passed
-  // (auto-close at 00:00 IST on the event day, per-venue).
-  const activeEvents = events.filter(eventHasOpenLocation);
+  const activeEvents = events.filter((e) => e.isActive);
   // Only show category tabs that actually have visible events, preserving the
   // managed order and appending any extras the events introduce.
   const presentCategories = Array.from(

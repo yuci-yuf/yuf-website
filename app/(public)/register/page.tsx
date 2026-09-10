@@ -5,7 +5,6 @@ import { RegistrationForm } from "@/components/public/RegistrationForm";
 import { Section } from "@/components/ui/Section";
 import { siteConfig } from "@/lib/content";
 import { getEvents, getCategoryOrder, getRegistrationSettings } from "@/lib/cms-data";
-import { eventHasOpenLocation } from "@/lib/event-groups";
 
 export const metadata: Metadata = {
   title: "Register",
@@ -25,9 +24,9 @@ export default async function RegisterPage() {
     getRegistrationSettings(),
   ]);
   // Only events that are visible AND still accepting sign-ups are registrable.
-  // `eventHasOpenLocation` also drops events whose every location's date has
-  // passed (auto-close at 00:00 IST on the event day, per-venue).
-  const activeEvents = events.filter(eventHasOpenLocation);
+  const activeEvents = events.filter(
+    (e) => e.isActive && e.registrationOpen !== false,
+  );
   // Only offer categories that have at least one active event.
   const presentCategories = Array.from(
     new Set(activeEvents.map((e) => e.category)),
