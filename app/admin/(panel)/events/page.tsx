@@ -409,6 +409,7 @@ export default function AdminEventsPage() {
                               {locs.map((loc) => {
                                 const place =
                                   loc.city || loc.address || "Location";
+                                const closed = loc.registrationOpen === false;
                                 return (
                                   <li
                                     key={loc.id}
@@ -424,6 +425,11 @@ export default function AdminEventsPage() {
                                         </span>
                                       ) : null}
                                     </span>
+                                    {closed && (
+                                      <span className="shrink-0 rounded-full bg-error/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-error">
+                                        Closed
+                                      </span>
+                                    )}
                                   </li>
                                 );
                               })}

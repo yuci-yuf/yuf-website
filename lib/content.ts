@@ -52,7 +52,8 @@ export const siteConfig: SiteConfig = {
     { label: "Terms & Conditions", path: "/terms-and-conditions" },
   ],
   contact: {
-    phone: "",
+    phone: "+91 88385 79407",
+    phone2: "+91 98404 36141",
     email: "info@youthunitedcouncilofindia.org",
     address:
       "YUCI, SSPDL, Alpha City It Park, Rajiv Gandhi Salai, Navallur, Chennai, Tamil Nadu 600130",

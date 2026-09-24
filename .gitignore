@@ -58,3 +58,9 @@ high-concurrency-registration.md
 
 #Docs
 docs/
+
+#Scripts
+scripts/
+
+# Participant data exports — contain personal info, never commit
+*.csv

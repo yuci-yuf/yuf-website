@@ -6,7 +6,21 @@ import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle, type CategoryStyle } from "@/lib/category-style";
-import { getEventLocations } from "@/lib/event-groups";
+import {
+  getEventLocations,
+  locationRegistrationOpen,
+} from "@/lib/event-groups";
+
+/**
+ * Locations to advertise for an event: only those still accepting sign-ups,
+ * falling back to all of them if every location is closed (so a card is never
+ * left with no date/place). Keeps closed venues off the public home cards.
+ */
+function displayLocations(event: EventItem) {
+  const all = getEventLocations(event);
+  const open = all.filter((l) => locationRegistrationOpen(event, l));
+  return open.length > 0 ? open : all;
+}
 
 export interface CategoryGroup {
   /** The real category key used for filtering/links (e.g. "Arts & Culturals"). */
@@ -143,7 +157,7 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
 }
 
 function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
-  const locations = getEventLocations(event);
+  const locations = displayLocations(event);
   const uniq = (arr: (string | undefined)[]) =>
     Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
   const metaDate = uniq(locations.map((l) => l.date)).join(", ");
@@ -223,7 +237,7 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
 
 /** A single-event category: a wide landscape card (poster left, details right). */
 function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
-  const locations = getEventLocations(event);
+  const locations = displayLocations(event);
   const uniq = (arr: (string | undefined)[]) =>
     Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
   const metaDate = uniq(locations.map((l) => l.date)).join(", ");

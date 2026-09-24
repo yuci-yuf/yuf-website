@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Lock } from "lucide-react";
+import { Lock, Phone } from "lucide-react";
 import { RegistrationForm } from "@/components/public/RegistrationForm";
 import { Section } from "@/components/ui/Section";
+import { siteConfig } from "@/lib/content";
 import { getEvents, getCategoryOrder, getRegistrationSettings } from "@/lib/cms-data";
 
 export const metadata: Metadata = {
@@ -56,6 +57,31 @@ export default async function RegisterPage() {
           <p className="mx-auto max-w-xl rounded-2xl border border-dashed border-border bg-surface-alt p-12 text-center text-text-muted">
             Registration isn&apos;t open yet — no events are available. Please
             check back soon.
+          </p>
+        )}
+
+        {/* Direct line for anyone who gets stuck part-way through signing up. */}
+        {siteConfig.contact.phone && (
+          <p className="mx-auto mt-10 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm text-text-muted">
+            <Phone size={15} className="shrink-0 text-primary-600" />
+            Need help registering? Call us at
+            <a
+              href={`tel:${siteConfig.contact.phone.replace(/[^\d+]/g, "")}`}
+              className="font-semibold text-primary-600 underline-offset-2 hover:underline"
+            >
+              {siteConfig.contact.phone}
+            </a>
+            {siteConfig.contact.phone2 && (
+              <>
+                or
+                <a
+                  href={`tel:${siteConfig.contact.phone2.replace(/[^\d+]/g, "")}`}
+                  className="font-semibold text-primary-600 underline-offset-2 hover:underline"
+                >
+                  {siteConfig.contact.phone2}
+                </a>
+              </>
+            )}
           </p>
         )}
       </Section>

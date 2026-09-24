@@ -8,6 +8,7 @@ import type { EventItem, EventLocation } from "@/types";
 import {
   getEventLocations,
   locationAudience,
+  locationRegistrationOpen,
   locationSpotsLeft,
 } from "@/lib/event-groups";
 import {
@@ -71,12 +72,16 @@ function locationForStudentType(
 }
 
 /**
- * True if the event has ANY location open to the given student type — used to
- * decide whether the event/category is offered at all.
+ * True if the event has ANY registrable location open to the given student type
+ * — used to decide whether the event/category is offered at all. An event whose
+ * every location is closed (or none match the student's type) is not offered.
  */
 function eventForStudentType(ev: EventItem, type: InstitutionType): boolean {
-  if (!type) return true;
-  return getEventLocations(ev).some((l) => locationForStudentType(ev, l, type));
+  return getEventLocations(ev).some(
+    (l) =>
+      locationRegistrationOpen(ev, l) &&
+      (!type || locationForStudentType(ev, l, type)),
+  );
 }
 
 /** School class levels (6th–12th). */
@@ -192,10 +197,13 @@ export function RegistrationForm({
 
   // The venues/dates the selected event runs in that are open to the student's
   // type — a College student only sees the college venues, etc. Fee is shared.
+  // Locations with registration closed are dropped so they can't be picked.
   const locationsForSelection = useMemo(() => {
     if (!selectedEvent) return [];
-    return getEventLocations(selectedEvent).filter((l) =>
-      locationForStudentType(selectedEvent, l, values.institutionType),
+    return getEventLocations(selectedEvent).filter(
+      (l) =>
+        locationRegistrationOpen(selectedEvent, l) &&
+        locationForStudentType(selectedEvent, l, values.institutionType),
     );
   }, [selectedEvent, values.institutionType]);
 
@@ -275,6 +283,7 @@ export function RegistrationForm({
 
     if (!selectedEvent || selectedEvent.registrationOpen === false) return;
     if (!selectedLocation) return;
+    if (!locationRegistrationOpen(selectedEvent, selectedLocation)) return;
     if (locationSpotsLeft(selectedLocation) === 0) {
       setStatus("full");
       return;

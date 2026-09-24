@@ -3,7 +3,11 @@ import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle } from "@/lib/category-style";
-import { getEventLocations, eventAudienceLabel } from "@/lib/event-groups";
+import {
+  getEventLocations,
+  eventAudienceLabel,
+  locationRegistrationOpen,
+} from "@/lib/event-groups";
 
 export function EventCard({ event }: { event: EventItem }) {
   const style = categoryStyle(event.category);
@@ -13,7 +17,14 @@ export function EventCard({ event }: { event: EventItem }) {
   // Location-aware meta: keep the card to two lines — one for date(s), one for
   // place(s) — even when the event runs in multiple places. Multi-location
   // events also get a "N locations" badge; the detail page lists each fully.
-  const locations = getEventLocations(event);
+  // Show only locations still accepting sign-ups; a closed location shouldn't
+  // add to the card's dates/places or the "N locations" count. Fall back to the
+  // full set if every location is closed so the card isn't left blank.
+  const allLocations = getEventLocations(event);
+  const openLocations = allLocations.filter((l) =>
+    locationRegistrationOpen(event, l),
+  );
+  const locations = openLocations.length > 0 ? openLocations : allLocations;
   const multi = locations.length > 1;
 
   // Combine dates and places across locations, de-duplicated, into one line each.

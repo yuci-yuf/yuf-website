@@ -78,8 +78,23 @@ export function getEventLocations(event: EventItem): EventLocation[] {
       date: event.date,
       registrationLimit: event.registrationLimit,
       registrationCount: event.registrationCount ?? 0,
+      // Legacy events have no per-location flag; the single implicit location
+      // inherits the event-level open/closed state.
+      registrationOpen: event.registrationOpen !== false,
     },
   ];
+}
+
+/**
+ * Whether a specific location currently accepts registrations. A location is
+ * open unless it (or the event as a whole) is explicitly closed — closing the
+ * event closes every location, while a location can also be closed on its own.
+ */
+export function locationRegistrationOpen(
+  event: EventItem,
+  location: EventLocation,
+): boolean {
+  return event.registrationOpen !== false && location.registrationOpen !== false;
 }
 
 /**

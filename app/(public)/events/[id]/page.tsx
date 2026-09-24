@@ -13,6 +13,7 @@ import {
   audienceLabelAlways,
   eventAudienceLabel,
   locationAudience,
+  locationRegistrationOpen,
 } from "@/lib/event-groups";
 import { SITE_URL } from "@/app/layout";
 import { jsonLdScript } from "@/lib/json-ld";
@@ -81,7 +82,15 @@ export default async function EventDetailPage({
   const event = allEvents.find((e) => e.id === id);
   if (!event) notFound();
 
-  const locations = getEventLocations(event);
+  // Only show locations that are still accepting sign-ups. A closed location is
+  // hidden from the public detail page so it matches what's registrable. If every
+  // location is closed, fall back to the full set so the page still renders the
+  // schedule (registration is closed anyway).
+  const allLocations = getEventLocations(event);
+  const openLocations = allLocations.filter((l) =>
+    locationRegistrationOpen(event, l),
+  );
+  const locations = openLocations.length > 0 ? openLocations : allLocations;
   const multi = locations.length > 1;
   // Every `selectedLocation` use below is guarded by `!multi`, i.e. it only
   // renders when the event has exactly one location — so this is always that

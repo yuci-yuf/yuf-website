@@ -170,6 +170,8 @@ export async function POST(req: Request) {
           : 0;
         if (idx < 0) throw new Error("LOCATION_NOT_FOUND");
         const loc = locations[idx];
+        // Per-location close switch — reject even if the client bypasses the UI.
+        if (loc.registrationOpen === false) throw new Error("CLOSED");
         const limit =
           typeof loc.registrationLimit === "number" ? loc.registrationLimit : null;
         const count =
