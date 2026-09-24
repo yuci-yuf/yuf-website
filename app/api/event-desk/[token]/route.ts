@@ -7,7 +7,6 @@ import {
   requireActiveDesk,
   safeDeskRegistration,
 } from "@/lib/event-desk-server";
-import { safeTriggerGSheetsSync } from "@/lib/google-sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,10 +75,6 @@ export async function POST(
         registration: { ...registration, checkedIn: true },
       };
     });
-
-    if (result.result === "ok") {
-      safeTriggerGSheetsSync();
-    }
 
     return Response.json(result);
   } catch (error) {

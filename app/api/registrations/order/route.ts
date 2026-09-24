@@ -247,9 +247,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Could not reserve a spot." }, { status: 500 });
   }
 
-  // Trigger automatic GSheets sync for newly created registration
-  safeTriggerGSheetsSync();
-
   const invoice = computeInvoice(base);
 
   // Free event → confirm immediately, no payment needed.
@@ -261,7 +258,7 @@ export async function POST(req: Request) {
     await sendRegistrationEmailOnce(adminDb, regRef).catch((err) => {
       console.error("order: free-event confirmation email failed", err);
     });
-    safeTriggerGSheetsSync();
+    safeTriggerGSheetsSync(regRef.id);
     return NextResponse.json({ registrationId: regRef.id, code, free: true });
   }
 

@@ -1,4 +1,5 @@
 import { GoogleAuth } from "google-auth-library";
+import { FieldValue, type DocumentData } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 
 export interface ParticipantRow {
@@ -43,47 +44,173 @@ export const GSHEETS_HEADERS = [
   "Checked In",
 ];
 
-export async function fetchAllParticipantsData(): Promise<ParticipantRow[]> {
+type SheetRow = (string | number)[];
+
+/**
+ * Only paid + confirmed participants belong in the sheet. Pending, failed,
+ * expired, and cancelled registrations must never appear.
+ */
+function belongsInSheet(d: DocumentData): boolean {
+  return d.status === "confirmed" && d.paymentStatus === "paid";
+}
+
+function toParticipantRow(d: DocumentData): ParticipantRow {
+  let createdAtStr = "";
+  if (d.createdAt && typeof d.createdAt.toDate === "function") {
+    createdAtStr = d.createdAt.toDate().toISOString();
+  } else if (typeof d.createdAt === "string") {
+    createdAtStr = d.createdAt;
+  }
+
+  const firstName = d.firstName ?? "";
+  const lastName = d.lastName ?? "";
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  return {
+    registrationCode: d.registrationCode ?? "",
+    createdAt: createdAtStr,
+    fullName,
+    email: d.email ?? "",
+    phone: d.phone ?? "",
+    institution: d.institution ?? "",
+    institutionType: d.institutionType ?? "",
+    ageCategory: d.ageCategory ?? "",
+    eventCategory: d.eventCategory ?? "",
+    eventTitle: d.eventTitle ?? "",
+    location: d.location ?? "",
+    locationVenue: d.locationVenue ?? "",
+    locationDate: d.locationDate ?? "",
+    status: d.status ?? "pending",
+    paymentStatus: d.paymentStatus ?? "pending",
+    amountPaid: Number(d.amountPaid ?? 0),
+    paymentId: d.paymentId ?? "",
+    checkedIn: d.checkedIn ? "Yes" : "No",
+  };
+}
+
+function toSheetRow(p: ParticipantRow): SheetRow {
+  return [
+    p.registrationCode,
+    p.createdAt,
+    p.fullName,
+    p.email,
+    p.phone,
+    p.institution,
+    p.institutionType,
+    p.ageCategory,
+    p.eventCategory,
+    p.eventTitle,
+    p.location,
+    p.locationVenue,
+    p.locationDate,
+    p.status,
+    p.paymentStatus,
+    p.amountPaid,
+    p.paymentId,
+    p.checkedIn,
+  ];
+}
+
+/**
+ * Sheet-row mirror.
+ *
+ * The sheet is always rewritten in full (the Apps Script webhook only
+ * understands `sync_all`). Building those rows by reading every registration
+ * cost one Firestore read per registration per sync — and a sync fires on every
+ * sign-up, payment and check-in, so total reads grew with the SQUARE of the
+ * registration count (~5M reads by 1.5k registrations).
+ *
+ * Instead the sheet's rows live in a mirror sharded across MIRROR_SHARDS docs,
+ * each `{ ready: true, rows: { [registrationId]: SheetRow } }`. A change
+ * rewrites just its own row, and a sync reads only the shards: ~10 reads no
+ * matter how many registrations exist. Sharding keeps every doc far below
+ * Firestore's 1 MiB limit (~400 B per row → room for ~20k rows).
+ *
+ * `ready` is written only by a full rebuild, so a missing/unready shard means
+ * the mirror was never built (or was deleted) and the sync rebuilds it once.
+ * Admin-SDK only — clients are denied by the default rule in firestore.rules.
+ */
+const MIRROR_COLLECTION = "gsheetsMirror";
+const MIRROR_SHARDS = 8;
+
+function mirrorShardRef(index: number) {
+  return getAdminDb().collection(MIRROR_COLLECTION).doc(`shard-${index}`);
+}
+
+function shardIndexFor(registrationId: string): number {
+  let hash = 0;
+  for (let i = 0; i < registrationId.length; i++) {
+    hash = (hash * 31 + registrationId.charCodeAt(i)) >>> 0;
+  }
+  return hash % MIRROR_SHARDS;
+}
+
+/** Newest first, matching the sheet's historical order. createdAt is ISO. */
+function sortRows(rows: SheetRow[]): SheetRow[] {
+  return rows.sort((a, b) => String(b[1]).localeCompare(String(a[1])));
+}
+
+/**
+ * Full rebuild from `registrations` — reads every confirmed registration, so
+ * it's reserved for first use and the admin's manual resync.
+ */
+async function rebuildMirror(): Promise<SheetRow[]> {
   const adminDb = getAdminDb();
+  // Equality-only filter, so no composite index; paymentStatus checked in memory.
   const snap = await adminDb
     .collection("registrations")
-    .orderBy("createdAt", "desc")
+    .where("status", "==", "confirmed")
     .get();
 
-  return snap.docs.map((doc) => {
+  const shards: Record<string, SheetRow>[] = Array.from(
+    { length: MIRROR_SHARDS },
+    () => ({}),
+  );
+  const rows: SheetRow[] = [];
+  for (const doc of snap.docs) {
     const d = doc.data();
-    let createdAtStr = "";
-    if (d.createdAt && typeof d.createdAt.toDate === "function") {
-      createdAtStr = d.createdAt.toDate().toISOString();
-    } else if (typeof d.createdAt === "string") {
-      createdAtStr = d.createdAt;
-    }
+    if (!belongsInSheet(d)) continue;
+    const row = toSheetRow(toParticipantRow(d));
+    shards[shardIndexFor(doc.id)][doc.id] = row;
+    rows.push(row);
+  }
 
-    const firstName = d.firstName ?? "";
-    const lastName = d.lastName ?? "";
-    const fullName = `${firstName} ${lastName}`.trim();
+  const batch = adminDb.batch();
+  shards.forEach((shardRows, i) =>
+    batch.set(mirrorShardRef(i), { ready: true, rows: shardRows }),
+  );
+  await batch.commit();
+  return sortRows(rows);
+}
 
-    return {
-      registrationCode: d.registrationCode ?? "",
-      createdAt: createdAtStr,
-      fullName,
-      email: d.email ?? "",
-      phone: d.phone ?? "",
-      institution: d.institution ?? "",
-      institutionType: d.institutionType ?? "",
-      ageCategory: d.ageCategory ?? "",
-      eventCategory: d.eventCategory ?? "",
-      eventTitle: d.eventTitle ?? "",
-      location: d.location ?? "",
-      locationVenue: d.locationVenue ?? "",
-      locationDate: d.locationDate ?? "",
-      status: d.status ?? "pending",
-      paymentStatus: d.paymentStatus ?? "pending",
-      amountPaid: Number(d.amountPaid ?? 0),
-      paymentId: d.paymentId ?? "",
-      checkedIn: d.checkedIn ? "Yes" : "No",
-    };
-  });
+/** Re-read one registration and add, update, or remove its mirror row. */
+async function updateMirrorRow(registrationId: string): Promise<void> {
+  const snap = await getAdminDb()
+    .collection("registrations")
+    .doc(registrationId)
+    .get();
+  const d = snap.data();
+  const row =
+    d && belongsInSheet(d)
+      ? toSheetRow(toParticipantRow(d))
+      : FieldValue.delete();
+  await mirrorShardRef(shardIndexFor(registrationId)).set(
+    { rows: { [registrationId]: row } },
+    { merge: true },
+  );
+}
+
+/** All mirrored rows, or null if the mirror hasn't been fully built. */
+async function readMirror(): Promise<SheetRow[] | null> {
+  const shards = await getAdminDb().getAll(
+    ...Array.from({ length: MIRROR_SHARDS }, (_, i) => mirrorShardRef(i)),
+  );
+  if (!shards.every((s) => s.exists && s.get("ready") === true)) return null;
+  return sortRows(
+    shards.flatMap((s) =>
+      Object.values((s.get("rows") ?? {}) as Record<string, SheetRow>),
+    ),
+  );
 }
 
 function getServiceAccountCredentials() {
@@ -234,8 +361,14 @@ async function syncViaWebhook(
 
 /**
  * Primary sync function — uses Webhook URL if set, otherwise uses Google Sheets API.
+ *
+ * With a `registrationId`, only that registration is re-read and its mirror
+ * row updated before the (full) sheet is pushed — the cheap path used on every
+ * sign-up, payment and check-in. Without one, the mirror is rebuilt from all
+ * registrations (manual admin resync); the same happens once if the mirror
+ * doesn't exist yet.
  */
-export async function triggerGSheetsSync(): Promise<{
+export async function triggerGSheetsSync(registrationId?: string): Promise<{
   success: boolean;
   totalSynced: number;
   message: string;
@@ -253,34 +386,14 @@ export async function triggerGSheetsSync(): Promise<{
   }
 
   try {
-    const participants = await fetchAllParticipantsData();
-    // Only paid + confirmed participants belong in the sheet. Pending, failed,
-    // expired, and cancelled registrations must never appear. Because the sync
-    // clears + rewrites the whole sheet, filtering here also removes any such
-    // rows that were written before (e.g. a pending row from the order step).
-    const paidParticipants = participants.filter(
-      (p) => p.status === "confirmed" && p.paymentStatus === "paid",
-    );
-    const rows = paidParticipants.map((p) => [
-      p.registrationCode,
-      p.createdAt,
-      p.fullName,
-      p.email,
-      p.phone,
-      p.institution,
-      p.institutionType,
-      p.ageCategory,
-      p.eventCategory,
-      p.eventTitle,
-      p.location,
-      p.locationVenue,
-      p.locationDate,
-      p.status,
-      p.paymentStatus,
-      p.amountPaid,
-      p.paymentId,
-      p.checkedIn,
-    ]);
+    let rows: SheetRow[] | null = null;
+    if (registrationId) {
+      await updateMirrorRow(registrationId);
+      rows = await readMirror();
+    }
+    // Because the sync clears + rewrites the whole sheet, rows that no longer
+    // qualify (e.g. a registration that expired) drop out of the sheet too.
+    rows ??= await rebuildMirror();
 
     if (webhookUrl) {
       return await syncViaWebhook(webhookUrl, rows);
@@ -306,8 +419,8 @@ export async function triggerGSheetsSync(): Promise<{
   }
 }
 
-export function safeTriggerGSheetsSync(): void {
-  triggerGSheetsSync().catch((err) => {
+export function safeTriggerGSheetsSync(registrationId: string): void {
+  triggerGSheetsSync(registrationId).catch((err) => {
     console.error("Background GSheets sync failed:", err);
   });
 }

@@ -87,7 +87,7 @@ export async function POST(req: Request) {
     await sendRegistrationEmailOnce(adminDb, ref).catch((err) => {
       console.error("webhook: confirmation email failed", err);
     });
-    safeTriggerGSheetsSync();
+    safeTriggerGSheetsSync(ref.id);
   } else if (event.event === "payment.failed") {
     // Only release a still-pending hold (never touch a confirmed reg).
     if (data.status === "pending") {

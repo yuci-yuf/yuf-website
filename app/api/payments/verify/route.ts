@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       paymentId: razorpay_payment_id,
       paidAt: FieldValue.serverTimestamp(),
     });
-    safeTriggerGSheetsSync();
+    safeTriggerGSheetsSync(registrationId);
   }
 
   return NextResponse.json({ ok: true, code: snap.data()?.registrationCode });
