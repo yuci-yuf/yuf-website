@@ -29,66 +29,6 @@ export function CashPrizeSection() {
         {/* Stacked Cards */}
         <div className="mt-14 flex flex-col gap-10 sm:mt-18 sm:gap-12">
 
-          {/* ──── CARD 1: National Level Youth Hackathon ──── */}
-          {/* Text on Left | Cash Prize & CTA on Right */}
-          <ScaleIn delay={0.1}>
-            <div className="group relative overflow-hidden rounded-3xl border border-[#96d7ec] bg-[#bde8f5] p-8 sm:p-12 lg:p-14 shadow-2xl transition-all duration-300 hover:-translate-y-1.5 hover:border-white hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
-              {/* Brand top accent bar */}
-              <span
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary-500 via-primary-600 to-highlight-500"
-              />
-
-              <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
-                {/* Left: Info */}
-                <div className="flex flex-col gap-5">
-                  <h3 className="font-display text-3xl font-black text-heading sm:text-4xl lg:text-5xl leading-tight">
-                    National Youth Hackathon
-                  </h3>
-
-                  <div className="inline-flex w-fit items-center gap-2.5 rounded-full border border-primary-300/80 bg-white/85 px-4 py-2 text-sm sm:text-base font-semibold text-primary-950 shadow-xs backdrop-blur-sm">
-                    <MapPin size={18} className="shrink-0 text-primary-600" />
-                    <span>Easwari Engineering College, Ramapuram</span>
-                  </div>
-
-                  <p className="mt-1 hidden sm:block text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
-                    Build futuristic tech solutions, solve real-world challenges, and pitch your innovation to industry experts!
-                  </p>
-                </div>
-
-                {/* Right: Cash Prize & CTA (Seamless, no inner card box) */}
-                <div className="flex flex-col items-center justify-center gap-4 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-highlight-500 text-white shadow-md">
-                    <Trophy size={32} />
-                  </div>
-
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-base sm:text-lg font-black uppercase tracking-wider text-primary-950">
-                      Winner Cash Prize
-                    </span>
-                    <span className="font-display text-5xl sm:text-6xl font-black text-highlight-600 drop-shadow-xs">
-                      ₹5,000
-                    </span>
-                    <span className="text-base sm:text-xl font-black text-primary-950">
-                      Awarded to 1st Place Winner
-                    </span>
-                  </div>
-
-                  <Link
-                    href="/events/national-level-youth-hackathon"
-                    className="group/btn mt-1 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary-600 px-8 py-4 text-base font-extrabold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg sm:w-auto"
-                  >
-                    <span>View Event &amp; Register</span>
-                    <ArrowRight
-                      size={18}
-                      className="transition-transform group-hover/btn:translate-x-1"
-                    />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </ScaleIn>
-
           {/* ──── CARD 2: India's Young Scientist ──── */}
           {/* Mirrored: Cash Prize & CTA on Left | Text on Right */}
           <ScaleIn delay={0.2}>
