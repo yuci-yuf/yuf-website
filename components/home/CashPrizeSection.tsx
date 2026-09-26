@@ -76,11 +76,6 @@ export function CashPrizeSection() {
                     India&apos;s Young Scientist
                   </h3>
 
-                  <div className="inline-flex w-fit items-center gap-2.5 rounded-full border border-primary-300/80 bg-white/85 px-4 py-2 text-sm sm:text-base font-semibold text-primary-950 shadow-xs backdrop-blur-sm">
-                    <MapPin size={18} className="shrink-0 text-primary-600" />
-                    <span>Easwari Engineering College, Ramapuram</span>
-                  </div>
-
                   <p className="mt-1 hidden sm:block text-lg leading-relaxed text-slate-800 sm:text-xl font-medium">
                     Unleash your scientific curiosity, present groundbreaking research, and inspire the next generation of innovators!
                   </p>
