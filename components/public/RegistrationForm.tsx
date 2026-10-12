@@ -691,7 +691,7 @@ export function RegistrationForm({
                   {values.institutionType === "school" && (
                     <p className="mt-2 flex items-center gap-1.5 rounded-md border border-highlight-400 bg-highlight-50 px-3 py-2 text-sm font-semibold text-warning-dark">
                       <ShieldCheck size={16} className="shrink-0 text-highlight-600" />
-                      Only {ALLOWED_SCHOOL} students can join.
+                      Only {ALLOWED_SCHOOL} students can participate.
                     </p>
                   )}
                   <ErrorText>{errors.institutionName}</ErrorText>
