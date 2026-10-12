@@ -8,6 +8,7 @@ import {
   reclaimStalePendingHolds,
 } from "@/lib/firebase-admin";
 import { getRazorpay } from "@/lib/razorpay";
+import { ALLOWED_SCHOOL } from "@/lib/event-groups";
 import { computeInvoice } from "@/lib/pricing";
 import { claimUniqueRegistrationCode } from "@/lib/registration-code";
 import { sendRegistrationEmailOnce } from "@/lib/email";
@@ -52,6 +53,12 @@ export async function POST(req: Request) {
     );
   }
   const body: OrderBody = parsed.data;
+  if (body.institutionType === "school" && body.institution !== ALLOWED_SCHOOL) {
+    return NextResponse.json(
+      { error: `Only ${ALLOWED_SCHOOL} students can register.` },
+      { status: 403 },
+    );
+  }
 
   const adminDb = getAdminDb();
 
