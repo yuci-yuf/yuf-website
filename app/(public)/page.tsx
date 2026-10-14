@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   title:
     "Youth United Festival 2026 — Youth Talent, Sports, Arts & Innovation",
   description:
-    "Youth United Festival (YUF) 2026 by Youth United Council of India — empowering students across India through sports, arts, innovation, leadership, and culture. Register for YUF 2026 today.",
+    "Youth United Festival (YUF) 2026 by Youth United Council of India — empowering students across India through sports, arts, innovation, leadership, and culture.",
   alternates: { canonical: "/" },
 };
 

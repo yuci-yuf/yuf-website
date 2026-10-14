@@ -12,10 +12,10 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
       <Container className="relative">
         <FadeUp className="mb-16 flex flex-col items-center gap-4 text-center">
           <h2 className="max-w-md font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
-            Steps to Register
+            How to Take Part
           </h2>
           <p className="max-w-xl text-[16px] leading-relaxed text-body">
-            Follow these simple steps to register for your desired competition.
+            Follow these simple steps to take part in your desired competition.
           </p>
         </FadeUp>
 
@@ -56,18 +56,6 @@ export function StepsTimeline({ steps }: { steps: RegistrationStep[] }) {
           </div>
         </div>
 
-        <FadeUp delay={0.3} className="mt-14 flex justify-center">
-          <Link
-            href="/register"
-            className="group inline-flex h-13 items-center gap-2 rounded-full bg-primary-600 px-8 text-[15px] font-semibold text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-xl"
-          >
-            Register Now
-            <ArrowRight
-              size={16}
-              className="transition-transform group-hover:translate-x-0.5"
-            />
-          </Link>
-        </FadeUp>
       </Container>
     </section>
   );

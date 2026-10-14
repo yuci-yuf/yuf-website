@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPin, FileDown } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
 import { getEvents, getEventById } from "@/lib/cms-data";
@@ -35,18 +34,6 @@ function toIsoDate(label?: string): string | undefined {
 function absImage(src?: string): string | undefined {
   if (!src) return undefined;
   return src.startsWith("http") ? src : `${SITE_URL}${src}`;
-}
-
-/**
- * Turn a Cloudinary file URL into a forced-download URL: insert the
- * `fl_attachment` flag so the browser downloads the file (Content-Disposition:
- * attachment) with a friendly name instead of opening it in the PDF viewer.
- * Non-Cloudinary URLs (e.g. an admin-pasted link) are returned unchanged.
- */
-function ruleBookDownloadUrl(url: string): string {
-  if (!url.includes("res.cloudinary.com") || url.includes("/fl_attachment"))
-    return url;
-  return url.replace("/upload/", "/upload/fl_attachment:YUF-Rule-Book/");
 }
 
 export async function generateMetadata({
@@ -134,7 +121,7 @@ export default async function EventDetailPage({
             "@type": "Offer",
             price: event.registrationFee,
             priceCurrency: "INR",
-            url: `${SITE_URL}/register?event=${event.id}`,
+            url: `${SITE_URL}/events/${event.id}`,
             availability: "https://schema.org/InStock",
           },
         }
@@ -291,10 +278,9 @@ export default async function EventDetailPage({
             )}
           </div>
 
-          {/* Register card */}
-          <aside className="h-fit overflow-hidden rounded-2xl border border-border bg-surface shadow-card lg:sticky lg:top-28">
-            {/* Framed event photo at the top of the card */}
-            {event.image && (
+          {/* Event image card (registration removed — image only) */}
+          {event.image && (
+            <aside className="h-fit overflow-hidden rounded-2xl border border-border bg-surface shadow-card lg:sticky lg:top-28">
               <div className="relative aspect-[4/3] w-full overflow-hidden">
                 <Image
                   src={event.image}
@@ -304,106 +290,8 @@ export default async function EventDetailPage({
                   className="object-cover"
                 />
               </div>
-            )}
-
-            <div className="p-6">
-            {event.registrationOpen !== false ? (
-              <>
-                <h3 className="font-heading text-lg font-bold text-heading">
-                  Ready to participate?
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                  Secure your spot for {event.title} at Youth United Festival 2026.
-                </p>
-                {typeof event.registrationFee === "number" && (
-                  <div className="mt-4 flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 px-4 py-3">
-                    <span className="text-sm font-semibold text-primary-800">
-                      Registration fee
-                    </span>
-                    <span className="font-heading text-2xl font-extrabold text-primary-700">
-                      ₹{event.registrationFee}
-                    </span>
-                  </div>
-                )}
-
-                {multi && (
-                  <div className="mt-5 flex flex-col gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-                      Available locations
-                    </p>
-                    <ul className="flex flex-col gap-2">
-                      {locations.map((location) => (
-                        <li
-                          key={location.id}
-                          className="flex items-start gap-2 rounded-xl border border-border bg-surface-alt px-3.5 py-2.5"
-                        >
-                          <MapPin
-                            size={15}
-                            className="mt-0.5 shrink-0 text-primary-600"
-                          />
-                          <span className="flex min-w-0 flex-col">
-                            <span className="text-sm font-medium text-text">
-                              {location.address ||
-                                location.city ||
-                                "Location"}
-                            </span>
-                            {(location.city || location.date) && (
-                              <span className="text-xs text-text-muted">
-                                {[location.city, location.date]
-                                  .filter(Boolean)
-                                  .join(" · ")}
-                              </span>
-                            )}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-xs text-text-muted">
-                      You&apos;ll choose your location on the next step.
-                    </p>
-                  </div>
-                )}
-
-                <Button asChild size="lg" className="mt-6 w-full">
-                  <Link
-                    href={`/register?event=${event.id}${
-                      selectedLocation && !multi
-                        ? `&loc=${encodeURIComponent(selectedLocation.id)}`
-                        : ""
-                    }`}
-                  >
-                    Register Now
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <h3 className="font-heading text-lg font-bold text-heading">
-                  Registration closed
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                  Sign-ups for {event.title} are no longer being accepted.
-                </p>
-                <Button asChild size="lg" variant="outline" className="mt-6 w-full">
-                  <Link href="/events">Browse other events</Link>
-                </Button>
-              </>
-            )}
-
-            {event.ruleBook && (
-              <a
-                href={ruleBookDownloadUrl(event.ruleBook)}
-                download
-                rel="noopener noreferrer"
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary-300 bg-white px-6 text-[15px] font-semibold text-primary-700 transition-colors hover:border-primary-500 hover:bg-primary-50"
-                style={{ height: "3rem" }}
-              >
-                <FileDown size={17} />
-                Download Rule Book (PDF)
-              </a>
-            )}
-            </div>
-          </aside>
+            </aside>
+          )}
         </div>
       </Section>
 

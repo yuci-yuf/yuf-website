@@ -31,7 +31,6 @@ export const siteConfig: SiteConfig = {
     { label: "YUF 2025", path: "/yuf-2025" },
     { label: "Gallery", path: "/gallery" },
     { label: "Partner", path: "/partner" },
-    { label: "Register Now", path: "/register", isCTA: true },
   ],
   footerBlurb:
     "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
@@ -47,7 +46,6 @@ export const siteConfig: SiteConfig = {
     { label: "Gallery", path: "/gallery" },
   ],
   usefulLinks: [
-    { label: "Register Now", path: "/register" },
     { label: "Privacy Policy", path: "/privacy-policy" },
     { label: "Terms & Conditions", path: "/terms-and-conditions" },
   ],
@@ -231,7 +229,7 @@ export const studyAbroadContent = {
   cta: {
     label: "Ready to Begin?",
     title: "Take the first step toward studying abroad",
-    body: "Register your interest and secure a free counselling session with our international education partners.",
+    body: "Secure a free counselling session with our international education partners.",
   },
 };
 
@@ -283,7 +281,7 @@ export const homeContent = {
       "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity.",
     ],
     buttons: [
-      { label: "Register now!", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
       { label: "View Events", href: "/events", variant: "outline" },
     ] satisfies CTAButton[],
   },
@@ -324,9 +322,9 @@ export const homeContent = {
   },
   registrationSteps: {
     label: "How It Works",
-    title: "Steps to Register",
+    title: "How to Take Part",
     subtitle:
-      "Follow these simple steps to register for your desired competition. Create an account, choose your competition, fill out the registration form, and complete the payment process.",
+      "Follow these simple steps to take part in your desired competition. Create an account, choose your competition, complete your details, and you're set.",
   },
   whyJoinUs: {
     label: "Why Choose YUF",
@@ -377,7 +375,7 @@ export const homeContent = {
     title: "Get Involved Today",
     body: "The Youth United Festival (YUF), organized by the Youth United Council of India with support from the Government of India, Tamil Nadu, and international bodies, celebrates youth creativity, innovation, and unity. Join us to showcase talents, connect globally, and shape an inclusive future!",
     buttons: [
-      { label: "Let's Go!", href: "/register", variant: "primary" },
+      { label: "Let's Go!", href: "/events", variant: "primary" },
     ],
   } satisfies CTABanner,
 };
@@ -388,7 +386,7 @@ export const aboutContent = {
     title: "Youth United Festival",
     subtitle: "Empowering the Next Generation of Leaders",
     buttons: [
-      { label: "Register Now", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
       { label: "View Events", href: "/events", variant: "outline" },
     ],
     backgroundImage: "/images/hero/about.jpg",
@@ -401,7 +399,7 @@ export const aboutContent = {
       "We are Youth United Council of India (YUCI), a nonprofit organization dedicated to empowering youth worldwide. With a focus on inclusivity and collaboration, we create opportunities for young individuals to showcase their talents and drive change through transformative initiatives like the Youth United Festival (YUF).",
       "Through our efforts, we aim to inspire, innovate, and unite youth as changemakers, building a brighter and more inclusive future for all. Together, we amplify the voices of youth to shape the world.",
     ],
-    button: { label: "Learn More", href: "/register", variant: "primary" } satisfies CTAButton,
+    button: { label: "Learn More", href: "/events", variant: "primary" } satisfies CTAButton,
   },
   mission: {
     label: "Our Purpose",
@@ -456,7 +454,7 @@ export const aboutContent = {
     title: "Be Part of the Movement",
     body: "Join thousands of young leaders, artists, athletes, and innovators at Youth United Festival 2026. Your talent deserves a stage.",
     buttons: [
-      { label: "Register Now", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
       { label: "Explore Events", href: "/events", variant: "outline" },
     ],
   } satisfies CTABanner,
@@ -470,7 +468,7 @@ export const eventsContent = {
     subtitle:
       "Celebrating Youth Talent, Innovation, and Unity — explore our full lineup of events designed to engage, inspire, and transform.",
     buttons: [
-      { label: "Register Now", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
       { label: "Browse Events", href: "#events-list", variant: "outline" },
     ],
     backgroundImage: "/images/hero/events.jpg",
@@ -486,18 +484,18 @@ export const eventsContent = {
     title: "Transforming Lives Through Youth Power",
     body: "Discover how YUF initiatives are transforming lives and empowering individuals to achieve their full potential. Join the movement today.",
     buttons: [
-      { label: "Register for YUF 2026", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
     ],
   } satisfies CTABanner,
 };
 
 export const registerContent = {
   hero: {
-    badge: "Registration Open",
-    title: "Register for",
-    highlight: "YUF 2026",
+    badge: "YUF 2026",
+    title: "Youth United",
+    highlight: "Festival 2026",
     subtitle:
-      "Secure your spot at the Youth United Festival 2026. Choose your event, fill your details, and complete payment in minutes.",
+      "Explore the Youth United Festival 2026 — sports, arts, innovation, and culture from across India.",
     backgroundImage: "/images/hero/register.jpg",
   } satisfies Hero,
   locations: [
@@ -515,13 +513,13 @@ export const contactContent = {
       "We'd love to hear from you! Whether you have questions, need more details about YUF, or want to get involved — feel free to reach out.",
     buttons: [
       { label: "Send a Message", href: "#contact-form", variant: "primary" },
-      { label: "Register Now", href: "/register", variant: "outline" },
+      { label: "Explore Events", href: "/events", variant: "outline" },
     ],
     backgroundImage: "/images/hero/contact.jpg",
   } satisfies Hero,
   subjects: [
     { label: "General Enquiry", value: "general" },
-    { label: "Event Registration", value: "registration" },
+    { label: "Event Participation", value: "registration" },
     { label: "Partnership", value: "partnership" },
     { label: "Sponsorship", value: "sponsorship" },
     { label: "Volunteering", value: "volunteer" },
@@ -541,9 +539,9 @@ export const contactContent = {
   ctaBanner: {
     label: "Ready to Participate?",
     title: "Get Involved Today",
-    body: "Don't wait — register now for Youth United Festival 2026 and be part of India's biggest youth celebration.",
+    body: "Be part of Youth United Festival 2026 — India's biggest youth celebration.",
     buttons: [
-      { label: "Register Now", href: "/register", variant: "primary" },
+      { label: "Explore Events", href: "/events", variant: "primary" },
       { label: "Browse Events", href: "/events", variant: "outline" },
     ],
   } satisfies CTABanner,
@@ -690,7 +688,7 @@ export const termsAndConditions: LegalPage = {
     {
       heading: "2. Student Verification",
       blocks: [
-        "All participants must present their registered email confirmation and a verified QR code during check-in.",
+        "All participants must present their confirmation email and a verified QR code during check-in.",
       ],
     },
     {

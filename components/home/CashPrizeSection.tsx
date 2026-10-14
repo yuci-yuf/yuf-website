@@ -62,7 +62,7 @@ export function CashPrizeSection() {
                     href="/events/indias-young-scientist"
                     className="group/btn mt-1 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary-600 px-8 py-4 text-base font-extrabold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg sm:w-auto"
                   >
-                    <span>View Event &amp; Register</span>
+                    <span>View Event</span>
                     <ArrowRight
                       size={18}
                       className="transition-transform group-hover/btn:translate-x-1"

@@ -396,22 +396,11 @@ export default function Yuf2025Page() {
                 Now be the story of{" "}
                 <span className="text-highlight-400">2026.</span>
               </h2>
-              <p className="mx-auto mt-5 max-w-xl text-lg text-white/90">
-                Registrations for Youth United Festival 2026 are open. Your
-                spotlight is waiting.
-              </p>
               <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80">
                 Thank you to every participant, volunteer, mentor, teacher,
                 partner and supporter who made Youth United Festival 2025
                 unforgettable.
               </p>
-              <Link
-                href="/register"
-                className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-white px-9 text-base font-semibold text-primary-700 shadow-xl transition hover:bg-white/90"
-              >
-                Register for YUF 2026
-                <ArrowRight size={18} />
-              </Link>
             </div>
           </ScaleIn>
         </Container>

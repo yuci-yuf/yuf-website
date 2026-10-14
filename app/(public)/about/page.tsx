@@ -120,14 +120,6 @@ export default function AboutPage() {
                 opportunities that turn that spark into lasting impact — across
                 arts, sport, science, and service.
               </p>
-              {/* Desktop: CTA sits with the statement */}
-              <Link
-                href="/register"
-                className="group mt-2 hidden h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg lg:inline-flex"
-              >
-                Join the Movement
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
             </FadeUp>
 
             {/* India map — left column on lg */}
@@ -145,16 +137,6 @@ export default function AboutPage() {
               />
             </FadeUp>
 
-            {/* Mobile: CTA moves below the image */}
-            <FadeUp className="flex justify-center lg:hidden">
-              <Link
-                href="/register"
-                className="group inline-flex h-13 w-fit items-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50 hover:shadow-lg"
-              >
-                Join the Movement
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </FadeUp>
           </div>
         </Container>
       </section>
@@ -498,17 +480,11 @@ export default function AboutPage() {
 
                 <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
                   <Link
-                    href="/register"
+                    href="/events"
                     className="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-8 text-[15px] font-semibold text-primary-700 shadow-md transition-all hover:bg-primary-50"
                   >
-                    Register Now
-                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    href="/events"
-                    className="inline-flex h-13 items-center gap-2 rounded-full border border-white/30 px-8 text-[15px] font-semibold text-white transition-all hover:bg-white/10"
-                  >
                     Explore Events
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </div>
               </div>

@@ -320,22 +320,6 @@ export function HeroSection({
             </div>
           </motion.div>
 
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="flex w-full justify-center pt-1 sm:w-auto"
-          >
-            <Link
-              href="/register"
-              className="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-8 text-lg font-bold text-primary-700 shadow-xl shadow-black/20 transition-all hover:bg-white/90 sm:h-13 sm:w-auto sm:text-[15px] sm:font-semibold"
-            >
-              Register Now
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </motion.div>
-
           {/* Glass stat cards */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}

@@ -68,6 +68,13 @@ const nextConfig: NextConfig = {
         destination: "/about",
         permanent: true,
       },
+      // Registration is closed for YUF 2026 — the /register route (and any
+      // deep links like /register?event=…) redirect home so it's unreachable.
+      {
+        source: "/register",
+        destination: "/",
+        permanent: false,
+      },
     ];
   },
 };
