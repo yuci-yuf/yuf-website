@@ -9,6 +9,9 @@
  */
 import type { EventAudience, EventItem, EventLocation } from "@/types";
 
+/** The only school whose students may register (school name is locked to this). */
+export const ALLOWED_SCHOOL = "SSVM World School";
+
 /**
  * Short label for who an event is open to. Returns null for "both" (the
  * default) so the UI can skip the badge when there's nothing distinctive.

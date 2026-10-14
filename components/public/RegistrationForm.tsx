@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import type { EventItem, EventLocation } from "@/types";
 import {
+  ALLOWED_SCHOOL,
   getEventLocations,
   locationAudience,
   locationRegistrationOpen,
@@ -190,6 +191,10 @@ export function RegistrationForm({
   }, [events, category, values.institutionType]);
 
   const selectedEvent = events.find((e) => e.id === eventId);
+
+  // Disable school/college in the picker when no open event accepts that type.
+  const hasSchoolEvents = events.some((e) => eventForStudentType(e, "school"));
+  const hasCollegeEvents = events.some((e) => eventForStudentType(e, "college"));
 
   // The category/event lists are gated on school/college, so the user must pick
   // that before choosing a category/event. The venue is picked afterwards.
@@ -619,6 +624,7 @@ export function RegistrationForm({
                     setValues((prev) => ({
                       ...prev,
                       institutionType: v as InstitutionType,
+                      institutionName: v === "school" ? ALLOWED_SCHOOL : "",
                       level: "",
                     }));
                     // Changing school/college changes which events are eligible,
@@ -644,8 +650,12 @@ export function RegistrationForm({
                     <SelectValue placeholder="Select school or college" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="school">School</SelectItem>
-                    <SelectItem value="college">College</SelectItem>
+                    <SelectItem value="school" disabled={!hasSchoolEvents}>
+                      School{!hasSchoolEvents && " (no events open)"}
+                    </SelectItem>
+                    <SelectItem value="college" disabled={!hasCollegeEvents}>
+                      College{!hasCollegeEvents && " (no events open)"}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <ErrorText>{errors.institutionType}</ErrorText>
@@ -671,12 +681,19 @@ export function RegistrationForm({
                     onChange={(e) => setField("institutionName", e.target.value)}
                     onBlur={() => handleBlur("institutionName")}
                     aria-invalid={!!errors.institutionName}
+                    readOnly={values.institutionType === "school"}
                     placeholder={
                       values.institutionType === "school"
                         ? "Name of the school"
                         : "Name of the college"
                     }
                   />
+                  {values.institutionType === "school" && (
+                    <p className="mt-2 flex items-center gap-1.5 rounded-md border border-highlight-400 bg-highlight-50 px-3 py-2 text-sm font-semibold text-warning-dark">
+                      <ShieldCheck size={16} className="shrink-0 text-highlight-600" />
+                      Only {ALLOWED_SCHOOL} students can participate.
+                    </p>
+                  )}
                   <ErrorText>{errors.institutionName}</ErrorText>
                 </>
               </Field>
