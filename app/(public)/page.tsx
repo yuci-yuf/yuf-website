@@ -14,7 +14,8 @@ import { Container } from "@/components/ui/Container";
 import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
 import { FestiveEyebrow, ConfettiDots, FestiveGlows } from "@/components/home/FestiveAccents";
 import { CategoryEventRows, type CategoryGroup } from "@/components/home/CategoryEventRows";
-import { CashPrizeSection } from "@/components/home/CashPrizeSection";
+// import { CashPrizeSection } from "@/components/home/CashPrizeSection";
+import { AwardCeremonyBanner } from "@/components/home/AwardCeremonyBanner";
 import {
   homeContent,
   partners,
@@ -87,6 +88,8 @@ export default async function HomePage() {
         ]}
       />
 
+      <AwardCeremonyBanner />
+
       <MissionSection
         label="From the Prime Minister of India"
         title="A Message to India's Youth"
@@ -153,7 +156,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Grand Cash Prize Spotlight ── */}
-      <CashPrizeSection />
+      {/* <CashPrizeSection /> */}
 
       {/* ── Event Categories — horizontal strips per category ── */}
       {categoryGroups.length > 0 && (
