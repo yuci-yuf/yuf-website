@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+// import { Mail, MapPin, Phone } from "lucide-react"; // contact block hidden
 import { siteConfig } from "@/lib/content";
 import { Container } from "@/components/ui/Container";
 import { SocialIcon } from "./SocialIcon";
@@ -23,9 +23,10 @@ export function Footer() {
         className="pointer-events-none absolute inset-0 bg-primary-950/35"
       />
 
-      <Container className="relative pb-8 pt-14 lg:pb-10 lg:pt-16">
-        {/* Link columns */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.4fr]">
+      <Container className="relative pb-6 pt-10 lg:pb-7 lg:pt-11">
+        {/* Link columns — brand anchors the left, the two nav lists fill the
+            right. (Contact column removed; grid rebalanced so there's no gap.) */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:gap-16">
           {/* Brand + blurb + socials */}
           <div className="flex flex-col gap-5 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-3">
@@ -67,7 +68,7 @@ export function Footer() {
           <FooterCol title="Quick Links" links={siteConfig.quickLinks} />
           <FooterCol title="Useful Links" links={siteConfig.usefulLinks} />
 
-          {/* Contact */}
+          {/* Contact — temporarily hidden
           <div className="flex flex-col gap-4">
             <h3 className="text-[13px] font-bold uppercase tracking-[0.18em] text-highlight-400">
               Contact Info
@@ -90,17 +91,6 @@ export function Footer() {
                   </a>
                 </li>
               )}
-              {siteConfig.contact.phone2 && (
-                <li className="flex items-center gap-2.5">
-                  <Phone size={16} className="shrink-0 text-highlight-400" />
-                  <a
-                    href={`tel:${siteConfig.contact.phone2.replace(/[^\d+]/g, "")}`}
-                    className="transition-colors hover:text-white"
-                  >
-                    {siteConfig.contact.phone2}
-                  </a>
-                </li>
-              )}
               <li className="flex items-center gap-2.5">
                 <Mail size={16} className="shrink-0 text-highlight-400" />
                 <a
@@ -112,12 +102,13 @@ export function Footer() {
               </li>
             </ul>
           </div>
+          */}
         </div>
       </Container>
 
       {/* Copyright bar */}
       <div className="relative border-t border-white/15">
-        <Container className="flex flex-col items-center justify-between gap-3 py-6 text-xs text-white/80 sm:flex-row">
+        <Container className="flex flex-col items-center justify-between gap-3 py-4 text-xs text-white/80 sm:flex-row">
           <p>{siteConfig.copyrightText}</p>
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="transition-colors hover:text-white">

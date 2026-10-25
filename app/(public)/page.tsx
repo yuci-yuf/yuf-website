@@ -15,7 +15,7 @@ import { FadeUp, ScaleIn } from "@/components/home/MotionWrapper";
 import { FestiveEyebrow, ConfettiDots, FestiveGlows } from "@/components/home/FestiveAccents";
 import { CategoryEventRows, type CategoryGroup } from "@/components/home/CategoryEventRows";
 // import { CashPrizeSection } from "@/components/home/CashPrizeSection";
-import { AwardCeremonyBanner } from "@/components/home/AwardCeremonyBanner";
+// import { AwardCeremonyBanner } from "@/components/home/AwardCeremonyBanner"; // section hidden
 import {
   homeContent,
   partners,
@@ -88,7 +88,7 @@ export default async function HomePage() {
         ]}
       />
 
-      <AwardCeremonyBanner />
+      {/* <AwardCeremonyBanner /> — temporarily hidden */}
 
       <MissionSection
         label="From the Prime Minister of India"
