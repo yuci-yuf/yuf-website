@@ -73,7 +73,7 @@ export interface RegistrationStep {
 export interface ContactInfo {
   phone: string;
   email: string;
-  address: string;
+  address?: string;
 }
 
 export interface Advisor {

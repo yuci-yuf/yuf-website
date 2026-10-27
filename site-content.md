@@ -41,7 +41,6 @@
 **Contacts:**
 - Phone: `+91 12334 12345`
 - Email: `info@youthunitedcouncilofindia.org`
-- Address: `NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India`
 
 **Footer bottom:**
 - Copyright: `© 2025 Youth United Council of India | All Rights Reserved`
@@ -454,11 +453,8 @@ All Events · Arts & Culturals · Sports & Games · Innovation · Fun Events
 ### Sidebar — Get in touch with us
 - 📞 **Phone:** +91 12334 12345
 - ✉️ **Email:** info@youthunitedcouncilofindia.org (mailto link)
-- 📍 **Address:** NO 603, BLOCK E2, Akshaya Today, Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India
 
 **Follow our social:** Facebook · Twitter · Instagram · YouTube (all `#`)
-
-**Map:** Google Maps embed — query "Thaiyur B Village, Chengalpet Taluk, Kanchipuram District, Chennai, 603103, Tamil Nadu, India"
 
 ### Section: We're Here for You
 - **Label:** How We Can Help

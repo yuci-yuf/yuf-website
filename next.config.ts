@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(__dirname ?? process.cwd()),
+  },
   // Deployed on Vercel, which builds and serves the standard `.next` output
   // directly — no custom server entry point is needed.
   images: {

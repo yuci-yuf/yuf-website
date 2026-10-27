@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { EventItem } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { FadeUp, StaggerContainer, StaggerItem } from "./MotionWrapper";
@@ -117,20 +117,6 @@ function EventCard({ event }: { event: EventItem }) {
         <h3 className="font-heading text-lg font-bold text-heading transition-colors group-hover:text-festival-blue">
           {event.title}
         </h3>
-
-        <div className="flex flex-col gap-1.5 text-xs text-body/80">
-          {event.date && (
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar size={13} className="text-highlight-500" /> {event.date}
-            </span>
-          )}
-          {event.venue && (
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin size={13} className="shrink-0 text-festival-cyan" />
-              <span className="truncate">{event.venue}</span>
-            </span>
-          )}
-        </div>
 
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-festival-blue">
           View Details

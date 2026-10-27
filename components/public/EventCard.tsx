@@ -1,38 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle } from "@/lib/category-style";
-import {
-  getEventLocations,
-  eventAudienceLabel,
-  locationRegistrationOpen,
-} from "@/lib/event-groups";
+import { eventAudienceLabel } from "@/lib/event-groups";
 
 export function EventCard({ event }: { event: EventItem }) {
   const style = categoryStyle(event.category);
   const Icon = style.icon;
   const audience = eventAudienceLabel(event);
-
-  // Location-aware meta: keep the card to two lines — one for date(s), one for
-  // place(s) — even when the event runs in multiple places. Multi-location
-  // events also get a "N locations" badge; the detail page lists each fully.
-  // Show only locations still accepting sign-ups; a closed location shouldn't
-  // add to the card's dates/places or the "N locations" count. Fall back to the
-  // full set if every location is closed so the card isn't left blank.
-  const allLocations = getEventLocations(event);
-  const openLocations = allLocations.filter((l) =>
-    locationRegistrationOpen(event, l),
-  );
-  const locations = openLocations.length > 0 ? openLocations : allLocations;
-  const multi = locations.length > 1;
-
-  // Combine dates and places across locations, de-duplicated, into one line each.
-  const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
-  const metaDate = uniq(locations.map((l) => l.date?.trim() ?? "")).join(", ");
-  const metaPlace = uniq(
-    locations.map((l) => (l.city || l.address || "").trim()),
-  ).join(", ");
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover">
@@ -87,40 +63,9 @@ export function EventCard({ event }: { event: EventItem }) {
           aria-hidden
         />
 
-        {/* Multi-location hint */}
-        {multi && (
-          <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1 text-xs font-semibold text-text shadow-sm ring-1 ring-border backdrop-blur-sm">
-            <MapPin size={12} style={{ color: style.accent }} />
-            {locations.length} locations
-          </span>
-        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        {/* Schedule meta — kept to two lines: all dates on one, all places on
-            the other, even for multi-location events. */}
-        {(metaDate || metaPlace) && (
-          <div className="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
-            {metaDate && (
-              <span className="inline-flex min-w-0 items-start gap-1.5">
-                <Calendar
-                  size={14}
-                  className="mt-0.5 shrink-0 text-primary-500"
-                />
-                <span className="line-clamp-1">{metaDate}</span>
-              </span>
-            )}
-            {metaPlace && (
-              <span className="inline-flex min-w-0 items-start gap-1.5">
-                <MapPin
-                  size={14}
-                  className="mt-0.5 shrink-0 text-primary-500"
-                />
-                <span className="line-clamp-1">{metaPlace}</span>
-              </span>
-            )}
-          </div>
-        )}
 
         <h3 className="font-heading text-xl font-bold text-heading">
           <Link

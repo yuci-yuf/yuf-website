@@ -52,8 +52,6 @@ export const siteConfig: SiteConfig = {
   contact: {
     phone: "+91 88385 79407",
     email: "info@youthunitedcouncilofindia.org",
-    address:
-      "YUCI, SSPDL, Alpha City It Park, Rajiv Gandhi Salai, Navallur, Chennai, Tamil Nadu 600130",
   },
   copyrightText: "© 2026 Youth United Festival | All Rights Reserved",
   stats: [

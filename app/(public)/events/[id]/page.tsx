@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Section } from "@/components/ui/Section";
 import { EventCard } from "@/components/public/EventCard";
@@ -190,14 +190,6 @@ export default async function EventDetailPage({
                       {selectedLocation.date}
                     </span>
                   )}
-                  {(selectedLocation?.address || selectedLocation?.city) && (
-                    <span className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
-                      <MapPin size={16} className="text-highlight-400" />
-                      {[selectedLocation.address, selectedLocation.city]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  )}
                 </>
               ) : (
                 locations.map((loc) => {
@@ -211,11 +203,9 @@ export default async function EventDetailPage({
                       key={loc.id}
                       className="inline-flex items-center gap-2 rounded-full bg-primary-950/45 px-4 py-1.5 font-medium text-white ring-1 ring-white/20 backdrop-blur-sm"
                     >
-                      <MapPin size={16} className="text-highlight-400" />
-                      {[loc.address, loc.city].filter(Boolean).join(" · ")}
                       {loc.date && (
                         <span className="font-semibold text-highlight-300">
-                          · {loc.date}
+                          {loc.date}
                         </span>
                       )}
                       <span

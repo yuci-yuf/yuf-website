@@ -3,24 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Calendar, MapPin } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { EventItem } from "@/types";
 import { categoryStyle, type CategoryStyle } from "@/lib/category-style";
-import {
-  getEventLocations,
-  locationRegistrationOpen,
-} from "@/lib/event-groups";
-
-/**
- * Locations to advertise for an event: only those still accepting sign-ups,
- * falling back to all of them if every location is closed (so a card is never
- * left with no date/place). Keeps closed venues off the public home cards.
- */
-function displayLocations(event: EventItem) {
-  const all = getEventLocations(event);
-  const open = all.filter((l) => locationRegistrationOpen(event, l));
-  return open.length > 0 ? open : all;
-}
 
 export interface CategoryGroup {
   /** The real category key used for filtering/links (e.g. "Arts & Culturals"). */
@@ -157,14 +142,6 @@ function FeaturedCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
 }
 
 function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
-  const locations = displayLocations(event);
-  const uniq = (arr: (string | undefined)[]) =>
-    Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
-  const metaDate = uniq(locations.map((l) => l.date)).join(", ");
-  const metaPlace = uniq(
-    locations.map((l) => l.city || l.address),
-  ).join(", ");
-
   return (
     <motion.article
       whileHover={{ y: -3 }}
@@ -194,23 +171,6 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
           {event.title}
         </h4>
 
-        {(metaDate || metaPlace) && (
-          <div className="flex flex-col gap-1 text-xs font-medium text-white/70">
-            {metaDate && (
-              <span className="inline-flex items-start gap-1.5">
-                <Calendar size={13} className="mt-0.5 shrink-0 text-primary-200" />
-                <span className="line-clamp-1">{metaDate}</span>
-              </span>
-            )}
-            {metaPlace && (
-              <span className="inline-flex items-start gap-1.5">
-                <MapPin size={13} className="mt-0.5 shrink-0 text-primary-200" />
-                <span className="line-clamp-1">{metaPlace}</span>
-              </span>
-            )}
-          </div>
-        )}
-
         <p className="line-clamp-2 text-xs leading-relaxed text-white/60">
           {event.description}
         </p>
@@ -237,12 +197,6 @@ function CompactCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
 
 /** A single-event category: a wide landscape card (poster left, details right). */
 function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
-  const locations = displayLocations(event);
-  const uniq = (arr: (string | undefined)[]) =>
-    Array.from(new Set(arr.map((s) => s?.trim()).filter(Boolean)));
-  const metaDate = uniq(locations.map((l) => l.date)).join(", ");
-  const metaPlace = uniq(locations.map((l) => l.city || l.address)).join(", ");
-
   return (
     <motion.article
       whileHover={{ y: -4 }}
@@ -272,23 +226,6 @@ function SoloCard({ event, st }: { event: EventItem; st: CategoryStyle }) {
         <h4 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
           {event.title}
         </h4>
-
-        {(metaDate || metaPlace) && (
-          <div className="flex flex-col gap-1.5 text-sm font-medium text-white/70">
-            {metaDate && (
-              <span className="inline-flex items-center gap-2">
-                <Calendar size={15} className="shrink-0 text-primary-200" />
-                {metaDate}
-              </span>
-            )}
-            {metaPlace && (
-              <span className="inline-flex items-center gap-2">
-                <MapPin size={15} className="shrink-0 text-primary-200" />
-                {metaPlace}
-              </span>
-            )}
-          </div>
-        )}
 
         <p className="line-clamp-3 max-w-2xl text-sm leading-relaxed text-white/70">
           {event.description}
