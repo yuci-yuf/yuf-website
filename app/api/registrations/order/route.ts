@@ -13,6 +13,7 @@ import { computeInvoice } from "@/lib/pricing";
 import { claimUniqueRegistrationCode } from "@/lib/registration-code";
 import { sendRegistrationEmailOnce } from "@/lib/email";
 import { safeTriggerGSheetsSync } from "@/lib/google-sheets";
+import { isExcludedEvent } from "@/lib/cms-data";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -124,6 +125,13 @@ export async function POST(req: Request) {
         );
       }
     }
+  }
+
+  if (isExcludedEvent(body.eventId)) {
+    return NextResponse.json(
+      { error: "This event is no longer available." },
+      { status: 404 },
+    );
   }
 
   const eventRef = adminDb.collection("events").doc(body.eventId);

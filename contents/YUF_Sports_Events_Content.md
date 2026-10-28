@@ -241,56 +241,7 @@ The High Jump event challenges participants to combine speed, agility, balance, 
 
 ---
 
-## 11. Yoga
-
-### About the Event
-The Yoga competition celebrates physical fitness, mental focus, flexibility, and inner balance through the performance of yoga asanas. Participants will demonstrate posture, control, breathing techniques, and overall body coordination while promoting the importance of holistic well-being. The event encourages discipline, mindfulness, and self-confidence, creating an inspiring platform for individuals to showcase their practice and dedication.
-
-### General Guidelines
-- Report to the venue at least 30 minutes before the event.
-- Wear comfortable yoga attire.
-- Carry a valid ID card.
-- Bring your own yoga mat if required.
-- Follow all instructions provided by event officials.
-- Maintain silence during performances.
-- Registration fees are non-refundable.
-
-### Rules & Regulations
-- Participants must perform only within the allotted time.
-- Performances should demonstrate proper posture, balance, and control.
-- Unsafe movements or inappropriate behaviour are prohibited.
-- Judges will evaluate based on technique, accuracy, and presentation.
-- Judges' decisions shall be final.
-- The organizing committee reserves the right to modify the event schedule.
-
----
-
-## 12. Silambam
-
-### About the Event
-Silambam is one of India's oldest traditional martial arts, renowned for its emphasis on agility, coordination, precision, and discipline. This event offers participants an opportunity to showcase their mastery of weapon handling, rhythm, balance, and technical skills while preserving a rich cultural heritage. The competition celebrates both athletic excellence and traditional values in a safe, respectful, and competitive environment.
-
-### General Guidelines
-- Report to the venue at least 30 minutes before the event.
-- Carry a valid ID card.
-- Use only approved Silambam equipment.
-- Wear appropriate performance attire.
-- Respect judges, organizers, and fellow participants.
-- Follow all safety instructions.
-- Registration fees are non-refundable.
-
-### Rules & Regulations
-- This event is conducted as an individual performance.
-- Participants must demonstrate proper technique and weapon control.
-- Dangerous or unsafe performances are strictly prohibited.
-- Good sportsmanship and discipline must be maintained.
-- Any misconduct may result in disqualification.
-- Judges' decisions shall be final.
-- The organizing committee reserves the right to revise the scoring format if necessary.
-
----
-
-## 13. Swimming
+## 11. Swimming
 
 ### About the Event
 Dive into an exciting swimming competition that showcases speed, endurance, technique, and determination. Participants will compete across designated races while demonstrating excellent swimming skills and maintaining the highest standards of sportsmanship. The event provides a competitive yet supportive environment where athletes can challenge themselves, improve their performance, and celebrate the spirit of healthy competition.
@@ -314,7 +265,7 @@ Dive into an exciting swimming competition that showcases speed, endurance, tech
 
 ---
 
-## 14. Table Tennis (Singles)
+## 12. Table Tennis (Singles)
 
 ### About the Event
 The Table Tennis Singles event provides participants with an opportunity to demonstrate quick reflexes, precision, strategic thinking, and exceptional hand-eye coordination. Players will compete individually in an exciting and competitive atmosphere while displaying technical excellence and sportsmanship. The competition encourages participants to perform at their best while enjoying the thrill of high-quality match play.
@@ -338,7 +289,7 @@ The Table Tennis Singles event provides participants with an opportunity to demo
 
 ---
 
-## 15. Kho-Kho
+## 13. Kho-Kho
 
 ### About the Event
 Kho-Kho is a traditional Indian team sport that combines speed, agility, teamwork, and tactical decision-making. The event encourages participants to demonstrate their athletic abilities through quick movements, coordinated strategies, and effective communication. Designed to promote fitness, discipline, and fair play, the competition offers an exciting platform for teams to compete while celebrating one of India's most dynamic indigenous sports.
@@ -359,3 +310,4 @@ Kho-Kho is a traditional Indian team sport that combines speed, agility, teamwor
 - Any form of misconduct may result in disqualification.
 - Referees' decisions shall be final.
 - The organizing committee reserves the right to revise schedules if required.
+

@@ -48,8 +48,6 @@ const FEES = {
   "shot-put-senior": 300,
   "long-jump-senior": 300,
   "high-jump-senior": 300,
-  yoga: 250,
-  silambam: 350,
   swimming: 500,
   "table-tennis-singles": 400,
   // Athletics

@@ -103,12 +103,35 @@ function normalizeEvent(id: string, data: Record<string, unknown>): EventItem {
   };
 }
 
+const EXCLUDED_EVENT_IDS = new Set(["silambam", "yoga"]);
+
+/** Checks if an event is explicitly removed/excluded (e.g. Silambam and Yoga). */
+export function isExcludedEvent(id: string, title?: string): boolean {
+  const normId = id.toLowerCase().trim();
+  if (EXCLUDED_EVENT_IDS.has(normId)) return true;
+  if (normId.startsWith("silambam") || normId.startsWith("yoga")) return true;
+  if (title) {
+    const t = title.toLowerCase().trim();
+    if (
+      t.includes("silambam") ||
+      t === "yoga" ||
+      t.startsWith("yoga ") ||
+      t.startsWith("yoga-")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** All events from Firestore, ordered. Empty array when none exist. */
 export async function getEvents(): Promise<EventItem[]> {
   try {
     const q = query(collection(db, "events"), orderBy("order", "asc"));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => normalizeEvent(d.id, d.data()));
+    return snap.docs
+      .map((d) => normalizeEvent(d.id, d.data()))
+      .filter((e) => !isExcludedEvent(e.id, e.title));
   } catch (e) {
     console.error("getEvents failed", e);
     return [];
@@ -120,10 +143,13 @@ export async function getEvents(): Promise<EventItem[]> {
  * build, and always returns the latest fee/details). Undefined if missing.
  */
 export async function getEventById(id: string): Promise<EventItem | undefined> {
+  if (isExcludedEvent(id)) return undefined;
   try {
     const snap = await getDoc(doc(db, "events", id));
     if (!snap.exists()) return undefined;
-    return normalizeEvent(snap.id, snap.data());
+    const ev = normalizeEvent(snap.id, snap.data());
+    if (isExcludedEvent(ev.id, ev.title)) return undefined;
+    return ev;
   } catch (e) {
     console.error("getEventById failed", e);
     return undefined;

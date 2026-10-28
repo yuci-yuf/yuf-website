@@ -30,7 +30,7 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { normalizeLocations } from "@/lib/cms-data";
+import { normalizeLocations, isExcludedEvent } from "@/lib/cms-data";
 import type {
   ContactMessage,
   EventCategoryDoc,
@@ -392,14 +392,19 @@ export type EventInput = Omit<EventItem, "id" | "registrationCount">;
 export async function getAdminEvents(): Promise<EventItem[]> {
   const q = query(collection(db, "events"), orderBy("order", "asc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => normalizeEvent(d.id, d.data()));
+  return snap.docs
+    .map((d) => normalizeEvent(d.id, d.data()))
+    .filter((e) => !isExcludedEvent(e.id, e.title));
 }
 
 /** Fetch a single event by id (for the per-event registrations header). */
 export async function getEventById(id: string): Promise<EventItem | null> {
+  if (isExcludedEvent(id)) return null;
   const snap = await getDoc(doc(db, "events", id));
   if (!snap.exists()) return null;
-  return normalizeEvent(snap.id, snap.data());
+  const event = normalizeEvent(snap.id, snap.data());
+  if (isExcludedEvent(event.id, event.title)) return null;
+  return event;
 }
 
 /** All registrations for one event (client SDK, admin-only per security rules). */
